@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Archive</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Montserrat:wght@300;400;500&family=Playfair+Display:ital,wght@1,400&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- ESTILO EDITORIAL (MINIMALISTA) --- */
+        :root {
+            --bg-color: #fcfcfc;
+            --text-color: #111111;
+            --accent-purple: #5D3A9B;
+            --muted-text: #999;
+            --border-color: #e5e5e5;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* HEADER */
+        header {
+            text-align: center;
+            padding: 80px 20px 60px 20px;
+            max-width: 600px;
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+            letter-spacing: 3px;
+            color: var(--text-color);
+            text-transform: uppercase;
+            font-weight: 400;
+        }
+
+        .subtitle {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            color: var(--accent-purple);
+            font-size: 1.1rem;
+        }
+
+        /* LISTA EDITORIAL */
+        .archive-list {
+            width: 100%;
+            max-width: 500px;
+            padding: 0 20px 80px 20px;
+        }
+
+        .archive-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 0;
+            border-bottom: 1px solid var(--border-color);
+            text-decoration: none;
+            transition: all 0.4s ease;
+        }
+
+        /* ESTADO: DISPONIBLE */
+        .archive-item.available {
+            cursor: pointer;
+        }
+
+        .archive-item.available:hover {
+            border-bottom-color: var(--accent-purple);
+            padding-left: 10px; /* Sutil movimiento a la derecha */
+        }
+
+        .archive-item.available .day-number {
+            color: var(--text-color);
+        }
+
+        .archive-item.available .status {
+            color: var(--accent-purple);
+            font-weight: 500;
+        }
+
+        /* ESTADO: BLOQUEADO */
+        .archive-item.locked {
+            cursor: default;
+            opacity: 0.5;
+        }
+
+        .archive-item.locked .status {
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+        }
+
+        /* TEXTOS DE LA LISTA */
+        .day-info {
+            display: flex;
+            align-items: baseline;
+            gap: 20px;
+        }
+
+        .day-number {
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            color: var(--muted-text);
+            min-width: 40px;
+        }
+
+        .day-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-color);
+        }
+
+        .status {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--muted-text);
+        }
+
+        /* FOOTER */
+        footer {
+            margin-top: auto;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .btn-home {
+            text-decoration: none;
+            font-family: 'Cinzel', serif;
+            font-size: 0.8rem;
+            color: var(--muted-text);
+            border-bottom: 1px solid transparent;
+            padding-bottom: 5px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .btn-home:hover {
+            color: var(--text-color);
+            border-bottom-color: var(--text-color);
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Table of Contents</h1>
+        <div class="subtitle">Way back to the end</div>
+    </header>
+
+    <div class="archive-list">
+        
+        <a href="day1.html" class="archive-item available">
+            <div class="day-info">
+                <span class="day-number">I.</span>
+                <span class="day-title">Where it started</span>
+            </div>
+            <span class="status">Read</span>
+        </a>
+
+    <footer>
+        <a href="index.html" class="btn-home">Back to Cover</a>
+    </footer>
+
+</body>
+</html>
