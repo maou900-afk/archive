@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 2: The Static</title>
+    <link rel="icon" type="image/png" href="img/icono.jpg">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@1,400&family=Rye&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #fcfcfc;
+            --text-color: #111111;
+            --purple-lala: #2b1055;
+            --tape-color: #f3e5ab;
+            --accent-red: #8b0000;
+            --paper: #fdfbf7;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            transition: background-color 0.8s ease, color 0.8s ease;
+        }
+
+        /* --- HEADER --- */
+        header {
+            min-height: 50vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 3rem;
+            letter-spacing: 5px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .subtitle {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        /* --- NUEVO ESTILO: FALSO COMIENZO (AGENDA) --- */
+        .false-start-container {
+            max-width: 600px;
+            margin: 0 auto 80px auto;
+            text-align: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        .calendar-card {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 20px 40px;
+            display: inline-block;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            position: relative;
+            transform: rotate(-1deg);
+            margin-bottom: 25px;
+        }
+
+        .event-meta {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            color: #999;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .event-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            color: #333;
+            text-decoration: line-through; /* Tachado */
+            text-decoration-color: #ccc;
+            opacity: 0.6;
+        }
+
+        .stamp-cancelled {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-10deg);
+            border: 2px solid #d9534f;
+            color: #d9534f;
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            padding: 5px 10px;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            background: rgba(255, 255, 255, 0.8);
+            pointer-events: none;
+        }
+
+        .realization-text {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.1rem;
+            color: #444;
+            max-width: 400px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* --- ACTO 1: PRIMERA CITA --- */
+        .act-one-container {
+            padding: 80px 20px;
+            transition: all 1s ease;
+        }
+        .act-one-container.cinema-mode {
+            background: linear-gradient(135deg, #1a0b2e 0%, #4b257e 100%);
+            color: #fff;
+        }
+        .act-one-container.cinema-mode h2,
+        .act-one-container.cinema-mode h3,
+        .act-one-container.cinema-mode p,
+        .act-one-container.cinema-mode .quote,
+        .act-one-container.cinema-mode .kiss-quote {
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255,255,255,0.3);
+            border-color: #fff;
+        }
+
+        /* Vinilo */
+        .vinyl-section { text-align: center; margin-bottom: 80px; }
+        .vinyl-disc {
+            width: 140px; height: 140px; border-radius: 50%; background: #000;
+            display: inline-block; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            cursor: pointer; transition: transform 0.3s;
+        }
+        .vinyl-disc:hover { transform: scale(1.05); }
+        .vinyl-disc img { width: 100%; height: 100%; border-radius: 50%; }
+        .spinning { animation: spin 4s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        .hidden-lyric {
+            opacity: 0; transform: translateY(20px); transition: all 1s ease;
+            margin-top: 30px; font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.2rem;
+        }
+        .hidden-lyric.visible { opacity: 1; transform: translateY(0); }
+
+        /* Ramen */
+        .ramen-section { max-width: 600px; margin: 0 auto 80px auto; text-align: center; position: relative; }
+        .ramen-bowl { width: 220px; margin: 0 auto; cursor: help; position: relative; z-index: 10; }
+        .ramen-bowl img { width: 100%; display: block; transition: transform 0.3s ease; }
+        .ramen-bowl:hover img { transform: translateY(5px); }
+        .steam-puff {
+            position: absolute; background: rgba(255, 255, 255, 0.9); color: #333;
+            padding: 8px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: 500;
+            opacity: 0; pointer-events: none; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            white-space: nowrap; left: 50%; transform: translateX(-50%); bottom: 80%;
+        }
+        .ramen-bowl:hover .steam-puff:nth-child(2) { animation: floatUp 2.5s ease-out infinite; }
+        .ramen-bowl:hover .steam-puff:nth-child(3) { animation: floatUp 3s ease-out infinite 1s; }
+        .ramen-bowl:hover .steam-puff:nth-child(4) { animation: floatUp 3.5s ease-out infinite 0.5s; }
+        @keyframes floatUp {
+            0% { opacity: 0; transform: translate(-50%, 0) scale(0.8); }
+            20% { opacity: 1; transform: translate(-50%, -30px) scale(1); }
+            80% { opacity: 0.8; }
+            100% { opacity: 0; transform: translate(-60%, -80px) scale(1.1); }
+        }
+
+        /* Bar */
+        .bar-section {
+            max-width: 700px; margin: 0 auto 80px auto; display: flex; align-items: center; gap: 40px; padding: 40px;
+            border: 1px solid rgba(0,0,0,0.05); background: rgba(255,255,255,0.05);
+        }
+        .bar-photo { flex: 1; }
+        .bar-photo img { width: 100%; border-radius: 2px; filter: grayscale(20%); box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .bar-text { flex: 1; text-align: left; }
+
+        /* Tram & House */
+        .tram-house-section {
+            max-width: 800px; margin: 0 auto; display: flex; flex-direction: row-reverse; align-items: center; gap: 40px;
+        }
+        .tram-text { flex: 1; text-align: left; }
+        .tram-img { flex: 1; }
+        .tram-img img { width: 100%; border-radius: 4px; box-shadow: 0 15px 40px rgba(0,0,0,0.15); filter: contrast(1.1); }
+        
+        .kiss-quote {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.4rem;
+            margin-top: 20px;
+            color: var(--purple-lala);
+            border-left: 3px solid var(--purple-lala);
+            padding-left: 20px;
+            transition: color 1s ease, border-color 1s ease;
+        }
+
+        /* Transition Photo */
+        .photo-transition { max-width: 400px; margin: 100px auto; transform: rotate(2deg); }
+        .photo-transition img { width: 100%; box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
+
+        /* Act 2 */
+        .act-two-header { text-align: center; margin-bottom: 60px; }
+        .tacos-section { display: flex; align-items: center; gap: 50px; max-width: 800px; margin: 0 auto 100px auto; padding: 20px; }
+        .tacos-img { flex: 1; position: relative; }
+        .tacos-img img { width: 100%; border-radius: 8px; box-shadow: 10px 10px 0px #eee; }
+        .tacos-text { flex: 1; }
+        .tacos-text h3 { font-family: 'Cinzel'; margin-bottom: 15px; }
+
+        .pearl-section { display: flex; flex-direction: row-reverse; align-items: center; gap: 50px; max-width: 800px; margin: 0 auto 100px auto; padding: 40px; border: 1px solid var(--accent-red); background-color: #fff5f5; }
+        .pearl-img { flex: 1; }
+        .pearl-img img { width: 100%; border: 5px solid white; box-shadow: 0 10px 30px rgba(139, 0, 0, 0.2); filter: sepia(0.3) contrast(1.1); }
+        .pearl-text { flex: 1; text-align: right; }
+        .pearl-text h3 { font-family: 'Rye', serif; color: var(--accent-red); font-size: 1.8rem; margin-bottom: 15px; }
+
+        /* Letter */
+        .letter-section { background-color: var(--paper); padding: 60px 40px; max-width: 700px; margin: 80px auto; border: 1px solid #eee; }
+        .letter-text { font-family: 'Montserrat', sans-serif; font-size: 1rem; line-height: 1.9; white-space: pre-wrap; }
+
+        /* Crash */
+        .crash-section { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; opacity: 0.8; }
+        .void-text { font-family: 'Cinzel', serif; font-size: 3rem; letter-spacing: 10px; color: #333; margin-top: 50px; }
+
+        audio { display: none; }
+        footer { padding: 40px; text-align: center; color: #555; }
+        footer a { color: inherit; text-decoration: none; text-transform: uppercase; letter-spacing: 2px; font-size: 0.8rem; }
+
+        @media (max-width: 768px) {
+            .bar-section, .tacos-section, .pearl-section, .tram-house-section { flex-direction: column; text-align: center; }
+            .pearl-text, .bar-text, .tram-text { text-align: center; }
+            .pearl-section, .tram-house-section { flex-direction: column; }
+            .kiss-quote { border-left: none; border-top: 3px solid var(--purple-lala); padding-top: 20px; padding-left: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div style="font-family: 'Cinzel'; font-size: 0.8rem; letter-spacing: 4px; color: #999; margin-bottom: 15px;">DAY 2</div>
+        <h1>Clean Cut</h1>
+        <div class="subtitle">What I consider the first part of our relationship</div>
+    </header>
+
+    <div class="false-start-container">
+        <div class="calendar-card">
+            <div class="event-meta">6:00 PM - Cancelled</div>
+            <div class="event-title">Shift Coverage Request</div>
+            <div class="stamp-cancelled">CANCELLED</div>
+        </div>
+        
+        <p class="realization-text">
+           You must hate me for that day. I accepted a shift that stood like a monument to my old, solitary life. It was a mistake that threatened to kill our destiny before its first breath, leaving us as nothing more than strangers. Drained by the work, yet something vital pushed through the fatigue. A little seed was germinating in the dark, a small rebellion against the indifference of fate that wouldn't let the fire go out.
+        </p>
+    </div>
+
+    <div class="act-one-container" id="actOne">
+        
+        <div class="vinyl-section">
+            <h2 style="font-family: 'Cinzel'; margin-bottom: 30px;">Date I: Unexpected</h2>
+            <div class="vinyl-disc" onclick="toggleCinema()">
+                <img src="img/vinyl.png" id="vinylImg" alt="Music">
+            </div>
+            <div style="margin-top: 15px; font-size: 0.8rem; letter-spacing: 2px; opacity: 0.7;">CLICK FOR A SURPRISE</div>
+            
+            <div class="hidden-lyric" id="lyrics">
+               The beauty of the world has two edges, one of joy and one of anguish, <br>
+               cutting the heart in so many pieces with the sudden realization that everything has changed. <br>
+               I was enchanted and repelled by the inexhaustible variety of life, <br>
+               until I looked at you and realized the world could be quiet and calm by a brief second.<br> 
+               On that first night I felt both the sharpness of the joy and the terror of finally being found, <br>
+               a masterpiece of a moment where the noise of the crowd dissolved <br> 
+               into the singular and terrifying clarity of your divine presence,<br>
+                leaving me in the silence of a story that was just beginning, unaware of what was to come.
+            </div>
+            <audio id="audioPlayer" src="lalaland.mp3"></audio>
+        </div>
+
+        <div class="ramen-section">
+            <div class="ramen-bowl">
+                <img src="img/ramen.png" alt="Ramen Bowl">
+                <div class="steam-puff">She smells incredible</div>
+                <div class="steam-puff">She is way prettier in person</div>
+                <div class="steam-puff">Talk about movies an art</div>
+                <div class="steam-puff">Is she an angel?</div>
+                <div class="steam-puff">This ramen is kinda mid</div>
+                   <div class="steam-puff">Movies movies</div>
+                      <div class="steam-puff">I have to pull my latino charm</div>
+                
+            </div>
+            <p style="margin-top: 20px; font-size: 0.9rem;">
+                Hover over the bowl to see my thoughts during dinner.
+            </p>
+        </div>
+
+        <div class="bar-section">
+            <div class="bar-photo">
+                <img src="img/bar.jpg" alt="The Bar">
+            </div>
+            <div class="bar-text">
+                <h3 style="font-family: 'Cinzel'; margin-bottom: 10px;">Fifty Five</h3>
+                <p style="font-size: 1rem; line-height: 1.8;">
+
+I wanted you with an intensity that bordered on the sacred.  You were remarkably beautiful and carried a scent that unsettled my very reason. A long-awaited voice through the downpour, redirecting my steps to you. I felt the dinner was almost quiet, so a bar was the best place to open up, and let the conversation flow. Silly of me  believed I could take the date by the horns and allow you to find ease in my company. Oh, yeah, completly wrong. baby, you shock like a thunderstorm. I have never been pursued with such magical intensity. I was in shambles.  I was completely enchanted by a spirit as wonderful as a pearl could be.          </p>
+            </div>
+        </div>
+
+        <div class="tram-house-section">
+            <div class="tram-text">
+                <h3 style="font-family: 'Cinzel'; margin-bottom: 10px;">The Ride Home</h3>
+                <p style="font-size: 1rem; line-height: 1.8;">
+I am always in awe of the secret ways each soul perceives the light and the spark in unseen moments. On the way to my place I was lost in a fever of wanting to be worthy 
+                   of you, haunted by the look that made me fall in love forever.                </p>
+                <p style="font-size: 1rem; line-height: 1.8;">
+                    I was trying too hard, as I always do, delivering a 
+                   desperate elevator pitch for a destiny that I was weaving with my own hands. 
+                   I felt as though I had only one night to prove my world was worth entering, luckiest by the mere chance of ever
+                    having encountered you. When you finally admitted to finding me charming, the triumph was absolute. It was the
+                     moment you were finally wrapped in my presence, my love. <br> I was entirely consumed by the need to show you my world, searching for any excuse to present one of my favorite films. It was my language, a more eloquent and certain way of expressing how much I wanted to be blessed by your presence. We watched La La Land, and as the light played across your face, I felt the borders of my solitary life finally begin to dissolve. The performance was over, and the shared reality of our presence was the only thing left.
+                    We finished the movie, scared by the wrong step, I preferred to play safe. Suddenly you wanted to leave. "Wait" I said "Stay"
+                </p>
+                <div class="kiss-quote">
+                    You said: "What are you giving me if I stay" <br> And then, I kissed you."
+                </div>
+            </div>
+        
+        </div>
+
+    </div>
+    
+    <div class="photo-transition">
+        <img src="img/melb_era.jpg" alt="Me in Melbourne">
+        <div style="text-align: center; font-size: 0.8rem; margin-top: 10px; color: #999; font-family: 'Cinzel';">
+            The version of me you met. Do I look like a fuckboy? 
+        </div>
+    </div>
+
+    <div class="act-two-header">
+        <h2 style="font-family: 'Cinzel'; color: #333;">Date II: The Shift</h2>
+    </div>
+
+    <div class="tacos-section">
+        <div class="tacos-img">
+            <img src="img/tacos.jpg" alt="Tacos Date">
+        </div>
+        <div class="tacos-text">
+            <h3>Melbourne Central</h3>
+            <p style="line-height: 1.8; color: #444;">
+              The days went by, and we wrote to each other. The sudden fear I felt in my chest when you offered me your grace. In those moments of tranquillity, you showed me affection, real and tangible affection, and I was paralysed by such honesty. I was so used to protecting my boundaries that I built a wall just when you were trying to show me the way out and the key to what our relationship should be. But I closed myself off. Apps are the worst thing that could have happened in the world, I thought, I have to be careful, I thought. Don't go so fast, I told myself. So and I invited you out for tacos.
+
+            </p>
+        </div>
+    </div>
+
+    <div class="pearl-section">
+        <div class="pearl-img">
+            <img src="img/pearl.jpg" alt="Pearl Movie">
+        </div>
+        <div class="pearl-text">
+            <h3>Pearl</h3>
+            <p style="line-height: 1.8; color: #333;">
+We reached your home and I turned to the only language I truly understand. Movies are not just images to me, they are the way I connect with the world and the bridge I use to reach the people I love. I wanted to take such profound care of our meeting but the noise of the outside world was still deafening.        <br><br>
+ The static of the apps and the digital echoes of a thousand faces kept me from seeing your true value in those first moments. We watched Pearl and while the screen was a nightmare of ambition I was dealing with the sudden weight of your reality. Watching films has always been my sanctuary, but as you have seen during our relationship, every frame is more beautiful when your presence is the light beside me. I was a man still fighting the interference of a world that taught me to be suspicious, slowly realizing that the best stories are the ones we watch together and the ones that we were about to live. Yet, I had to live one more reality check.                     </p>
+        </div>
+    </div>
+
+    <div class="letter-section">
+        <div class="letter-text">Hello My Love, welcome to day two. 
+
+TTo be honest, there is a certain fog surrounding those days even though they were the real beginning of our relationship. We were finding our way toward an emotional center, but the feverish chemistry of our first dates was the main engine moving us forward. Cut off from my old life in Melbourne, I was foolish to see you almost as a source of enchantment, a distraction where I could recognize your charm but remain guarded by the paralyzing fear of getting hurt. It felt like the fragile destiny of a connection born in a digital world, and the near cancellation was a symptom of these transparent relationships that we see today, victims of a world without veils. Lucky me, attracted by your secret melody I took all the right decisions to end up just in front of you.
+
+I navigated those first dates with the calculated confidence of a man who relied on his natural charm to keep the world at bay. I believed I understood the rules of this world without veils, a place where connections are often as transparent as they are fleeting. Then I encountered you and realized that you were extraordinary beyond any script or screen I had ever known. You were a living mystery in a time that had forgotten how to be sacred, a depth that made my own performance feel small and thin. While I was trying to keep our story within the lines of a casual distraction you were pulling me into a current that was far deeper than I was prepared to swim. I was a man standing in the light and pretending it was still night.
+
+I have come to see that you possess a heart that loves without breaks, a luminous and unceasing stream that I did not yet know how to follow. While you were offering the full warmth of your soul, I was stretching the thread between us too thin, retreating into the safety of my own hesitation. I am a man who speaks through the language of movies, finding in their frames the courage I often lack in life, but I was blinded by the static of a digital world. I failed to realize that you were the only real music in a room full of noise. You finally reached for your own peace and told me that if I was not serious we should stop. And so the messages faded into a profound silence. We left our hearts suspended in the dark, waiting for a tomorrow that I was not yet brave enough to imagine.
+
+Before that, I was a fool who was happy within the narrow rhythm of my own relationship frame. I was convinced that such a limited horizon was all a heart could ever find. I swear your text took me by surprise. Your words were a flash of reality that broke my calculated peace. You asked me that for your own mental healt you would rather stop talking, and the melody that grew louder and louder ceased.
+</div>
+       
+<div style="text-align: right; margin-top: 30px; font-family: 'Playfair Display', italic; color: #8b0000;">Today I decided to make it a bit more narrative <br> Write you tomorrow, Andrés.</div>
+    </div>
+
+    <div class="crash-section" id="crashSection">
+        <div style="font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #ccc; max-width: 600px;">
+            "If you're not going to take this seriously, it's better we stop talking for good." You said. And I thought it was fair.
+        </div>
+        
+        <div class="void-text">
+            SILENCE
+        </div>
+    </div>
+
+    <footer>
+        <a href="index.html" id="footerLink">Back to Index</a>
+    </footer>
+
+    <script>
+        function toggleCinema() {
+            const container = document.getElementById('actOne');
+            const audio = document.getElementById('audioPlayer');
+            const vinyl = document.getElementById('vinylImg');
+            const lyrics = document.getElementById('lyrics');
+
+            container.classList.toggle('cinema-mode');
+            lyrics.classList.toggle('visible');
+
+            if (audio.paused) {
+                audio.play();
+                vinyl.parentElement.classList.add('spinning');
+            } else {
+                audio.pause();
+                vinyl.parentElement.classList.remove('spinning');
+            }
+        }
+
+        window.addEventListener('scroll', function() {
+            const crashSection = document.getElementById('crashSection');
+            const footerLink = document.getElementById('footerLink');
+            const rect = crashSection.getBoundingClientRect();
+            const percentage = 1 - (rect.top / window.innerHeight);
+
+            if (percentage > 0) {
+                if(percentage > 0.3) {
+                    document.body.style.backgroundColor = "#080808"; 
+                    document.body.style.color = "#555";
+                    footerLink.style.color = "#444";
+                    
+                    const allLinks = document.querySelectorAll('a');
+                    allLinks.forEach(link => link.style.color = '#777');
+                }
+            } else {
+                document.body.style.backgroundColor = "#fcfcfc";
+                document.body.style.color = "#111";
+                footerLink.style.color = "#555";
+                
+                const allLinks = document.querySelectorAll('a');
+                allLinks.forEach(link => link.style.color = 'inherit');
+            }
+        });
+    </script>
+
+</body>
+</html>
