@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 4: The Departure</title>
+    <link rel="icon" type="image/png" href="img/icono.jpg">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Montserrat:wght@300;400;500&family=Playfair+Display:ital,wght@1,400&family=La+Belle+Aurore&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- ESTILO MUSEO --- */
+        :root {
+            --bg-color: #fcfcfc;
+            --text-color: #111111;
+            --accent-purple: #5D3A9B;
+            --paper-color: #fdfbf7;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* HEADER */
+        header {
+            min-height: 50vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+            color: var(--text-color);
+        }
+
+        .subtitle {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            color: var(--accent-purple);
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            max-width: 80%;
+        }
+
+        /* SECCIONES */
+        section {
+            padding: 60px 20px;
+            max-width: 600px; 
+            margin: 0 auto;
+        }
+
+        .section-large {
+            max-width: 1000px; 
+        }
+
+        /* --- DIVISOR DE BUFANDA (CORREGIDO: ROTACIÓN REAL) --- */
+        .scarf-divider {
+            width: 100%;
+            height: 140px; /* Altura fija del divisor */
+            margin: 80px 0;
+            overflow: hidden; /* Corta lo que sobre */
+            position: relative;
+            
+            /* Centramos el contenido */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+            background-color: #f9f9f9;
+        }
+
+        .scarf-rotated {
+            /* AQUÍ ESTÁ LA ROTACIÓN QUE PEDÍAS */
+            transform: rotate(90deg);
+            
+            /* LÓGICA INVERSA POR LA ROTACIÓN: */
+            /* 1. El width de la img controla la ALTURA visual (grosor de la bufanda) */
+            width: 140px; 
+            
+            /* 2. El height de la img controla la LONGITUD visual (ancho de pantalla) */
+            height: 120vw; /* 120% del ancho de pantalla para asegurar cobertura */
+            
+            /* Mantiene la calidad y llena el espacio */
+            object-fit: cover; 
+            
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+
+        /* --- CARTAS DE COMIDA --- */
+        .food-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .flip-card {
+            background-color: transparent;
+            height: 250px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .flip-card:hover .flip-card-inner, .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 4px;
+        }
+
+        .flip-card-front {
+            background-color: #fff;
+            border: 1px solid #eee;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .clue-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 0.95rem;
+            color: #444;
+            font-style: italic;
+            line-height: 1.4;
+        }
+        
+        .hint-icon {
+            margin-top: 15px;
+            font-size: 0.7rem;
+            color: var(--accent-purple);
+            font-family: 'Cinzel', serif;
+            opacity: 0.6;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+            width: 50%;
+        }
+
+        .flip-card-back {
+            background-color: #000;
+            transform: rotateY(180deg);
+            overflow: hidden;
+        }
+        
+        .flip-card-back img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .card-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0));
+            padding: 20px 10px 10px 10px;
+            box-sizing: border-box;
+        }
+
+        .food-name {
+            font-family: 'Cinzel', serif;
+            font-size: 0.9rem;
+            color: #fff;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        /* --- FROZEN TIME (REDISEÑADO: CINTA Y PARED LIMPIA) --- */
+        .frozen-section {
+            text-align: center;
+            padding: 80px 20px;
+            background-color: #fafafa; /* Fondo sutilmente diferente */
+        }
+
+        .photobooth-display {
+            position: relative;
+            display: inline-block;
+            margin-top: 40px;
+            transform: rotate(-3deg);
+            transition: transform 0.3s ease;
+        }
+        
+        .photobooth-display:hover {
+            transform: rotate(0deg) scale(1.02);
+            z-index: 5;
+        }
+
+        .photobooth-strip-clean {
+            background: #fff;
+            padding: 12px 12px 50px 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15); /* Sombra realista suave */
+            border: 1px solid #ddd;
+            width: 220px;
+        }
+
+        .photobooth-strip-clean img {
+            width: 100%;
+            display: block;
+            filter: grayscale(100%) contrast(1.1);
+        }
+
+        /* Efecto Cinta Adhesiva (Washi Tape) Simple */
+        .tape-simple {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 25px;
+            background-color: rgba(255, 255, 255, 0.4); /* Casi transparente */
+            border: 1px solid rgba(0,0,0,0.05);
+            backdrop-filter: blur(2px);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+        
+        .caption-hand {
+            position: absolute;
+            bottom: 15px;
+            width: 100%;
+            text-align: center;
+            font-family: 'La Belle Aurore', cursive;
+            color: #666;
+            font-size: 1.2rem;
+            left: 0;
+        }
+
+        /* TEXTOS */
+        h2 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.5rem;
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: 400;
+            color: var(--text-color);
+        }
+
+        p {
+            line-height: 2;
+            color: #444;
+            font-weight: 300;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        /* CARTA FINAL */
+        .letter-container {
+            background-color: var(--paper-color);
+            padding: 60px 50px;
+            border: 1px solid #eee;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.05);
+            text-align: left;
+            margin-top: 30px;
+        }
+
+        .letter-text {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.1rem;
+            line-height: 1.9;
+            color: #333;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            white-space: pre-wrap;
+        }
+
+        .letter-signature {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.4rem;
+            margin-top: 40px;
+            color: var(--accent-purple);
+            text-align: right;
+        }
+
+        .divider {
+            width: 50px; 
+            height: 2px; 
+            background: var(--accent-purple); 
+            margin: 20px auto 40px auto;
+        }
+
+        footer {
+            text-align: center;
+            padding: 60px 20px;
+            font-size: 0.8rem;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        footer a {
+            text-decoration: none;
+            color: #999;
+            transition: color 0.3s;
+        }
+        footer a:hover { color: var(--accent-purple); }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div style="font-family: 'Cinzel'; font-size: 0.8rem; letter-spacing: 4px; color: #999; margin-bottom: 15px;">DAY 4</div>
+        <h1>Departure</h1>
+        <div class="divider"></div>
+        <div class="subtitle">The end of the beginning.</div>
+    </header>
+
+    <section class="section-large">
+        <h2>The Last Bites</h2>
+        <p>
+         Ten memories, places before I had to leave. Hover to remember.
+        </p>
+
+        <div class="food-grid">
+            <div class="flip-card">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="clue-text">Mauritian spices and anchovies.</div>
+                        <div class="hint-icon">REVEAL</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <img src="img/food1.jpg" alt="Manze">
+                        <div class="card-overlay"><div class="food-name">MANZE</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flip-card">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="clue-text">Sweaty as fuck</div>
+                        <div class="hint-icon">REVEAL</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <img src="img/food2.jpg" alt="Serai">
+                        <div class="card-overlay"><div class="food-name">Me in House of Maximon</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flip-card">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="clue-text">Best meat in Melbourne</div>
+                        <div class="hint-icon">REVEAL</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <img src="img/food3.jpg" alt="Old Palm">
+                        <div class="card-overlay"><div class="food-name">OLD PALM LIQUOR</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flip-card">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="clue-text">Burgers, Crazy people, Groceries</div>
+                        <div class="hint-icon">REVEAL</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <img src="img/food4.jpg" alt="Coffee">
+                        <div class="card-overlay"><div class="food-name">Southern cross/Spencer Street</div></div>
+                    </div>
+                </div>
+            </div>
+
+             <div class="flip-card">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="clue-text">Long to cook and Salty</div>
+                        <div class="hint-icon">REVEAL</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <img src="img/food5.jpg" alt="Brunch">
+                        <div class="card-overlay"><div class="food-name">I'm offended but Onion Soup</div></div>
+                    </div>
+                </div>
+            </div>
+
+             <div class="flip-card">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="clue-text">Weekends, Sugar Cane, Pizza.</div>
+                        <div class="hint-icon">REVEAL</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <img src="img/food6.jpg" alt="Dumplings">
+                        <div class="card-overlay"><div class="food-name">Queen victoria market</div></div>
+                    </div>
+                </div>
+            </div>
+
+             <div class="flip-card">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="clue-text">Site of one of our first arguments. Just us, the dogs, and the trees.</div>
+                        <div class="hint-icon">REVEAL</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <img src="img/food7.jpg" alt="Lune">
+                        <div class="card-overlay"><div class="food-name">Flagstaff Gardens</div></div>
+                    </div>
+                </div>
+            </div>
+
+             <div class="flip-card">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="clue-text">My favorite Spot in Melbourne</div>
+                        <div class="hint-icon">REVEAL</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <img src="img/food8.jpg" alt="Gelato">
+                        <div class="card-overlay"><div class="food-name">Carlton Gardens</div></div>
+                    </div>
+                </div>
+            </div>
+
+             <div class="flip-card">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="clue-text">Rooftop Icecream, Reading, Grill'd</div>
+                        <div class="hint-icon">REVEAL</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <img src="img/food9.jpg" alt="Pho">
+                        <div class="card-overlay"><div class="food-name">Cinema Nova</div></div>
+                    </div>
+                </div>
+            </div>
+
+             <div class="flip-card">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="clue-text">Chefs, Menu, Lechon.</div>
+                        <div class="hint-icon">REVEAL</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <img src="img/food10.jpg" alt="Kebab">
+                        <div class="card-overlay"><div class="food-name">Serai</div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="scarf-divider">
+        <img src="day4/scarf_vertical.jpg" alt="Scarf Divider" class="scarf-rotated">
+    </div>
+
+    <section>
+        <h2>A fight</h2>
+        <p>
+As the day of my departure approached, I couldn't stop thinking about how magnificent you are the way you look at me as if the world has stopped, your constant need to be near and that gentle, radiant warmth you give off just by existing. I have never seen anyone love the way you do, with the intensity you do. One of one kind. We both knew my time in Melbourne was ending. I knew you tended to stay quiet when you were in pain, but I could still feel it. I didn’t want to leave with the bitter taste of a good relationship gone to waste by me leaving. In my silly logic, , I thought it was better if you hated me that it would be easier for you than mourning the what if. I reached the conclusion that leaving was the only way to remain a beautiful image in your memory rather than becoming a heavy, daily burden in your present.
+        </p>
+        <p>
+I have to confess that even today, I still think about how this relationship might be hurting you. There comes a moment when love stops being a sanctuary and starts feeling like an open wound. I don’t want you to see me at my worst because I fear my defeats will only become your sadness. Back then, I thought the right thing was to leave right then and there while there was still light between us, ensuring that light was the only thing you’d keep of my time in your life. I thought that by being the asshole to end the relationship,  I was providing the perfect closure. I was a fool, I know that now.
+        </p>
+        <p>
+Then you called me, and you were furious, are you a kid? I rembemer you said in flagstaff. You told me you knew exactly what it meant to be in a relationship that would end when I left. That we should take every single day we had together mo matter the ending, living our live at the fullest. I was speechless, your bravery in choosing me over the fear of the future is something I admire every single day. t's your fierce love, there is something moving about your heart, the gem that refuses to hold back. I promised myself to protect it since then, endlessly grateful for your courage to love me so completely and purely.        </p>
+        <p style="margin-top: 30px; font-style: italic; color: #777; font-family:'Playfair Display'">
+            (And yet, despite my stupid Idea, you kept knitting.)
+        </p>
+    </section>
+
+    <div class="scarf-divider">
+        <img src="day4/scarf_vertical.jpg"alt="Scarf Divider" class="scarf-rotated">
+    </div>
+
+    <section class="frozen-section">
+        <h2>One of Many</h2>
+        <p>My favorite wallpaper. These strips are a glimpse of what we are and hopefully there are many more incoming.</p>
+        
+        <div class="photobooth-display">
+            <div class="tape-simple"></div>
+            <div class="photobooth-strip-clean">
+                <img src="day4/photobooth.jpg" alt="Photobooth Memory">
+                <div class="caption-hand">Dec 2024</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="scarf-divider">
+        <img src="day4/scarf_vertical.jpg" alt="Scarf Divider" class="scarf-rotated">
+    </div>
+
+    <section>
+        <h2>The day</h2>
+        
+        <div class="letter-container">
+            <div class="letter-text">So then the day actually came. 
+We took that polaroid with both our faces completely covered by tears and I was just so sad and wanted to leave because I didn't trust the distance. You called while I was in that ulgy and heated airport. and asked me to find a middle point instead of me just abandoning everything we built. When you look at me and you stay even when the road is difficult I realize that we are creating a reality that is ours alone. Life was already diffcult but worse wihtout you. way worse. Your determiantion, your love pull me back from that edge of leaving and I realized that staying was the only thing that made sense because you are worth every single mile of that distance.
+
+When you asked me a few days ago why I would pick you over someone like Dua Lipa, I pick you every single day, because no celebrity or an atractive person could ever have the radiant warmth you give just by existing or the way you look at me like the world has stopped. No one has that maracuya smell in her armpits, How I can replace that? I don't love you because you are hot(that you are unvelbible hot), I don't love you because you are perfect. At the end, we are all a little broken, a bit crazy. But you are my miracle, you look at me, you saw that wreckage and chooses to sit in it with me. I decided you were the one no matter the distance because you are my home. I knew that, if I have to travel through the dark to get back to you, then the dark is just part of the road. I was scared of the dark for sure, but I knew that you are the place where I finally put down my bags. No matter the destiny or how far it is, you are the only map I need to follow. I know that distance hurts and even more remembering our past life, but i'd hurt more to have as a memory, because memories don't hug, hermosa. I love you, because your specific way of being alive makes the world feel habitable. .</div>
+            <div class="letter-signature">Love, Andrés.</div>
+        </div>
+    </section>
+
+    <footer>
+        <a href="index.html">Back to Index</a>
+    </footer>
+
+    <script>
+        document.querySelectorAll('.flip-card').forEach(card => {
+            card.addEventListener('click', () => {
+                card.classList.toggle('flipped');
+            });
+        });
+    </script>
+
+</body>
+</html>
