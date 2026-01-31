@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 6</title>
+    <link rel="icon" type="image/png" href="img/icono.jpg">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Montserrat:wght@300;400;500&family=Playfair+Display:ital,wght@1,400&family=La+Belle+Aurore&family=Cormorant+Garamond:ital,wght@0,400;1,600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- VARIABLES --- */
+        :root {
+            --bg-color: #fcfcfc;
+            --text-color: #111111;
+            --accent-purple: #5D3A9B;
+            --paper-color: #fdfbf7;
+            --gold: #c5a059;
+            --border-color: #e0e0e0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* HEADER */
+        header {
+            min-height: 50vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        h1 { font-family: 'Cinzel', serif; font-size: 2.5rem; letter-spacing: 2px; }
+        .subtitle { font-family: 'Playfair Display', serif; font-style: italic; color: var(--accent-purple); font-size: 1.2rem; margin-bottom: 20px; }
+        .divider { width: 50px; height: 2px; background: var(--accent-purple); margin: 20px auto 40px auto; }
+
+        section { padding: 80px 20px; max-width: 900px; margin: 0 auto; }
+        h2 { font-family: 'Cinzel', serif; font-size: 1.8rem; text-align: center; margin-bottom: 50px; font-weight: 400; color: #111; border-bottom: 1px solid #ddd; padding-bottom: 20px; display: inline-block; }
+        .section-center { text-align: center; }
+        
+        p { line-height: 2; color: #444; font-weight: 300; margin-bottom: 25px; font-size: 1rem; }
+
+
+        /* --- 1. THE PIZZA PROCESS --- */
+        .pizza-story-container {
+            background-color: var(--paper-color);
+            padding: 60px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            text-align: left;
+            margin-bottom: 60px;
+        }
+
+        .step-list {
+            list-style: none;
+            padding: 0;
+            margin: 40px 0;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2rem;
+        }
+        .step-list li { margin-bottom: 20px; display: flex; align-items: baseline; }
+        .step-number { font-family: 'Cinzel'; font-weight: bold; margin-right: 15px; color: var(--accent-purple); }
+
+        .pizza-display-large {
+            margin-top: 40px;
+            position: relative;
+            transform: rotate(-1deg);
+            border: 12px solid #fff;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            width: 100%;
+            overflow: hidden;
+        }
+        .pizza-display-large img { width: 100%; display: block; height: auto; }
+        .handwritten-note {
+            font-family: 'La Belle Aurore', cursive;
+            font-size: 1.5rem;
+            color: #666;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        /* --- 2. THE CULINARY LOG (MENU EXTENDED) --- */
+        .culinary-log {
+            max-width: 700px;
+            margin: 0 auto;
+            border-top: 2px solid #111;
+            border-bottom: 2px solid #111;
+            padding: 40px 0;
+        }
+        
+        .log-entry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .log-entry:last-child { border-bottom: none; }
+        
+        .log-details { text-align: left; width: 75%; }
+        .log-title { font-family: 'Cinzel', serif; font-size: 1.1rem; font-weight: 600; color: #111; display: block; margin-bottom: 5px; }
+        .log-desc { font-family: 'Montserrat', sans-serif; font-size: 0.85rem; color: #666; font-style: italic; }
+        
+        .log-rating { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--gold); white-space: nowrap; }
+        .rating-fail { color: #d32f2f; text-decoration: line-through; opacity: 0.6; }
+
+
+        /* --- 3. THE EXHIBITION (UPDATED) --- */
+        .exhibition-section { padding: 100px 0; background: #fff; }
+
+        .gallery-intro { text-align: center; max-width: 600px; margin: 0 auto 50px auto; padding: 0 20px; }
+        .sub-location { font-family: 'Cinzel', serif; font-size: 1.2rem; margin: 80px 0 40px 0; color: var(--accent-purple); letter-spacing: 2px; text-transform: uppercase; }
+
+        /* Estilo base de cuadro */
+        .art-frame {
+            background: white;
+            padding: 15px 15px 50px 15px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+            cursor: zoom-in;
+            transition: transform 0.3s ease;
+            position: relative;
+            margin-bottom: 40px;
+        }
+        .art-frame:hover { transform: translateY(-3px); }
+        .art-frame img { width: 100%; display: block; filter: contrast(1.05) saturate(1.1); object-fit: cover; }
+        .art-label { position: absolute; bottom: 15px; left: 0; width: 100%; font-family: 'Cinzel', serif; font-size: 0.8rem; color: #111; text-transform: uppercase; letter-spacing: 2px; text-align: center; }
+
+        /* THE SPECIAL FRAME (THE CALM) */
+        .special-frame {
+            border: 2px solid var(--gold); /* Borde dorado */
+            padding: 20px 20px 60px 20px;
+            background: #fff;
+            box-shadow: 0 20px 50px rgba(197, 160, 89, 0.2); /* Sombra dorada */
+            width: 95%;
+            max-width: 900px;
+            margin: 60px auto;
+        }
+        .special-frame .art-label {
+            color: var(--gold);
+            font-weight: bold;
+            font-size: 1rem;
+            bottom: 20px;
+        }
+
+        /* Layouts */
+        .single-photo { max-width: 600px; margin: 0 auto 60px auto; }
+        .panoramic-frame { width: 95%; max-width: 1100px; margin: 0 auto 60px auto; padding: 10px 10px 40px 10px; }
+        .panoramic-frame img { height: auto; max-height: 550px; }
+
+        .duality-grid {
+            display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 40px; max-width: 1000px; margin: 0 auto; padding: 0 20px;
+        }
+        .frame-horizontal { flex: 2; min-width: 300px; }
+        .frame-horizontal img { aspect-ratio: 16/10; }
+        .frame-vertical { flex: 1.2; min-width: 250px; margin: 0 auto; }
+        .frame-vertical img { aspect-ratio: 3/4; }
+
+        .mood-title { width: 100%; text-align: center; font-family: 'Playfair Display', serif; font-style: italic; color: #777; margin-bottom: 20px; font-size: 1.1rem; }
+
+
+        /* --- 4. HUSTLE & BUS --- */
+        .hustle-container { margin: 80px auto; max-width: 700px; border-left: 2px solid var(--accent-purple); padding-left: 40px; }
+        .hustle-title { font-family: 'Cinzel'; font-weight: bold; font-size: 1.2rem; margin-bottom: 20px; color: #333; }
+
+        .bus-station-card { background-color: #1a1a1a; color: #eee; padding: 80px 40px; text-align: center; position: relative; margin-top: 60px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+        .bus-station-card::before { content: ''; position: absolute; top: -50px; left: 50%; transform: translateX(-50%); width: 1px; height: 100px; background: linear-gradient(to bottom, transparent, var(--gold)); opacity: 0.5; }
+        .station-quote { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-style: italic; line-height: 1.8; max-width: 600px; margin: 0 auto; }
+
+        /* --- 5. LETTER --- */
+        .letter-container { background-color: var(--paper-color); padding: 80px 60px; border: 1px solid #eee; text-align: left; margin-top: 100px; position: relative; }
+        .letter-container::after { position: absolute; top: 20px; right: 20px; font-family: 'Cinzel'; color: #e0e0e0; font-size: 3rem; opacity: 0.3; }
+        .letter-text { font-family: 'Montserrat'; line-height: 1.9; color: #333; white-space: pre-wrap; font-size: 1rem; }
+        .letter-signature { font-family: 'Playfair Display'; font-style: italic; color: var(--accent-purple); text-align: right; margin-top: 30px; font-size: 1.4rem; }
+
+        /* --- MODAL (SIMPLE NO ZOOM) --- */
+        .modal-overlay {
+            display: none; 
+            position: fixed; 
+            top: 0; left: 0; 
+            width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.98); 
+            z-index: 10000;
+        }
+
+        .modal-scroll-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            box-sizing: border-box;
+        }
+
+        .modal-img {
+            max-width: 95vw;
+            max-height: 95vh;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            border: 1px solid #333;
+            cursor: default; /* No zoom cursor */
+        }
+
+        .close-btn {
+            position: fixed; top: 30px; right: 30px; color: #fff;
+            font-family: sans-serif; font-size: 40px; cursor: pointer; z-index: 10001;
+            opacity: 0.7; transition: opacity 0.3s;
+        }
+        .close-btn:hover { opacity: 1; }
+
+        footer { padding: 60px; text-align: center; font-size: 0.8rem; letter-spacing: 2px; }
+        footer a { text-decoration: none; color: #999; }
+        
+        @media (max-width: 768px) {
+            .duality-grid { flex-direction: column; }
+            .frame-horizontal, .frame-vertical { width: 100%; }
+            .letter-container { padding: 40px 20px; }
+            .log-details { width: 60%; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div style="font-family: 'Cinzel'; font-size: 0.8rem; letter-spacing: 4px; color: #999; margin-bottom: 15px;">DAY 6</div>
+        <h1>Goodbye Melbourne</h1>
+        <div class="divider"></div>
+        <div class="subtitle">The wait, Pizza and some trips</div>
+    </header>
+
+    <section>
+        <div class="section-center">
+            <h2>How did we arrive here?</h2>
+        </div>
+        
+        <div class="gallery-intro">
+            <p>Upon returning to Melbourne, I not only conversed with the city that had given me shelter, but also with myself. Despite having been away for only a short time, I felt like a stranger; I understood that one does not settle in a country, but rather in a time, and mine there was gone. In the midst of that strangeness, I realised that I had not returned out of nostalgia for Melbourne, but out of the certainty of having you.</p>
+        </div>
+
+        <div class="pizza-story-container">
+            <p>Amidst all the chaos of recent months, and the distance that those months in Switzerland represented, we wanted to get closer to normality, so we cooked together. Oh boy...</p>
+            <ul class="step-list">
+                <li><span class="step-number">I.</span> Go and buy ingredients:  Lots of ingredients, check. Lots of cheese, check. Excessively expensive, triple check.</li>
+                <li><span class="step-number">II.</span> The making: Flour reached places it definitely shouldn't be,  but I channeled my inner European chef to keep the technique somewhat classy. Mostly. </li>
+                <li><span class="step-number">III.</span> Reality Check: Eunice better than me, thanks. #humbled.</li>
+            </ul>
+
+            <div class="pizza-display-large">
+                <img src="day6/pizza.jpg" alt="Square Pizza Result">
+            </div>
+            <div class="handwritten-note">"Deformed, square, and half was dough."</div>
+        </div>
+    </section>
+
+    <section>
+        <div class="section-center">
+            <h2 style="margin-bottom: 30px; border: none;">The Taste of Melbourne</h2>
+        </div>
+        <div class="culinary-log">
+            <div class="log-entry">
+                <div class="log-details">
+                    <span class="log-title">Soi 39</span>
+                    <span class="log-desc">Thai, Our safe spot.</span>
+                </div>
+                <div class="log-rating">★★★★</div>
+            </div>
+            
+            <div class="log-entry">
+                <div class="log-details">
+                    <span class="log-title">Malatang David's Hot Pot</span>
+                    <span class="log-desc">I love Malatang, although my baby orders four people's worth of food.</span>
+                </div>
+                <div class="log-rating">★★★</div>
+            </div>
+
+            <div class="log-entry">
+                <div class="log-details">
+                    <span class="log-title">Korean BBQ(Don't remember the name)</span>
+                    <span class="log-desc">Good, forgettable (clearly)</span>
+                </div>
+                <div class="log-rating">★★★</div>
+            </div>
+
+            <div class="log-entry">
+                <div class="log-details">
+                    <span class="log-title">Khao</span>
+                    <span class="log-desc">Thai food never disappoints, probably the best pad thai I tried. You didn't show me this place fast enough!</span>
+                </div>
+                <div class="log-rating">★★★★★</div>
+            </div>
+
+            <div class="log-entry">
+                <div class="log-details">
+                    <span class="log-title">Mensho Tokyo</span>
+                    <span class="log-desc">Sophisticated place, pretty yummy. Still not as delicious as you, though</span>
+                </div>
+                <div class="log-rating">★★★★★</div>
+            </div>
+
+              <div class="log-entry">
+                <div class="log-details">
+                    <span class="log-title">Marameo</span>
+                    <span class="log-desc">Italian vibes. You were the hottest sadly, the food didn't even come close to your level.</span>
+                </div>
+                <div class="log-rating">★★</div>
+            </div>
+
+            <div class="log-entry">
+                <div class="log-details">
+                    <span class="log-title">SinJeon</span>
+                    <span class="log-desc">This place reminds me of you and everything you embrace. 10/10. The food? I don't mind</span>
+                </div>
+                <div class="log-rating">★★★★★★★★★★</div>
+            </div>
+
+            <div class="log-entry">
+                <div class="log-details">
+                    <span class="log-title">Stinky Noodles</span>
+                    <span class="log-desc">Your cooking flawless. My nose defeated.</span>
+                </div>
+                <div class="log-rating rating-fail">LET'S NOT</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="exhibition-section">
+        <div class="gallery-intro">
+            <h2>The Beholder</h2>
+            <p>I have traveled to so many places and I admit I’ve become a bit pretentious about some (of course, Switzerland). I have seen the world’s greatest beauties, but I’ve realized one constant, My lens always ends up looking for you. In your gaze you will find mine and in your presence my world stops to let you pass. In the end in my world, only my photographs exist and in all of them, there you are. We visited Wilsons Promontory and Noojee</p>
+        </div>
+
+        <div class="section-center"><div class="sub-location">WILSONS PROMONTORY</div></div>
+        
+        <div class="single-photo">
+            <div class="art-frame" onclick="openModal('day6/WFirst.jpg')">
+                <img src="day6/WFirst.jpg" alt="Us on the Sand">
+                <div class="art-label">Baddie in the wild</div>
+            </div>
+        </div>
+
+        <div class="panoramic-frame art-frame" onclick="openModal('day6/WPano.jpg')">
+            <img src="day6/WPano.jpg" alt="Wilsons Panoramic">
+            <div class="art-label">The Horizon</div>
+        </div>
+
+        <div class="special-frame art-frame" onclick="openModal('day6/Wseriuos.jpg')">
+            <img src="day6/Wseriuos.jpg" alt="Her (Serious)">
+            <div class="art-label">MY FAVORITE</div>
+        </div>
+
+        <div class="section-center">
+            <div class="art-frame frame-vertical" style="max-width: 400px; margin: 0 auto;" onclick="openModal('day6/Wsilly.jpg')">
+                <img src="day6/Wsilly.jpg" alt="Her (Silly)">
+                <div class="art-label">What's behind that stare</div>
+            </div>
+        </div>
+
+
+        <div class="section-center"><div class="sub-location">NOOJEE</div></div>
+
+        <div class="panoramic-frame art-frame" onclick="openModal('day6/NPano.jpg')">
+            <img src="day6/NPano.jpg" alt="Noojee View">
+            <div class="art-label">Before Arrival</div>
+        </div>
+
+        <div class="duality-grid">
+            <div class="mood-title">GREEN REFLECTIONS</div>
+            
+            <div class="art-frame frame-vertical" onclick="openModal('day6/NSeriuos.jpg')">
+                <img src="day6/NSeriuos.jpg" alt="Her (Serious)">
+                <div class="art-label">Eat First</div>
+            </div>
+            
+            <div class="art-frame frame-horizontal" onclick="openModal('day6/NSilly.jpg')">
+                <img src="day6/NSilly.jpg" alt="Her (Silly)">
+                <div class="art-label">Panic LATER</div>
+            </div>
+        </div>
+        
+    </div>
+
+    <section>
+        <div class="hustle-container">
+            <div class="hustle-title">Working</div>
+            <p>Was I in love? Yes, I am and  always have been. I aspire to be the man capable of giving you the world I once promised. Everything I do, I do it thinking that you will like it, that you will be proud of me.  I am always in competition with myself. So I started working for Uber Eats to be able to give you something better while I was there.</p>
+            <p>I fell off my bike. I ripped my pants completely in the middle of the street and I still carry the scar on my knee. It was painful and frustrating, if I close my eyes I can still live that moment vividly. I remember that as soon as I got up after the accident that the only thing that came to mind was that I wouldn't be able to treat you to a nice dinner because of me.
+
+I stood there, contemplating my life, my knee was burning like hell. It’s strange how in a moment of crisis, your mind strips everything away until only one single line of thought remains and for me, that was you. I realized then that I would gladly trade a thousand falls. why? Because all those scars would simply be the price I’d pay just to see you smile across a dinner table.
+</p>
+        </div>
+
+        <div class="bus-station-card">
+            <div style="font-family: 'Cinzel'; margin-bottom: 20px; letter-spacing: 3px;">NORTH MELBOURNE STATION</div>
+            <div class="station-quote">
+                I waited for you every single time<br>
+                I was counting the seconds until I see you, even though I would spend a lifetime waiting if I had to.<br>
+                Because seeing your tired face melt into a smile the moment you saw me?<br>
+                That's the greatest gift. 
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>The Closing Note</h2>
+        <div class="letter-container">
+            <div class="letter-text">Goodnight, Hermosa, 
+Welcome to day 6. Short letter today
+
+    Sometimes, I mix this trip to my life in Melbourne, and for a moment, I realize that time felt like a glimpse of the best life we could have. It was the closest we ever got to a daily life together in Australia, and I know I will miss those moments for the rest of my life. But I must confess our relationship has grown so much since then that our Melbourne trip is just one chapter in our incredible collection of memories. You have made every single one of those moments unforgettable.
+
+    Those old past days didn’t stay frozen in time, of course. Those days when we lived just 20 minutes apart moved forward with us, they transformed and became the solid ground we walk on today. Because of that, I don’t love you the way I did in Australia, I love you more and more improtantly, better. it's because I love you with that  certainty of someone who knows no matter where we are, you are my destination. Long time ago I stopped to belong to a specific location, my favorite place in the world isn’t a city or a memory anymore. It’s you.</div>
+            <div class="letter-signature">Andrés.</div>
+        </div>
+    </section>
+
+    <footer>
+        <a href="index.html">BACK TO INDEX</a>
+    </footer>
+
+    <div id="imageModal" class="modal-overlay" onclick="closeModal()">
+        <span class="close-btn">&times;</span>
+        <div class="modal-scroll-container">
+            <img class="modal-img" id="img01">
+        </div>
+    </div>
+
+    <script>
+        var modal = document.getElementById("imageModal");
+        var modalImg = document.getElementById("img01");
+
+        function openModal(src) {
+            modal.style.display = "block"; 
+            modalImg.src = src;
+        }
+
+        function closeModal() {
+            modal.style.display = "none";
+        }
+        /* Zoom toggle removed */
+    </script>
+
+</body>
+</html>
