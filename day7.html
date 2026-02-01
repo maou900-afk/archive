@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 7</title>
+    <link rel="icon" type="image/png" href="img/icono.jpg">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Montserrat:wght@300;400;600&family=Playfair+Display:ital,wght@1,400;1,500&family=Space+Mono&family=Cormorant+Garamond:ital,wght@0,500;1,500&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #fcfcfc;
+            --text-color: #111;
+            
+            --emerald-green: #046A38;
+            --coffee-brown: #6f4e37;
+            --clay-red: #a83f39;
+            --gold: #FFD700;
+            
+            --night-blue: #0f172a;
+            --dawn-orange: #ff9a9e;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* HEADER */
+        header {
+            min-height: 40vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        h1 { font-family: 'Cinzel', serif; font-size: 2.8rem; letter-spacing: 2px; margin-bottom: 10px; color: #222; }
+        .subtitle { font-family: 'Playfair Display', serif; font-style: italic; color: #666; font-size: 1.1rem; }
+        .divider { width: 40px; height: 3px; background: var(--emerald-green); margin: 20px auto; }
+
+        section { padding: 80px 20px; max-width: 1000px; margin: 0 auto; }
+        
+        
+        /* --- 1. TIME WARP (REAL TIME) --- */
+        .clock-intro-text {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto 40px auto;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            color: #555;
+            line-height: 1.6;
+        }
+        .clock-intro-text strong { color: var(--clay-red); font-family: 'Cinzel'; }
+
+        .time-warp-container {
+            display: flex;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            min-height: 250px;
+        }
+
+        .time-zone {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+            position: relative;
+        }
+
+        /* Colombia: Amanecer */
+        .zone-col {
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            color: #fff;
+        }
+        
+        /* Melbourne: Noche */
+        .zone-mel {
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 100%);
+            color: #fff;
+        }
+
+        .time-icon { font-size: 3rem; margin-bottom: 10px; opacity: 0.8; }
+        .time-digits { font-family: 'Cinzel', serif; font-size: 3rem; font-weight: bold; text-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .time-label { font-family: 'Space Mono', monospace; font-size: 0.8rem; letter-spacing: 2px; opacity: 0.8; margin-top: 5px; }
+        .date-label { font-size: 0.7rem; opacity: 0.7; margin-top: 5px; font-weight: 300; }
+
+
+        /* --- 2. COLOMBIA THEME (GIANT CARDS) --- */
+        .colombia-section {
+            padding: 100px 0;
+            background-color: #fff;
+        }
+        
+        .section-header { text-align: center; margin-bottom: 60px; }
+        .section-title { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--emerald-green); font-style: italic; }
+        .section-desc { font-family: 'Montserrat'; color: #666; margin-top: 10px; }
+
+        .giant-gallery {
+            display: flex;
+            flex-direction: column;
+            gap: 60px;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .giant-card {
+            position: relative;
+            width: 100%;
+            height: 70vh;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            cursor: help;
+        }
+
+        .giant-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.7s ease, filter 0.7s ease;
+        }
+
+        .giant-card:hover img { transform: scale(1.05); filter: brightness(0.6); }
+
+        .card-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            backdrop-filter: blur(2px);
+        }
+
+        .giant-card:hover .card-overlay { opacity: 1; }
+
+        .word-reveal {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 2rem;
+            color: #fff;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.6);
+            padding-bottom: 10px;
+            transform: translateY(10px);
+            transition: transform 0.5s ease;
+        }
+        
+        .giant-card:hover .word-reveal { transform: translateY(0); }
+        
+        .hint-text {
+            color: rgba(255,255,255,0.9);
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 300;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+
+        /* --- 3. THE FIGHT --- */
+        .fight-container {
+            border-left: 4px solid #111;
+            padding-left: 40px;
+            margin: 80px auto;
+            max-width: 800px;
+        }
+        .fight-title { font-family: 'Cinzel'; font-size: 2rem; margin-bottom: 30px; color: #111; }
+        .fight-p { font-size: 1.1rem; line-height: 1.8; color: #333; margin-bottom: 20px; }
+
+
+        /* --- 4. THE PORTRAIT --- */
+        .portrait-section {
+            background-color: #111;
+            padding: 80px 20px;
+            text-align: center;
+        }
+        .portrait-frame {
+            border: 10px solid #fff;
+            display: inline-block;
+            box-shadow: 0 0 50px rgba(255,255,255,0.1);
+            max-width: 500px;
+        }
+        .portrait-frame img { width: 100%; display: block;}
+        .portrait-caption { color: #888; margin-top: 20px; font-family: 'Space Mono'; font-size: 0.8rem; }
+
+
+        /* --- 5. CREATIVE CLOSING NOTE --- */
+        .envelope-section {
+            padding: 100px 20px;
+            background-color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .paper-letter {
+            background-color: #fdfbf7;
+            width: 100%;
+            max-width: 700px;
+            padding: 60px;
+            position: relative;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.2), 0 0 40px rgba(0,0,0,0.1);
+            background-image: url("https://www.transparenttextures.com/patterns/cream-paper.png");
+        }
+
+        .paper-letter::before {
+            content: '';
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.02) 0%, transparent 5%, transparent 95%, rgba(0,0,0,0.02) 100%);
+            pointer-events: none;
+        }
+
+        .letter-content {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            line-height: 1.8;
+            color: #2c2c2c;
+        }
+
+        .letter-header {
+            border-bottom: 1px solid #d4af37;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        
+        .stamp-mark {
+            border: 2px solid #d4af37;
+            color: #d4af37;
+            padding: 5px 10px;
+            font-family: 'Space Mono';
+            font-size: 0.7rem;
+            transform: rotate(-5deg);
+            opacity: 0.8;
+        }
+
+        .signature {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.5rem;
+            text-align: right;
+            margin-top: 40px;
+            color: var(--emerald-green);
+        }
+
+        footer { padding: 60px; text-align: center; font-size: 0.8rem; letter-spacing: 2px; }
+        footer a { text-decoration: none; color: #999; }
+
+        @media (max-width: 768px) {
+            .time-warp-container { flex-direction: column; }
+            .giant-card { height: 50vh; }
+            .paper-letter { padding: 40px 20px; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div style="font-family: 'Cinzel'; font-size: 0.8rem; letter-spacing: 4px; color: #999; margin-bottom: 15px;">DAY 7</div>
+        <h1>The gap</h1>
+        <div class="divider"></div>
+        <div class="subtitle">When our distance relationship started to shape</div>
+    </header>
+
+    <section>
+        <div class="clock-intro-text">
+            When I arrived in Colombia from Australia, I arrived as a new person. With a different view of the world and a new relationship in my suitcase. You have always been the only person I can talk to about the shadow of a cloud, and even though you may not believe me, about mundane and meaningless things. I filled 
+            Colombia with memories of you, and when something was new, I discovered it with you.<br>
+            <br>
+            We were so far apart, probably further apart geographically than we will ever be. But there is something beautiful about this pain; we are not together out of habit or geographical convenience, but because of a choice we renew every time we decide to call each other every day. The ocean that separates us is not a wall, it is a space 
+            we are filling with our determination not to forget each other.              At this point, my mind is so full of you that sometimes I stumble over my own thoughts about us as if they were pieces of furniture in a dark room. 
+
+        </div>
+
+        <div class="time-warp-container">
+            <div class="time-zone zone-col">
+                <div class="time-icon">☀</div>
+                <div class="time-digits" id="time-bog">--:--</div>
+                <div class="time-label">BOGOTÁ, CO</div>
+                <div class="date-label" id="date-bog">Loading...</div>
+            </div>
+            
+            <div class="time-zone zone-mel">
+                <div class="time-icon">☾</div>
+                <div class="time-digits" id="time-mel">--:--</div>
+                <div class="time-label">MELBOURNE, AU</div>
+                <div class="date-label" id="date-mel">Loading...</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="colombia-section">
+        <div class="section-header">
+            <h2 class="section-title">Español Time</h2>
+            <p class="section-desc">During my time in Colombia, I taught you spanish. So let's see how much you know now!</p>
+            <p class="section-desc">Try to guess the word, the food or the phrase. Hover to translate.</p>
+        </div>
+
+        <div class="giant-gallery">
+            
+            <div class="giant-card">
+                <img src="day7/span1.jpeg" alt="Photo 1">
+                <div class="card-overlay">
+                    <span class="word-reveal">Ajiaco! (And Pataconas)</span>
+                    <span class="hint-text">I Miss Those Days</span>
+                </div>
+            </div>
+
+            <div class="giant-card">
+                <img src="day7/span2.jpeg" alt="Photo 2">
+                <div class="card-overlay">
+                    <span class="word-reveal">Fotografías</span>
+                    <span class="hint-text">O como dice Bad Bunny Fotos</span>
+                </div>
+            </div>
+
+            <div class="giant-card">
+                <img src="day7/span3.jpeg" alt="Photo 3">
+                <div class="card-overlay">
+                    <span class="word-reveal">Beso en la frente</span>
+                    <span class="hint-text">De los que más me gustan</span>
+                </div>
+            </div>
+
+            <div class="giant-card">
+                <img src="day7/span4.jpeg" alt="Photo 4">
+                <div class="card-overlay">
+                    <span class="word-reveal">Abuela</span>
+                    <span class="hint-text">Te extraña más a ti, que a mi</span>
+                </div>
+            </div>
+   <div class="giant-card">
+                <img src="day7/span5.jpeg" alt="Photo 6">
+                <div class="card-overlay">
+                    <span class="word-reveal">Flores</span>
+                    <span class="hint-text">Esa flor la guardo con amor</span>
+                </div>
+            </div>
+            <div class="giant-card">
+                <img src="day7/span6.jpeg" alt="Photo 5">
+                <div class="card-overlay">
+                    <span class="word-reveal">Eunice viendo series coreanas con mi familia</span>
+                    <span class="hint-text">Super Facil de Adivinar</span>
+                </div>
+            </div>
+
+         
+
+        </div>
+    </div>
+
+    <div class="fight-container">
+        <div class="fight-title">Hitting Hard</div>
+        <p class="fight-p">
+For most of my life, I’ve been an excessively rational person, handling conflicts as if they were debates. I always prided myself on my honesty. However, lately, I’ve realized that it is only in the presence of those we trust completely that we dare to be extravagantly and limitlessly irrational.
+        </p>
+        <p class="fight-p">
+            You oOur first fight  didn’t happen in Colombia, but the first Colombia fight felt differnt, had a different flavor, the taste of something real. We weren't afraid, we had enough confidence to know that the other could withstand our darkest parts. Since then, our relationship has evolved into something much deeper. We are so intertwined that even a faint sigh can keep us from staring into the void.
+pened up about your deep traumas, about feeling unlovable. I felt overwhelmed by your insecurity, heavy with the distance between us. I felt useless sitting here while you were hurting there.
+        </p>
+        <p class="fight-p">
+Today, we are learning to recognize, with a certain grace, that in some ways, we are both a little crazy. In a long distance relationship, conflict is amplified because we don’t have each other’s physical presence to ground us.  We have stood, more than once, at the absolute threshold of departure, that cold doorway where the ego whispers that it would be easier to simply cease to exist in each other's lives. We have exchanged words like knifes, fragments of a temporary hatred that only the most intimate lovers can forge. And yet, this is the miracle, we remain. Our persistence is a quiet rebellion against our own shadows.        </p>
+    </div>
+
+    <div class="portrait-section">
+        <div class="portrait-frame">
+            <img src="day7/portrait_her.jpg" alt="Portrait">
+        </div>
+        <div class="portrait-caption">I support you wholeheartedly, Hermosa.</div>
+    </div>
+
+    <div class="envelope-section">
+        <div class="paper-letter">
+            <div class="letter-header">
+                <span style="font-family:'Cinzel'; font-weight:bold;">A LETTER FROM THE FUTURE</span>
+                <span class="stamp-mark">SPAIN</span>
+            </div>
+
+            <div class="letter-content">
+                <p>Hello, hermosa,</p>
+                <p>Today I don't want to write about this part of our lives, when I arrived to Colombia. I wanted to reach about what happened today for me yestarday for you. Big fight. </p>
+                <p>I must confess that in the midst of the noise of life it seems I have lost sight of the support I promised you. It is complex I know we carry so many things that it is too easy to forget what is essential. This morning after our fight I saw you talk about your past crying inconsolably letting out your frustration with me and fighting against yourself. I stayed there watching you and I remembered something I have always believed that couples are not two perfect people who are disappointed by each others flaws but two wounded people trying to help each other heal. I had that philosophy clear but I had forgotten my role which is to be your benevolent interpreter. Love in the end consists of navigating each others neuroses with patience recognizing that we are both on some level survivors of our own stories.
+
+<p>In my rage and my desire to be heard I judged you more than I should have. I know I had my reasons and that boundaries were crossed but what truly weighs on me is that love only heals when it allows us to show our most broken parts without the fear of being abandoned and for a long time I have not made you feel that security. For a moment I stopped recognizing your story.</p>
+
+<p>I know you still carry your ghosts but I want to affirm to you today that there is nothing in your past no matter how dark it may seem to you that scares me enough to let you go. Even today when rage took me to the limit of thinking it my final choice is still you. You are the most valuable project I have ever decided to participate in. I deeply admire the courage with which you face your shadows even when you feel they are defeating you.</p>
+
+<p>I want to invite you to walk our maps in a different way together. In the heat of arguments our old defenses rise up and we look at each other as enemies. I would like us to try little by little to make this space so safe that you no longer need those weapons to protect yourself from me because I am on your team.</p>
+
+<p>Without me and especially with me you are worthy of being loved. I love you bravely with your wounds and I want to be a witness to your reconstruction. I hope that one day you see me and that above the fear you feel that my presence is stronger than your ghosts. Because at the end of the day my only desire is to be the place where your nervous system finds peace and where your heart knows without any doubt that it no longer has to fight anymore.</p>
+            </div>
+
+            <div class="signature">With love, Andrés.</div>
+        </div>
+    </div>
+
+    <footer>
+        <a href="index.html">BACK TO INDEX</a>
+    </footer>
+
+    <script>
+        function updateClocks() {
+            const now = new Date();
+
+            // Opciones de formato
+            const options = { hour: '2-digit', minute: '2-digit', hour12: false };
+
+            // Hora BOGOTÁ
+            const bogTime = new Intl.DateTimeFormat('en-US', {
+                timeZone: 'America/Bogota',
+                ...options
+            }).format(now);
+
+            // Hora MELBOURNE
+            const melTime = new Intl.DateTimeFormat('en-US', {
+                timeZone: 'Australia/Melbourne',
+                ...options
+            }).format(now);
+
+            // Actualizar DOM
+            document.getElementById('time-bog').innerText = bogTime;
+            document.getElementById('time-mel').innerText = melTime;
+
+            // Calcular diferencia de días para la etiqueta
+            // Obtenemos el día del mes en ambas zonas
+            const bogDay = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Bogota', day: 'numeric' }).format(now);
+            const melDay = new Intl.DateTimeFormat('en-US', { timeZone: 'Australia/Melbourne', day: 'numeric' }).format(now);
+
+            // Lógica simple para etiquetas (asumiendo que Melbourne siempre va adelante)
+            document.getElementById('date-bog').innerText = "Current Time";
+            
+            if (bogDay === melDay) {
+                document.getElementById('date-mel').innerText = "Same Day";
+            } else {
+                document.getElementById('date-mel').innerText = "Already Tomorrow";
+            }
+        }
+
+        // Actualizar inmediatamente y luego cada segundo
+        updateClocks();
+        setInterval(updateClocks, 1000);
+    </script>
+
+</body>
+</html>
