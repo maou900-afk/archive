@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 8</title>
+    <link rel="icon" type="image/png" href="img/icono.jpg">
+
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;500;600;800&family=Playfair+Display:ital,wght@1,400;1,600&family=Space+Mono&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- VARIABLES --- */
+        :root {
+            --bg-color: #fcfcfc;
+            --text-color: #1a1a1a;
+            --gold: #d4af37;
+            --success-green: #2e7d32;
+            --pineapple-yellow: #f8cf40;
+            --vinyl-dark: #121212;
+            --bubble-grey: #e5e5ea;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* HEADER */
+        header {
+            min-height: 40vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 2.5rem;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            color: #111;
+        }
+
+        .subtitle {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            color: #555;
+            font-size: 1.1rem;
+        }
+
+        .divider {
+            width: 50px;
+            height: 3px;
+            background: var(--gold);
+            margin: 20px auto;
+        }
+
+        .date-stamp {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            letter-spacing: 3px;
+            color: #888;
+        }
+
+        section {
+            padding: 80px 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h2 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.8rem;
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+
+        /* --- 1. LGD MEMORIES (ZIG-ZAG LAYOUT) --- */
+        .lgd-section {
+            text-align: center;
+            padding: 80px 20px; /* Padding lateral añadido */
+        }
+
+        .lgd-intro {
+            max-width: 680px; /* Un poco más ancho para mejor lectura */
+            margin: 0 auto 60px auto;
+            color: #444; /* Color más suave */
+            font-style: italic;
+            line-height: 1.8; /* Mejor interlineado */
+            font-size: 1.05rem;
+        }
+
+        .memories-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .memory-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 50px;
+            opacity: 0.9;
+            transition: opacity 0.3s;
+        }
+
+        .memory-row:hover {
+            opacity: 1;
+        }
+
+        /* Alternar dirección */
+        .memory-row:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .video-bubble {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            overflow: hidden;
+            position: relative;
+            border: 5px solid #fff;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+        }
+
+        .video-bubble:hover {
+            transform: scale(1.05);
+        }
+
+        .video-bubble video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: sepia(0.2) contrast(1.1) brightness(0.9);
+        }
+
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDUiLz4KPC9zdmc+');
+            pointer-events: none;
+        }
+
+        .chat-text {
+            background-color: var(--bubble-grey);
+            color: #000;
+            padding: 20px 25px;
+            border-radius: 20px;
+            font-size: 1rem;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
+            max-width: 250px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            text-align: left;
+            position: relative;
+        }
+
+        .memory-row:nth-child(odd) .chat-text {
+            border-top-left-radius: 4px;
+        }
+
+        .memory-row:nth-child(even) .chat-text {
+            border-top-right-radius: 4px;
+            text-align: right;
+        }
+
+
+        /* --- 2. THE VINYL PREMIUM --- */
+        .vinyl-showcase {
+            background-color: #fff;
+            padding: 100px 0;
+            margin: 60px 0;
+            overflow: hidden;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.02);
+        }
+
+        /* CLASE CORREGIDA PARA EL TEXTO "A GIFT" */
+        .section-center {
+            max-width: 700px;
+            margin: 0 auto 60px auto;
+            text-align: center;
+            padding: 0 20px; /* Evita que toque los bordes */
+        }
+        
+        .section-center p {
+            line-height: 2; /* Texto más elegante y menos monótono */
+            color: #444;
+            margin-bottom: 25px;
+            font-size: 1.05rem;
+        }
+
+        .vinyl-display-area {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0;
+            margin-bottom: 60px;
+            perspective: 1500px;
+            flex-wrap: wrap;
+        }
+
+        .cover-flip-container {
+            width: 500px;
+            height: 500px;
+            position: relative;
+            z-index: 2;
+            perspective: 1500px;
+        }
+
+        .cover-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+        }
+
+        .cover-flip-container:hover .cover-inner {
+            transform: rotateY(180deg);
+        }
+
+        .cover-front,
+        .cover-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            background: #eee;
+        }
+
+        .cover-back {
+            transform: rotateY(180deg);
+        }
+
+        .cover-front img,
+        .cover-back img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .vinyl-disc-large {
+            width: 480px;
+            height: 480px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #111 20%, #222 21%, #111 22%, #222 23%, #111 24%, #222 25%, #111 60%);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            position: relative;
+            animation: spinRecord 8s linear infinite;
+            margin-left: -200px;
+            z-index: 1;
+            transition: margin-left 0.5s ease;
+        }
+
+        .vinyl-showcase:hover .vinyl-disc-large {
+            margin-left: -100px;
+        }
+
+        .custom-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 4px solid #fff;
+        }
+
+        .custom-label img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        @keyframes spinRecord {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .playlist-intro {
+            max-width: 700px;
+            margin: 0 auto 30px auto;
+            text-align: center;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2rem;
+            color: #555;
+            font-style: italic;
+            padding: 0 20px;
+        }
+
+        .modern-tracklist {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--vinyl-dark);
+            color: #fff;
+            padding: 60px;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .modern-tracklist::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(to right, var(--gold), #333);
+        }
+
+        .disk-sides {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+        }
+
+        .side-header {
+            font-family: 'Space Mono';
+            font-size: 1.2rem;
+            color: var(--gold);
+            border-bottom: 1px solid #333;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            letter-spacing: 3px;
+            font-weight: bold;
+        }
+
+        .track-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            font-family: 'Montserrat';
+        }
+
+        .track-name {
+            color: #f0f0f0;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .artist-name {
+            color: #888;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            margin-left: 8px;
+            letter-spacing: 1px;
+        }
+
+
+        /* --- 3. THE VISA SCARE --- */
+        .visa-container {
+            border: 2px solid #ccc;
+            background: #fff;
+            padding: 40px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, #fafafa 10px, #fafafa 20px);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .doc-header {
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .doc-title {
+            font-family: 'Space Mono', monospace;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .doc-body {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .stamp {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-15deg);
+            border: 5px solid;
+            padding: 10px 20px;
+            font-size: 2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            opacity: 0;
+            animation: stampIn 0.8s 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            color: var(--success-green);
+            border-color: var(--success-green);
+        }
+
+        @keyframes stampIn {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(2) rotate(-15deg); }
+            to { opacity: 0.8; transform: translate(-50%, -50%) scale(1) rotate(-15deg); }
+        }
+
+
+        /* --- 4. PINEAPPLES --- */
+        .pineapple-section {
+            text-align: center;
+            padding: 60px 20px;
+            background-color: #fffde7;
+            border-radius: 20px;
+            margin-top: 80px;
+        }
+        
+        /* Fix para que los párrafos en Pineapples no toquen bordes y se vean bien */
+        .pineapple-section p {
+            max-width: 700px;
+            margin: 20px auto;
+            line-height: 1.8;
+            color: #555;
+        }
+
+        .stat-circle {
+            width: 120px;
+            height: 120px;
+            background: var(--pineapple-yellow);
+            border-radius: 50%;
+            display: inline-flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0 20px;
+            box-shadow: 0 10px 20px rgba(248, 207, 64, 0.3);
+        }
+
+        .stat-num {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-label {
+            font-family: 'Space Mono';
+            font-size: 0.6rem;
+            color: #665c3b;
+            margin-top: 5px;
+            text-transform: uppercase;
+        }
+
+
+        /* --- 5. ENVELOPE LETTER --- */
+        .envelope-section {
+            padding: 100px 20px;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: center;
+            margin-top: 100px;
+        }
+
+        .paper-letter {
+            background-color: #fdfbf7;
+            width: 100%;
+            max-width: 700px;
+            padding: 60px;
+            position: relative;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid #f0f0f0;
+            background-image: url("https://www.transparenttextures.com/patterns/cream-paper.png");
+        }
+
+        .letter-content {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            line-height: 1.8;
+            color: #2c2c2c;
+        }
+
+        .letter-header {
+            border-bottom: 1px solid #d4af37;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .signature {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.5rem;
+            text-align: right;
+            margin-top: 40px;
+            color: var(--success-green);
+        }
+
+        footer {
+            padding: 60px;
+            text-align: center;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+        }
+
+        footer a {
+            text-decoration: none;
+            color: #999;
+        }
+
+        @media (max-width: 900px) {
+            .vinyl-display-area { flex-direction: column; gap: 40px; }
+            .vinyl-disc-large { margin-left: 0; margin-top: -200px; z-index: 1; width: 350px; height: 350px; }
+            .vinyl-showcase:hover .vinyl-disc-large { margin-left: 0; margin-top: -100px; }
+            .cover-flip-container { width: 350px; height: 350px; }
+            .disk-sides { grid-template-columns: 1fr; gap: 20px; }
+            .paper-letter { padding: 40px 20px; }
+            .memory-row, .memory-row:nth-child(even) { flex-direction: column; gap: 20px; }
+            .chat-text { text-align: center !important; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div style="font-family: 'Cinzel'; font-size: 0.8rem; letter-spacing: 4px; color: #999; margin-bottom: 15px;">
+            DAY 8</div>
+        <h1>Consolidation</h1>
+        <div class="divider"></div>
+        <div class="subtitle">Our daily life, anticipation and anxiety.</div>
+    </header>
+
+    <section class="lgd-section">
+        <h2>What I sent you</h2>
+        <div class="lgd-intro">
+            This small section is dedicated to some videos I sent you when I was in Colombia, I know it hurts you to
+            have lost our chats. So I wanted to gather these videos to remind you of some mundane moments of our life.
+            <br><br> I wish I could write something as beautiful as you make me feel. I love love thinking about you,
+            remembering those beautiful moments that we have lived far from each other. Thinking of you, I had the
+            fortune of sharing my life with you to be a little bit closer. How lucky that time, which undoes us, also
+            allows us to build these moments where the 'I' and the 'you' are lost so that the 'us' appears.
+        </div>
+
+        <div class="memories-container">
+
+            <div class="memory-row">
+                <div class="video-bubble">
+                    <div class="video-overlay"></div>
+                    <video autoplay muted loop playsinline>
+                        <source src="day8/mem1.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div class="chat-text">Without you around, I had to take it out on someone.</div>
+            </div>
+
+            <div class="memory-row">
+                <div class="video-bubble">
+                    <div class="video-overlay"></div>
+                    <video autoplay muted loop playsinline>
+                        <source src="day8/mem2.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div class="chat-text">I mean I love that song and I love you, I just wanted to share my happiness with
+                    you.</div>
+            </div>
+
+            <div class="memory-row">
+                <div class="video-bubble">
+                    <div class="video-overlay"></div>
+                    <video autoplay muted loop playsinline>
+                        <source src="day8/mem3.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div class="chat-text">Sharing the things I love (Always food)</div>
+            </div>
+
+            <div class="memory-row">
+                <div class="video-bubble">
+                    <div class="video-overlay"></div>
+                    <video autoplay muted loop playsinline>
+                        <source src="day8/mem4.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div class="chat-text">This one was the first video I sent you after cutting my hair. Worst the decision
+                    of my life.</div>
+            </div>
+
+            <div class="memory-row">
+                <div class="video-bubble">
+                    <div class="video-overlay"></div>
+                    <video autoplay muted loop playsinline>
+                        <source src="day8/mem5.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div class="chat-text">I'd sent you videos of my before sleeping or taking a nap. We never lost that
+                    habit</div>
+            </div>
+
+
+            <div class="memory-row">
+                <div class="video-bubble">
+                    <div class="video-overlay"></div>
+                    <video autoplay muted loop playsinline>
+                        <source src="day8/mem6.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div class="chat-text">I almost died here!</div>
+            </div>
+
+        </div>
+    </section>
+
+    <div class="vinyl-showcase">
+        <div class="section-center">
+            <h2 style="font-size: 2.2rem; color: #111;">A gift</h2>
+            <p>I want to incorporate the album into this day, and I know I gave it to you when you
+                arrived in Colombia, but the curious thing is that when I think about the album, I think of the
+                anticipation, waiting for the record label to answer me. Collecting all the small details you see on the
+                cover, I realize that I love you in an almost impossible way.</p>
+
+            <p>I think of that album and I think about how our anniversary is a way for me to stop, to tell you that
+                this is not a habit, but a necessity of my soul to recognize that every year by your side is the only
+                year that has truly been worth living. Time is what has forged us, the daily calls, the videos and the
+                vast amount of movies we have watched.</p>
+
+            <p>I do not love you just for who you are, but for the architecture of life we have built together, stone by
+                stone, day after day. This album is simply the pretext to tell you that, if I had to choose again, I
+                would choose every second of this path with you.</p>
+        </div>
+
+        <div class="vinyl-display-area">
+            <div class="cover-flip-container">
+                <div class="cover-inner">
+                    <div class="cover-front">
+                        <img src="day8/vinyl_cover.jpg" alt="Album Front">
+                    </div>
+                    <div class="cover-back">
+                        <img src="day8/vinyl_back.jpg" alt="Album Back">
+                    </div>
+                </div>
+                <p style="position: absolute; bottom: -30px; width: 100%; text-align: center; color: #999; font-size: 0.8rem;">
+                    [ HOVER TO FLIP ]</p>
+            </div>
+
+            <div class="vinyl-disc-large">
+                <div class="custom-label">
+                    <img src="day8/vinyl_label.png" alt="Label Art">
+                </div>
+            </div>
+        </div>
+
+        <div class="playlist-intro">
+            <p> The croweded melbourne night, the anchovies in Manzé and the first time I caught the scent of your Aesop
+                fragrance cover under your blankets, all converge in music. This art is the only territory where time
+                cannot harm us. I think of the moment we listened to those songs, like the first time I heard Happy and
+                Well while you were cooking, me dancing and you chopping onions. I remember the first time I heard Lizzy
+                McAlpine while you explained exactly why that song reminded you of me. It was not just the chords, the
+                piano in When We're Older or the way we found ourselves in When I'm in Your Arms. It was the very air
+                that existed between us when we were together, that air has became our home. Years from now when we
+                listen to these songs together they will not be just music. They will be the scent of the room, the
+                light of the moon walking home and the certainty that in that moment the world was perfect because you
+                were there listening them with me. </p>
+
+            <p> If we ever lose our roof, we can always move into that song we heard those days, because time is not
+                allowed to enter there.</p>
+        </div>
+
+        <div class="modern-tracklist">
+            <div class="disk-sides">
+
+                <div class="side-column">
+                    <div class="side-header">SIDE A</div>
+                    <div class="track-item">
+                        <div class="track-left">
+                            <span class="track-name">She's Mine Pt. 1</span> <span class="artist-name">J. COLE</span>
+                        </div>
+                    </div>
+                    <div class="track-item">
+                        <div class="track-left">
+                            <span class="track-name">Little Bit More</span> <span class="artist-name">MK.GEE</span>
+                        </div>
+                    </div>
+                    <div class="track-item">
+                        <div class="track-left">
+                            <span class="track-name">Happy and Well</span> <span class="artist-name">THEE SACRED
+                                SOULS</span>
+                        </div>
+                    </div>
+                    <div class="track-item">
+                        <div class="track-left">
+                            <span class="track-name">Staying</span> <span class="artist-name">LIZZY MCALPINE</span>
+                        </div>
+                    </div>
+                    <div class="track-item">
+                        <div class="track-left">
+                            <span class="track-name">When We're Older</span> <span class="artist-name">JAMES
+                                BLAKE</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="side-column">
+                    <div class="side-header">SIDE B</div>
+                    <div class="track-item">
+                        <div class="track-left">
+                            <span class="track-name">CGYOMH</span> <span class="artist-name">JAFFÉ JOFFER</span>
+                        </div>
+                    </div>
+                    <div class="track-item">
+                        <div class="track-left">
+                            <span class="track-name">Dive</span> <span class="artist-name">OLIVIA DEAN</span>
+                        </div>
+                    </div>
+                    <div class="track-item">
+                        <div class="track-left">
+                            <span class="track-name">When I'm in Your Arms</span> <span class="artist-name">CLEO
+                                SOL</span>
+                        </div>
+                    </div>
+                    <div class="track-item">
+                        <div class="track-left">
+                            <span class="track-name">Those Eyes</span> <span class="artist-name">NEW WEST</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <section>
+        <div class="visa-container">
+            <div class="doc-header">
+                <span class="doc-title">IMMIGRATION CONTROL / COLOMBIA</span>
+                <span class="doc-title" style="color: #999;">NECESSITY: HIGH</span>
+            </div>
+            <div class="doc-body">
+                <p>I realise that my life, which is so big when I am with you, becomes small and vulnerable in the face of the laws of the world. It is a fear that is not about the paper itself, but about how the paper denies us the possibility of being together. We made a mistake when applying for our first visa in Colombia, and my world fell apart. </p>
+                <p>Nothing is as discouraging as seeing our entire life and future happiness depend on a small piece of paper and the will of a stranger.</p>
+            </div>
+            <div class="stamp">APPROVED</div>
+        </div>
+    </section>
+
+    <section>
+        <div class="pineapple-section">
+            <h2 style="color: #665c3b; font-size: 1.5rem; margin-bottom: 20px;">Horny metrics</h2>
+
+            <div style="display: flex; justify-content: center; align-items: center;">
+                <div class="stat-circle">
+                    <span class="stat-num">2</span>
+                    <span class="stat-label">Whole Pineapples</span>
+                </div>
+                <div class="stat-circle" style="background: #fff; border: 2px solid var(--pineapple-yellow);">
+                    <span class="stat-num" style="color: var(--pineapple-yellow);">1</span>
+                    <span class="stat-label">week before</span>
+                </div>
+            </div>
+
+            <p>To be honest I was not the only one feeling that electric pulse because we were both caught in the same fever. We spent so many hours weaving plans just to finally see each other and to finally touch and taste the reality of being together. Now that I am looking back from this distance I recognize the raw intensity of that feeling within me. I can still feel the phantom weight of my hands on your skin and the absolute urgency of wanting to devour every inch of you.</p>
+
+            <p>It was never about the pineapple itself or eeverything we had planned before. The truth is that I was waiting for the moment that we were in the same room, stare at you until my eyes were exhausted. I wanted to feel the exact moment your breath hitches when I get close enough to touch the line of your back. I wanted to bury my face in the curve of your neck to taste that Aesop fragrance mixed with the salt of your skin, close my eyes and slowly trace your body with my hand and feel the way your body arches under my control.</p>
+
+            <p>And finally get the chance to embrace you in my arms, finally feel you and with nothing between our bodies.</p>
+        </div>
+    </section>
+
+    <div class="envelope-section">
+        <div class="paper-letter">
+            <div class="letter-header">
+                <span style="font-family:'Cinzel'; font-weight:bold;">Letter for you</span>
+            </div>
+
+            <div class="letter-content">
+                <p>Hello, Bizcochito de Azucar,</p>
+                <p>What can I say about this time together. I look at us and I see our small routines and our comfort and our fights and every little thing that makes us real. You are my home and the source of my desires and my adventure all at the same time. You are the owner of all my thoughts and every small detail of my life. Even when we watched Chernobyl I felt a depth of emotion that I had felt before and I put myself in the boots of the fireman and I thought about the weight of our promises.</p>
+
+                <p>We share the same space in our heads and we share the same thoughts even when the distance is vast. You are the most real presence in my life even when I cannot touch you. You are present in how I move and how I see the world and in the things that stay with me forever. I am horny because my body waits for you with a thirst that only your skin can quench but I love you with a soul that already belongs to you completely. You have become the architecture of my days and the only place where I truly want to stay.</p>
+            </div>
+
+            <div class="signature">Andrés.</div>
+        </div>
+    </div>
+
+    <footer>
+        <a href="index.html">BACK TO INDEX</a>
+    </footer>
+
+</body>
+
+</html>
