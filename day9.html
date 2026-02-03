@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 9</title>
+    <link rel="icon" type="image/png" href="img/icono.jpg">
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Montserrat:wght@300;400;500&family=Playfair+Display:ital,wght@1,400&family=La+Belle+Aurore&family=Cormorant+Garamond:ital,wght@0,400;1,600&family=Space+Mono&display=swap"
+        rel="stylesheet">
+
+    <style>
+        /* --- VARIABLES --- */
+        :root {
+            --bg-color: #fcfcfc;
+            --text-color: #111111;
+            --gold: #d4af37;
+            --mango: #ffcc00;
+            --milk: #fffaf0;
+            --paper-color: #fdfbf7;
+            --success-green: #2e7d32;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* HEADER */
+        header {
+            min-height: 40vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 2.5rem;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            color: #555;
+            font-size: 1.2rem;
+        }
+
+        .divider {
+            width: 50px;
+            height: 2px;
+            background: var(--gold);
+            margin: 20px auto;
+        }
+
+        .date-stamp {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            letter-spacing: 3px;
+            color: #888;
+        }
+
+        section {
+            padding: 60px 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h2 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.8rem;
+            text-align: center;
+            margin-bottom: 40px;
+            color: #111;
+        }
+
+        p {
+            line-height: 1.9;
+            color: #444;
+            margin-bottom: 25px;
+            font-size: 1.05rem;
+            text-align: center;
+        }
+
+
+        /* --- ESTILOS LIMPIOS (INTRO, MANGO, RECEIPT) --- */
+        .grid-2-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+            margin-bottom: 60px;
+        }
+
+        .clean-polaroid {
+            background: white;
+            padding: 12px 12px 35px 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transform: rotate(-2deg);
+            transition: transform 0.3s;
+        }
+
+        .clean-polaroid:hover {
+            transform: rotate(0deg) scale(1.02);
+        }
+
+        .clean-polaroid img {
+            width: 100%;
+            display: block;
+            filter: saturate(1.1);
+        }
+
+        .mango-section {
+            background: linear-gradient(135deg, var(--milk) 0%, #fffbe6 100%);
+            border-radius: 20px;
+            padding: 60px 40px;
+            border: 2px solid var(--mango);
+            text-align: center;
+            margin: 40px auto;
+            max-width: 600px;
+        }
+
+        .mango-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .receipt-container {
+            background: #fff;
+            padding: 40px;
+            max-width: 450px;
+            margin: 0 auto;
+            border: 1px solid #eee;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.05);
+            font-family: 'Space Mono', monospace;
+            position: relative;
+        }
+
+        .receipt-container::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: 0;
+            width: 100%;
+            height: 10px;
+            background: radial-gradient(circle, transparent, transparent 50%, #fff 50%, #fff 100%);
+            background-size: 15px 15px;
+        }
+
+        .receipt-header {
+            text-align: center;
+            border-bottom: 2px dashed #ccc;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+
+        .receipt-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 0.85rem;
+        }
+
+        .receipt-total {
+            border-top: 2px dashed #ccc;
+            padding-top: 20px;
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            color: #a32a2a;
+        }
+
+
+        /* --- ESTILOS DE LA CARTA (DAY 8 STYLE) --- */
+        .envelope-section {
+            padding: 100px 20px;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: center;
+            margin-top: 80px;
+        }
+
+        .paper-letter {
+            background-color: #fdfbf7;
+            width: 100%;
+            max-width: 700px;
+            padding: 60px;
+            position: relative;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid #f0f0f0;
+            background-image: url("https://www.transparenttextures.com/patterns/cream-paper.png");
+        }
+
+        .letter-content,
+        .letter-content p {
+            font-family: 'Cormorant Garamond', serif !important;
+            font-size: 1.3rem !important;
+            line-height: 1.8 !important;
+            color: #2c2c2c !important;
+            text-align: left !important;
+            margin-bottom: 20px;
+        }
+
+        .letter-header {
+            border-bottom: 1px solid #d4af37;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .signature {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.5rem;
+            text-align: right;
+            margin-top: 40px;
+            color: var(--success-green);
+        }
+
+
+        /* --- ESTILOS SCRAPBOOK (ORGANIC MIX) --- */
+        .scrapbook-section {
+            padding: 60px 20px;
+            max-width: 900px;
+            /* Ancho para permitir fotos horizontales */
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .scrap-item {
+            background: white;
+            padding: 10px 10px 35px 10px;
+            /* Espacio extra abajo para caption */
+            box-shadow: 2px 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            position: relative;
+            border: 1px solid #eee;
+            margin-bottom: 20px;
+
+            /* Clave para layouts orgánicos: */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .scrap-item:hover {
+            z-index: 100;
+            transform: scale(1.02) !important;
+            box-shadow: 5px 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .scrap-item img,
+        .scrap-item video {
+            display: block;
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+        }
+
+        .scrap-caption {
+            font-family: 'La Belle Aurore', cursive;
+            font-size: 1rem;
+            color: #555;
+            text-align: center;
+            margin-top: auto;
+            padding-top: 10px;
+            line-height: 1.2;
+        }
+
+        /* CLASES DE TAMAÑO ORGÁNICO */
+        /* Fotos Verticales (Portraits) - Ocupan menos ancho */
+        .portrait {
+            width: 30%;
+        }
+
+        /* Fotos Horizontales (Landscapes) - Ocupan más ancho */
+        .landscape {
+            width: 45%;
+        }
+
+        /* Fotos Muy Anchas (Full width relative to container) */
+        .wide {
+            width: 60%;
+        }
+
+        /* Contenedor flexible para grupos */
+        .organic-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Centrados verticalmente para que no se vea rígido */
+            gap: 20px;
+            /* Espacio justo */
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .journey-block {
+            margin-bottom: 80px;
+            position: relative;
+        }
+
+        .tilt-left {
+            transform: rotate(-2deg);
+        }
+
+        .tilt-right {
+            transform: rotate(2deg);
+        }
+
+        .tilt-hard-left {
+            transform: rotate(-4deg);
+        }
+
+        .tilt-hard-right {
+            transform: rotate(4deg);
+        }
+
+        .inter-text {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: #444;
+            background: #fffce0;
+            padding: 15px 20px;
+            border: 1px dashed #ccc;
+            max-width: 280px;
+            box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.05);
+            position: relative;
+            z-index: 4;
+            text-align: left;
+            margin: 20px auto;
+        }
+
+        .inter-text::before {
+            content: '✎';
+            color: var(--gold);
+            margin-right: 8px;
+        }
+
+
+        /* Footer */
+        footer {
+            padding: 60px;
+            text-align: center;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+        }
+
+        footer a {
+            text-decoration: none;
+            color: #999;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 10000;
+        }
+
+        .modal-scroll-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-img {
+            max-width: 95vw;
+            max-height: 95vh;
+            object-fit: contain;
+            border: 1px solid #333;
+        }
+
+        .close-btn {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            color: #fff;
+            font-size: 40px;
+            cursor: pointer;
+            z-index: 10001;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2-col {
+                grid-template-columns: 1fr;
+            }
+
+            .scrap-item.portrait,
+            .scrap-item.landscape,
+            .scrap-item.wide {
+                width: 90%;
+                margin: 10px auto;
+            }
+
+            .organic-row {
+                flex-direction: column;
+                gap: 30px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div style="font-family: 'Cinzel'; font-size: 0.8rem; letter-spacing: 4px; color: #999; margin-bottom: 15px;">
+            DAY 9</div>
+        <h1>Roots</h1>
+        <div class="divider"></div>
+        <div class="subtitle">Colombia Part I: The vicinity of what my life used to be. </div>
+    </header>
+
+    <section>
+        <div class="grid-2-col">
+            <div>
+                <h2 style="border:none; text-align:left; margin-bottom:20px;">Baddie en mi casa</h2>
+                <p style="text-align:left;">There I was, standing like an idiot in front of the arrivals glass waiting
+                    for you. "Where the hell is Eunice?" I thought, and then suddenly, you were right there by my side.
+                    On the other side of the world, in a place you were never a part of, but that you braved just so we
+                    could be together one more time. I was completely speechless when I laid eyes on you.</p>
+                <p style="text-align:left;">I know I say this constantly, almost as if I want it to stay etched in your
+                    memory, you are beautiful. You fight against your skin, hard on yourself. There isn’t a place on
+                    earth that matches your beauty, but I swear on whatever you hold most dear that in person, you are
+                    like a literal angel. I’ve told you time and time again, I know, but you simply disarm me, you just
+                    walk into a room and suddenly I am completely and utterly yours. it’s a miracle I was holding those
+                    flowers with my dear life, because I was so unprepared for the sight of you that I would have looked
+                    like an idiot standing without anything.
+                </p>
+                <p style="text-align:left;">We ate burger that day, you didn't like them.
+                </p>
+            </div>
+            <div class="clean-polaroid">
+                <img src="day9/bienvenida.jpg" alt="Welcome Moment">
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-bottom: 40px;">
+            <div
+                style="width: 150px; height: 150px; border-radius: 50%; overflow: hidden; margin: 0 auto 15px auto; border: 4px solid #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                <img src="day9/manolo.jpg" alt="Manolo" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <p style="font-style: italic; font-size: 0.9rem; margin-bottom: 0;">Manolo approved immediately.</p>
+        </div>
+
+        <div class="mango-section">
+            <span class="mango-icon">🥭🥛</span>
+            <h3 style="color: #e6ac00; margin-bottom: 10px; font-family:'Cinzel';">The Addiction</h3>
+            <p style="margin-bottom: 0;">The amount of mango we consumed should be illegal. I swear that Mango con Leche is top best creation of history(Chai tow kway higher in the top, don't worry). it's incredible how after my whole life lived in Colombia, Mango con leche reminds me of you</p>
+        </div>
+    </section>
+
+    <div class="scrapbook-section">
+
+        <h2 style="margin-top: 0; letter-spacing: 3px; margin-bottom: 40px;">GETAWAT</h2>
+
+        <div class="journey-block">
+
+            <div class="organic-row">
+                <div class="scrap-item wide tilt-left">
+                    <video autoplay muted loop playsinline>
+                        <source src="day9/catedral_vid.mp4" type="video/mp4">
+                    </video>
+                    <div class="scrap-caption">WHo can resist?</div>
+                </div>
+            </div>
+
+            <div class="inter-text tilt-right">
+            Our journey began at home, and our first destination was the salt cathedral.
+            </div>
+
+            <div class="organic-row">
+                <div class="scrap-item portrait tilt-right" onclick="openModal('day9/catedral_1.jpg')">
+                    <img src="day9/catedral_1.jpg" alt="Salt Detail">
+                    <div class="scrap-caption">The photos that only us are going to see</div>
+                </div>
+                <div class="scrap-item portrait tilt-hard-left" onclick="openModal('day9/catedral_2.jpg')">
+                    <img src="day9/catedral_2.jpg" alt="Cross">
+                    <div class="scrap-caption">Style a no more.</div>
+                </div>
+                 <div class="scrap-item wide tilt-left">
+                    <video autoplay muted loop playsinline>
+                        <source src="day9/catedral_vid2.mp4" type="video/mp4">
+                    </video>
+                    <div class="scrap-caption">Seeking the heart of your ring</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="journey-block">
+            <h2 style="margin-bottom: 40px;">The Lake</h2>
+
+            <div class="organic-row">
+                <div class="scrap-item landscape tilt-left" onclick="openModal('day9/guatavita_1.jpg')">
+                    <img src="day9/guatavita_1.jpg" alt="Hike Start">
+                    <div class="scrap-caption">Start of the hike</div>
+                </div>
+            </div>
+
+            <div class="inter-text tilt-left">
+               I remember this walk and feel so fortunate to have experienced it with you and my family. I was fortunate to live to witness it, for which I am grateful every day. 
+            </div>
+
+            <div class="organic-row">
+                <div class="scrap-item portrait tilt-right" onclick="openModal('day9/guatavita_2.jpg')">
+                    <img src="day9/guatavita_2.jpg" alt="The Path">
+                    <div class="scrap-caption">A fairy in the forest</div>
+                </div>
+
+                <div class="scrap-item landscape tilt-hard-left" onclick="openModal('day9/guatavita_4.jpg')">
+                    <img src="day9/guatavita_4.jpg" alt="The Lake Reveal">
+                    <div class="scrap-caption">Another beautiful photo of you</div>
+                </div>
+            </div>
+
+            <div class="organic-row">
+                <div class="scrap-item wide tilt-right" onclick="openModal('day9/guatavita_5.jpg')">
+                    <img src="day9/guatavita_5.jpg" alt="Summit Us">
+                    <div class="scrap-caption">We made it at the top</div>
+                </div>
+            </div>
+             <div class="organic-row">
+                <div class="scrap-item wide tilt-right" onclick="openModal('day9/guatavita_6.jpg')">
+                    <img src="day9/guatavita_6.jpg" alt="Summit Us">
+                    <div class="scrap-caption">My dream is that you enjoy life everyday</div>
+                </div>
+                 <div class="scrap-item wide tilt-right" onclick="openModal('day9/guatavita_7.jpg')">
+                    <img src="day9/guatavita_7.jpg" alt="Summit Us">
+                    <div class="scrap-caption">The worst timing alongside the most beautiful setting. Dad's magic</div>
+                </div>
+                
+            </div>
+        </div>
+
+        <div class="journey-block">
+            <h2 style="margin-bottom: 40px;">Home Ground</h2>
+
+            <div class="organic-row">
+                <div class="scrap-item portrait tilt-left" onclick="openModal('day9/caminata_main.jpg')">
+                    <img src="day9/caminata_main.jpg" alt="Walking Main">
+                    <div class="scrap-caption">Walking my parents</div>
+                </div>
+            </div>
+
+            <div class="inter-text tilt-none">
+The fact that my parents invited us for a walk and that we ate guava with cheese along the way. I live for those days, I live to remember, and I am proud of this life I have built with you.             </div>
+
+            <div class="organic-row">
+                <div class="scrap-item landscape tilt-right" onclick="openModal('day9/caminata_2.jpg')">
+                    <img src="day9/caminata_2.jpg" alt="Parents Joy">
+                    <div class="scrap-caption">Casual bizcochito pose</div>
+                </div>
+                <div class="scrap-item landscape tilt-hard-left" onclick="openModal('day9/caminata_3.jpg')">
+                    <img src="day9/caminata_3.jpg" alt="Street detail">
+                    <div class="scrap-caption">The path</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="journey-block" style="margin-bottom: 0;">
+            <h2 style="margin-bottom: 30px;">Rest & Peace</h2>
+
+            <div class="inter-text" style="text-align: center; margin-bottom: 30px; margin-top:0;">
+After so many getaways, we needed a break (some more than others).             </div>
+
+            <div class="organic-row">
+                <div class="scrap-item portrait tilt-left" onclick="openModal('day9/descanso_1.jpg')">
+                    <img src="day9/descanso_1.jpg" alt="Resting 1">
+                    <div class="scrap-caption">First Dinner outside with my family</div>
+                </div>
+                <div class="scrap-item landscape tilt-right" onclick="openModal('day9/descanso_2.jpg')">
+                    <img src="day9/descanso_2.jpg" alt="Resting 2">
+                    <div class="scrap-caption">The best photo of you taken by me</div>
+                </div>
+                <div class="scrap-item landscape tilt-hard-left" onclick="openModal('day9/descanso_3.jpg')">
+                    <img src="day9/descanso_3.jpg" alt="Resting 3">
+                    <div class="scrap-caption">Your first time cooking for us</div>
+                </div>
+                 <div class="scrap-item landscape tilt-hard-left" onclick="openModal('day9/descanso_4.jpg')">
+                    <img src="day9/descanso_4.jpg" alt="Resting 3">
+                    <div class="scrap-caption">Sneaky photos</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <section>
+        <div class="receipt-container">
+            <div class="receipt-header">
+                <h3>THE DAMAGE (WORTH IT)</h3>
+                <span style="font-size: 0.8rem; color: #888;">ORDER #2025-PART 1</span>
+            </div>
+            <div class="receipt-item"><span>CREPES & WAFFLES</span><span>$$</span></div>
+            <div class="receipt-item"><span>CENTRAL CEVICHERÍA</span><span>$$$$$$</span></div>
+            <div class="receipt-item"><span>WOK</span><span>$$$</span></div>
+            <div class="receipt-item"><span>FRENCH QUARTER</span><span>$$$</span></div>
+            <div class="receipt-item"><span>STREET EMPANADAS</span><span>$</span></div>
+            <div class="receipt-item" style="color: #888; font-style: italic;"><span>ABUELA'S
+                    RECALENTADO</span><span>PRICELESS</span></div>
+            <div class="receipt-total"><span>STATUS:</span><span>BANKRUPT</span></div>
+        </div>
+    </section>
+
+    <div class="envelope-section">
+        <div class="paper-letter">
+            <div class="letter-header">
+                <span style="font-family:'Cinzel'; font-weight:bold;">A Note from Home</span>
+            </div>
+            <div class="letter-content">
+                <p>Hola, Hermosa. 
+</p>
+                <p>I’ve been holding back a bit throughout the entire page so as not to write too much, however, I’ve barely mentioned how important it has been that you visited Colombia, not just for the fact that you decided to put your life on hold for an entire month to see this fool. But also, what it has meant to me.</p>
+
+<p>First of all, you were the answer to so many questions. Before you, my life was a succession of identical days, an empty calendar. Now that I’ve found you, the past no longer hurts, because every mistake was leading me, every self doubt, without knowing it, toward this precise moment when I looked at you in that airport in Colombia that time. Love becomes a homeland. One of those you feel proud to belong to, one of those that inspires you every day you set foot on this earth and build the world where our love can live.</p>
+
+<p>Bringing you to my streets, to these places that know my childhood steps, is as if the puzzle pieces finally clicked. My whole life I felt like an outsider to Colombia, to the restaurants, to the people. When I built the trip itinerary, I felt guilty, I felt I wasn’t Colombian enough to show you Bogota, or Medellin, or Salento. I was afraid that the voices of my past would take on some meaning. I was showing you the city where I had lived almost all my life, the same one that saw me leave after years of monotony. Today, writing this from my computer, I realize that Bogota was waiting for you to gain meaning. Every corner that used to be loneliness is now the stage for your laughter, and suddenly I understand that all my returns were nothing more than a rehearsal for this moment, walking hand in hand, almost teaching me how to dream again.</p>
+
+<p>I feel that my roots, those roots, the ones that were buried in this cold, arid soil, neglected by my indifference, have finally bloomed because you have come to water them with your presence. I am no longer the one who left Colombia 3 years ago, I am the one who returns with you, planting a new world. You make me feel proud to be Colombian, remembering you eating chicharrón, seeing you sleeping in my bed, finally, in a childhood wish, what I longed for has become a reality. My love, realize that finally, after so much time, now in my past your face rest and my future has your name.</p>
+
+<p>I didn't bring you to show you where I come from, but for you to see where the road that led me to you began. Where my customs, my fears, and my desires came from. What better place to start than with my family. All families are complex, with their codes, with their cracks. I was afraid, afraid of their reactions, their comments. Seeing you there, sitting at the table where I so often felt small or misunderstood, so judged, transformed the space. Suddenly, my parents were no longer just the figures who gave me life, who scolded me, but witnesses to the person I have become because of you. There was a strange peace in seeing how your laughter mixed with their voices, as if an invisible thread were finally uniting my two worlds, the resentful child I once was and the man who loves you.</p>
+
+<p>You know that I am a private person, I don't say very, above all, private. Because I don’t share my intimate life with anyone, not even my family. Introducing you to my family was telling them, without words, that I have been building my place in the world, that same place I have drawn over the years with my photos, the streets of Melbourne, the scent of flowers, of bays, of mountains, visiting Fontanar again and again, petting Manolo over and over. In those days, I realized that this patient weaving of lines traces the image of your face. In the end, my past wasn't a bunch of disconnected points, I wasn't running from my past, I was taking the long way around so that, when I finally reached you, I would have an entire world to give you.</p>
+
+<p>I feel lucky that you now walk through my memories with the same naturalness as you walk through my present. You are the only person in the world capable of entering my mess and finding something beautiful in it worth taking care of. Thank you for making me feel that, after all, my origin was not something I should hide, but the ground where we could finally find each other.</p>
+
+<p>I love you, today more than ever, for having made Bogota, my family, and myself be born again in your gaze.</p>
+            </div>
+            <div class="signature">Andrés.</div>
+        </div>
+    </div>
+
+    <footer>
+        <a href="index.html">BACK TO INDEX</a>
+    </footer>
+
+    <div id="imageModal" class="modal-overlay" onclick="closeModal()">
+        <span class="close-btn">&times;</span>
+        <div class="modal-scroll-container">
+            <img class="modal-img" id="img01">
+        </div>
+    </div>
+
+    <script>
+        var modal = document.getElementById("imageModal");
+        var modalImg = document.getElementById("img01");
+        function openModal(src) { modal.style.display = "block"; modalImg.src = src; }
+        function closeModal() { modal.style.display = "none"; }
+    </script>
+
+</body>
+
+</html>
