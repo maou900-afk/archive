@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 10</title>
+    <link rel="icon" type="image/png" href="img/icono.jpg">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Montserrat:wght@300;400;500&family=Playfair+Display:ital,wght@1,400&family=La+Belle+Aurore&family=Cormorant+Garamond:ital,wght@0,400;1,600&family=Space+Mono&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- VARIABLES --- */
+        :root {
+            --bg-color: #fcfcfc;
+            --text-color: #111111;
+            --gold: #d4af37;
+            --paper-color: #fdfbf7;
+            --tape-color: rgba(255, 255, 255, 0.6);
+            --shadow-soft: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* --- TYPOGRAPHY --- */
+        h1 { font-family: 'Cinzel', serif; font-size: 2.5rem; letter-spacing: 2px; margin-bottom: 10px; }
+        h2 { font-family: 'Cinzel', serif; font-size: 1.8rem; text-align: center; margin-bottom: 30px; border-bottom: 1px solid var(--gold); display: inline-block; padding-bottom: 5px; }
+        
+        /* --- MEJORA DE PÁRRAFOS (SIN JUSTIFICAR) --- */
+        p { 
+            line-height: 1.8; 
+            color: #333; 
+            margin-bottom: 25px; 
+            font-size: 1rem; 
+            
+            /* Alineación Centrada Natural (Estilo Álbum) */
+            text-align: center; 
+            
+            /* Ancho controlado para que no se vea disperso */
+            max-width: 700px; 
+            margin-left: auto; 
+            margin-right: auto;
+        }
+
+        .caption { font-family: 'La Belle Aurore', cursive; font-size: 1rem; color: #666; text-align: center; margin-top: 10px; }
+
+        /* HEADER */
+        header { min-height: 40vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 40px 20px; }
+        .date-stamp { font-family: 'Space Mono', monospace; font-size: 0.8rem; letter-spacing: 3px; color: #888; margin-top: 15px; }
+
+        section { padding: 50px 20px; max-width: 900px; margin: 0 auto; position: relative; }
+
+        /* --- SCRAPBOOK PHOTO STYLE --- */
+        .photo-wrapper {
+            background: white;
+            padding: 8px 8px 30px 8px; /* Polaroid bottom */
+            box-shadow: var(--shadow-soft);
+            position: relative;
+            transition: transform 0.3s;
+            border: 1px solid #f0f0f0;
+        }
+        .photo-wrapper:hover { transform: scale(1.02); z-index: 10; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .photo-wrapper img, .photo-wrapper video { display: block; width: 100%; height: auto; }
+
+        /* CINTA ADHESIVA (TAPE) */
+        .tape {
+            position: absolute; width: 80px; height: 20px;
+            background-color: rgba(220, 220, 220, 0.5);
+            top: -8px; left: 50%; transform: translateX(-50%) rotate(-1deg);
+            z-index: 5; backdrop-filter: blur(2px);
+        }
+
+        /* SIZES */
+        .w-sm { width: 30%; min-width: 220px; } 
+        .w-md { width: 48%; min-width: 300px; } 
+        .w-lg { width: 70%; min-width: 350px; }
+        .row { display: flex; justify-content: center; align-items: center; gap: 30px; flex-wrap: wrap; margin-bottom: 40px; }
+
+        .tilt-l { transform: rotate(-2deg); }
+        .tilt-r { transform: rotate(2deg); }
+        .tilt-none { transform: rotate(0deg); }
+
+
+        /* --- DISEÑO ESPECIAL DELICADO (VIRGILIO) --- */
+        .delicate-section {
+            background-color: #fffdf9;
+            border: 1px solid #e8e0cc;
+            padding: 60px 40px;
+            margin: 40px auto;
+            position: relative;
+        }
+        .delicate-section::before, .delicate-section::after {
+            content: ""; position: absolute; width: 20px; height: 20px;
+            border: 1px solid var(--gold);
+        }
+        .delicate-section::before { top: 10px; left: 10px; border-right: none; border-bottom: none; }
+        .delicate-section::after { bottom: 10px; right: 10px; border-left: none; border-top: none; }
+
+        /* Layout Arquitectura */
+        .arch-layout {
+            display: flex; align-items: center; gap: 40px; margin-top: 60px; justify-content: center;
+        }
+        .arch-photo { flex: 0 0 35%; max-width: 250px; } 
+        .arch-text { 
+            flex: 1; 
+            font-family: 'Cormorant Garamond', serif; 
+            font-size: 1.1rem; font-style: italic; color: #555; 
+            text-align: left; /* Alineado a la izquierda para lectura cómoda */
+            line-height: 1.6;
+            border-left: 1px solid var(--gold);
+            padding-left: 20px;
+        }
+
+
+        /* --- TARJETA NADA --- */
+        .nada-card {
+            background: #fff; border: 1px solid #ddd;
+            padding: 30px; max-width: 400px; margin: 50px auto 0 auto;
+            text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            transform: rotate(-1deg);
+        }
+        .nada-logo-text { font-family: 'Cinzel'; font-size: 1.5rem; border: 1px solid #111; display: inline-block; padding: 5px 15px; margin-bottom: 15px; }
+
+
+        /* --- PRETTY BIRTHDAY SECTION --- */
+        .birthday-card {
+            background: linear-gradient(135deg, #fffcf5 0%, #fff 100%);
+            border: 2px solid #e6c86e; /* Borde dorado suave */
+            padding: 50px 30px;
+            margin: 60px auto;
+            position: relative;
+            box-shadow: 0 15px 40px rgba(212, 175, 55, 0.15); /* Sombra dorada */
+            text-align: center;
+        }
+        .birthday-card::before {
+            content: "★"; font-size: 2rem; color: var(--gold);
+            position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
+            background: var(--bg-color); padding: 0 10px;
+        }
+        .birthday-title {
+            font-family: 'Cinzel'; color: #b8860b; font-size: 1.5rem; letter-spacing: 3px; margin-bottom: 30px;
+        }
+
+
+        /* --- NOTES & LETTERS --- */
+        .note {
+            background: #fffce0; padding: 25px; border: 1px dashed #ccc;
+            font-family: 'Space Mono', monospace; font-size: 0.9rem; color: #444; 
+            max-width: 550px; margin: 30px auto; position: relative;
+            text-align: center;
+        }
+
+        .envelope-section { padding: 80px 20px; background-color: #fff; display: flex; justify-content: center; margin-top: 60px; }
+        .paper-letter {
+            background-color: var(--paper-color); width: 100%; max-width: 700px; padding: 60px;
+            position: relative; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid #f0f0f0; background-image: url("https://www.transparenttextures.com/patterns/cream-paper.png");
+        }
+        .letter-content p { 
+            font-family: 'Cormorant Garamond', serif !important; font-size: 1.3rem !important;
+            line-height: 1.8 !important; color: #2c2c2c !important; 
+            text-align: left !important; /* Carta alineada a la izquierda siempre */
+            margin-bottom: 20px;
+        }
+        .letter-header { border-bottom: 1px solid var(--gold); padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end; }
+        .signature { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.5rem; text-align: right; margin-top: 40px; color: var(--success-green); }
+
+
+        /* Footer */
+        footer { padding: 60px; text-align: center; font-size: 0.8rem; letter-spacing: 2px; }
+        footer a { text-decoration: none; color: #999; }
+
+        /* Modal */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10000; }
+        .modal-scroll-container { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .modal-img { max-width: 95vw; max-height: 95vh; object-fit: contain; border: 1px solid #333; }
+        .close-btn { position: fixed; top: 20px; right: 30px; color: #fff; font-size: 40px; cursor: pointer; z-index: 10001; }
+
+        @media (max-width: 768px) {
+            .arch-layout { flex-direction: column; gap: 20px; }
+            .arch-text { border-left: none; border-top: 1px solid var(--gold); padding-left: 0; padding-top: 20px; text-align: center; }
+            .w-sm, .w-md, .w-lg { width: 100%; }
+            .paper-letter { padding: 30px 20px; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div style="font-family: 'Cinzel'; font-size: 0.8rem; letter-spacing: 4px; color: #999;">DAY 10</div>
+        <h1>The chaotic city</h1>
+        <div class="divider" style="width: 50px; height: 2px; background: var(--gold); margin: 20px auto;"></div>
+      
+    </header>
+
+    <section>
+        <div style="text-align:center;"><h2>The Garden</h2></div>
+        <p>After several days, the real trip began. Our first contact with the city of Bogotá was the Botanical Garden. It was the perfect place to start.</p>
+
+        <div class="row">
+            <div class="photo-wrapper w-md tilt-l" onclick="openModal('day10/jardin1.jpg')">
+                <div class="tape"></div>
+                <img src="day10/jardin1.jpg" alt="Garden Landscape">
+                <div class="caption">Colombia green</div>
+            </div>
+            <div class="photo-wrapper w-sm tilt-r" onclick="openModal('day10/jardin2.jpg')">
+                <div class="tape"></div>
+                <img src="day10/jardin2.jpg" alt="Garden Portrait">
+                <div class="caption">You & Flowers</div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="delicate-section">
+            <div style="text-align:center;"><h2>The library & the Arepa</h2></div>
+            
+            <p style="font-size:0.95rem; font-style:italic;">
+                As I was putting this part of the page together, I realized that you are in almost every photo I’ve taken on this trip whether they’re professional shots or just quick photos. You know my passion for photography, the idea that a picture is more than a memory, it’s a decision. It’s my way of saying, I see you, and what I see is so important that I want time to stop right here. I have so many photos of you because they represent exactly that, my wish for time to stand still whenever I’m by your side.
+            </p>
+
+            <div class="row">
+                <div class="photo-wrapper w-md tilt-l" onclick="openModal('day10/virgilio_main.jpg')">
+                    <img src="day10/virgilio_main.jpg" alt="Main Portrait">
+                    <div class="caption">The Muse</div>
+                </div>
+                <div class="photo-wrapper w-md tilt-r" onclick="openModal('day10/virgilio_her.jpg')">
+                    <img src="day10/virgilio_her.jpg" alt="Side Portrait">
+                </div>
+            </div>
+
+            <div class="arch-layout">
+                <div class="arch-photo photo-wrapper tilt-none" onclick="openModal('day10/virgilio_arch.jpg')">
+                    <img src="day10/virgilio_arch.jpg" alt="Salmona Architecture">
+                </div>
+                <div class="arch-text">
+                    I think about how magical this place was. We both know well that this library is the pride of every architect in Colombia. It has a power and a unique simplicity that I still think about from time to time. And then you arrived in Bogota at the Virgilio Barco. The center of gravity shifted completely. Those walls that have heard our names seemed to lean toward you for a moment. The windows were brighter as they watched you pass and the beautiful ochre colors of the library seemed more vivid than ever. You are like an inevitable force in my life and you do not adapt to the place. It was the place that reorganized itself around you so that its famous beauty could be the perfect frame for your face. The Virgilio Barco was waiting for you to arrive so that perspective would finally have a reason to exist.
+                </div>
+            </div>
+        </div>
+
+        <div class="nada-card">
+            <div class="nada-logo-text">NADA</div>
+            <div onclick="openModal('day10/nada.jpg')" style="cursor: pointer; margin-bottom: 15px;">
+                <img src="day10/nada.jpg" style="width:100%; display:block; filter: grayscale(20%);" alt="Dinner at NADA">
+            </div>
+            <p style="font-family:'Cormorant Garamond'; font-style:italic; margin:0;">We enjoy good restaurants, new meals, new experiences. I feel like NADA was the second best restaurant we visited in Colombia.</p>
+        </div>
+    </section>
+
+
+    <section>
+        <div style="text-align:center;"><h2>Birthday Trip</h2></div>
+        
+        <p>I think we share the same requirements of a weakness. It brings me peace to know that we surrender so easily to pleasing one another. It happens the moment I see your face, that smile that leaves me defenseless, until every word I intended to say simply vanishes into the air.</p>
+        
+        <p>Before Colombia, I promised you that I wanted to give you everything. I am determined to spend every cent I have, even if it is not much, and every ounce of my energy, to ensure you lack nothing this world can offer. My only luxury is watching how you enjoy what I can give you.</p>
+        
+        <p>I am almost desperate, my love, to know your heart's desires, no matter how small they may be. My greatest fortune is to invest everything in your happiness. All that I possess is yours, not because I have plenty, but because nothing I own has any meaning unless it is shared through you. I want to invite you to inhabit my entire life, my days and my possessions, until nothing is left that is mine, and everything is ours. For you, I would conquer the world.</p>
+
+        <div class="row">
+            <div class="photo-wrapper w-sm tilt-l" onclick="openModal('day10/breakfast.jpg')">
+                <div class="tape"></div>
+                <img src="day10/breakfast.jpg" alt="Breakfast">
+                <div class="caption">Mid Breakfast</div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="photo-wrapper w-sm tilt-r" onclick="openModal('day10/walking_center.jpg')">
+                <img src="day10/walking_center.jpg" alt="Walking">
+                <div class="caption">Walking to Center</div>
+            </div>
+            <div class="photo-wrapper w-md tilt-l" onclick="openModal('day10/fruit_bowl.jpg')">
+                <img src="day10/fruit_bowl.jpg" alt="Fruits">
+                <div class="caption">Fruits, it would work but you come from Malaysia</div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="photo-wrapper w-md tilt-none" onclick="openModal('day10/ajiaco.jpg')">
+                <img src="day10/ajiaco.jpg" alt="Ajiaco">
+                <div class="caption">Ajiaco!! Y pataconas</div>
+            </div>
+            <div class="photo-wrapper w-lg tilt-r" style="margin-top:-20px; z-index:5;" onclick="openModal('day10/plaza.jpg')">
+                <div class="tape"></div>
+                <img src="day10/plaza.jpg" alt="Plaza de Bolivar">
+                <div class="caption">Plaza de Bolívar</div>
+            </div>
+        </div>
+
+        <div class="note">
+            On these pages, I always like to ignore certain unpleasant things that happened on our trips. Thinking about how that maniac was bothering us is giving him control over our lives. It is a choice to choose ourselves and remember the beautiful moments, the tour, the people, and the food, above all else.
+        </div>
+    </section>
+
+
+    <section style="background: #fafafa; border-top:1px dashed #ccc; border-bottom:1px dashed #ccc;">
+        <div style="text-align:center;"><h2>The Night Out</h2></div>
+        
+        <p>We had dinner at Selma, still carrying the bitterness of the afternoon, for reasons only life understands. Forgive me for my silences and my outbursts. I think about our arguments throughout the years, about that tension that lingers in the air, waiting for a simple misunderstanding to break it. If you think about these last few days, there is nothing more intimate than a disagreement. In those moments of anger, we reveal ourselves to each other with a nakedness that even sex can never reach.</p>
+        
+        <p>I remember it started with me, my insecurities and my fears. You tried to comfort me, yet, look at me, I am as stubborn as a mule. Stubborn as I am, I fight with you because I need you to see me, not as you want me to be, but as I truly am. To fight with you is my way of telling you that you are the only person in the world who holds the power to make me suffer.</p>
+        
+        <p>Luckily, our arguments never last long, and somehow, we always find the path back to one another.</p>
+
+        <div class="row">
+            <div class="photo-wrapper w-md tilt-r" onclick="openModal('day10/bar.jpg')">
+                <div class="tape"></div>
+                <img src="day10/bar.jpg" alt="Rock Bar">
+                <div class="caption">2 Cocktails in and my baby was ready</div>
+            </div>
+        </div>
+
+        <div class="note" style="background: #fff;">
+            We drank of course and I always had the impression that you were a drinker of great capacity. But that night the drinks won and I saw you there broken and crying because our plans to dance were canceled. I confess that I felt angry for a minute of selfish frustration over what our night should have been. But when we got to the uber that anger dissolved just by looking at you. I realized that you are the greatest gift in my life, stills vivid in my head the moment I hugged you tight while you were endlessly crying in the middle of the street. I loved taking care of you. I loved reminding myself that you are never a burden but my absolute priority. Carrying you to bed made me see that you are beautiful in any state and that I am the luckiest man because I am the one who gets to hold you. I did not need a party because having you safe in my arms is the only place I want to be, yeah, it didn't stop me to take some photos of you. hehe.
+        </div>
+
+        <div class="row">
+            <div class="photo-wrapper w-sm tilt-hard-l" onclick="openModal('day10/llorando.jpg')">
+                <img src="day10/llorando.jpg" alt="Crying">
+                <div class="caption">Love the moment</div>
+            </div>
+            <div class="photo-wrapper w-md tilt-r" onclick="openModal('day10/durmiendo.jpg')">
+                <img src="day10/durmiendo.jpg" alt="Sleeping">
+                <div class="caption">KO in bed</div>
+            </div>
+        </div>
+        <p style="font-size:0.9rem; font-style:italic; margin-top:20px;">(I secretly ate a hamburger while you were sleep, hehehehe)</p>
+    </section>
+
+
+    <section>
+        <div style="text-align:center;"><h2>Family Recovery</h2></div>
+
+        <div class="row">
+            <div class="photo-wrapper w-md tilt-l" onclick="openModal('day10/tacos.jpg')">
+                <div class="tape"></div>
+                <img src="day10/tacos.jpg" alt="Tacos">
+                <div class="caption">Recovery Tacos</div>
+            </div>
+            <div class="photo-wrapper w-sm tilt-r" onclick="openModal('day10/abuela.jpg')">
+                <div class="tape"></div>
+                <img src="day10/abuela.jpg" alt="Family">
+                <div class="caption">Grandma's Bday</div>
+            </div>
+        </div>
+
+        <div class="birthday-card">
+            <div class="birthday-title">YOUR BIRTHDAY (AUG 3)</div>
+            
+            <div class="photo-wrapper w-lg tilt-none" style="margin: 0 auto;" onclick="openModal('day10/andres_selfie.jpg')">
+                <img src="day10/andres_selfie.jpg" alt="Andres Selfie">
+                <div class="caption">Rumba at Andrés with Family</div>
+            </div>
+
+            <div style="margin-top: 30px; font-family:'Cormorant Garamond'; font-size:1.1rem; max-width: 650px; margin-left: auto; margin-right: auto;">
+                <p>That morning of your birthday still haunts me because I felt like I didn't put in the effort you deserved. I remember your hints and your desire to do something special but I stayed quiet and did nothing to make you feel like the princess you are. I limited myself to walking through Bogota as if we were fulfilling a task, I mean I couldn't feel it but I got lost in the logistics and the money, neglecting the sacred detail of making you feel that your existence is the only monument worth admiring.</p>
+                
+                <p>Now when you mention that day I feel a crack opening in the ground we walk on because I know you are right to feel like my love had no weight. It hurts me to have left that mark of loneliness in your memory when you are the root that has made my desert bloom and the only homeland I want to belong to. Today I would give anything to go back and prepare that breakfast for you, to look into your eyes so you would have no doubt that you are everything I need. You are the most incredible woman I know and you deserve for every day to be a tribute to your existence, not just because I give it to you but because celebrating you comes from my soul.</p>
+            </div>
+        </div>
+    </section>
+
+
+    <section>
+        <div style="text-align:center;"><h2>Last Bites & Goodbyes</h2></div>
+        
+        <p>Our days in Colombia were coming to an end, and we enjoyed our last few days in Bogotá with my family and my Manolo. We enjoyed everyday life knowing that soon we would have to say goodbye to it all again.</p>
+
+        <div class="row">
+            <div class="photo-wrapper w-md tilt-none">
+                <div class="tape"></div>
+                <video controls playsinline style="width:100%; display:block; border-radius:2px;">
+                    <source src="day10/manolo_snack.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <div class="caption">The king being pleased</div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="photo-wrapper w-sm tilt-l" onclick="openModal('day10/crepes.jpg')">
+                <img src="day10/crepes.jpg" alt="Crepes">
+                <div class="caption">A dessert for my queen</div>
+            </div>
+            <div class="photo-wrapper w-md tilt-r" onclick="openModal('day10/alpina.jpg')">
+                <img src="day10/alpina.jpg" alt="Alpina">
+                <div class="caption">Alpina Smile</div>
+            </div>
+            <div class="photo-wrapper w-sm tilt-l" onclick="openModal('day10/french.jpg')">
+                <img src="day10/french.jpg" alt="French Quarter">
+                <div class="caption">French Quarter views</div>
+            </div>
+        </div>
+    </section>
+
+
+    <div class="envelope-section">
+        <div class="paper-letter">
+            <div class="letter-header">
+                <span style="font-family:'Cinzel'; font-weight:bold;">A Note on Perspectives</span>
+            </div>
+            <div class="letter-content">
+                <p>My Love,</p>
+                <p>Hello beautiful.</p> 
+                <p>I do not know how to start this. Those days were like a sea of mixed emotions. Do not misunderstand me because there are beautiful things that happened and that I treasure, but there is a certain weight in me, a shadow that grew from what happened on your birthday.</p> 
+                <p>I am a man with an inner dryness that often makes me feel ashamed. I have ignored so many things that other people consider natural, perhaps because of my upbringing or my own way of growing up and being in this world with that unbearable lightness that you often point out with such determination. I have become used to being this way, thinking that love is a safe harbor, something that is built once and left there like a house. Many times I feel that we are there in that refuge, but we live under the same roof without truly being in the same room. It was arrogant of me to take for granted that everything would be okay or to think that you would understand me and like what I did just because I put effort into it. In the end I was not a wicked man, but I was a distracted man, and distraction in love is a silent way of ruining things. I planned so much for the trip to go well and I was so obsessed with making you proud of my country that I got lost in the itinerary when the only thing I had to do was stop looking into the map and look into your eyes.</p> 
+                <p>I always tell you that our fights lead us to something better and today I understand more than ever that we have built this beautiful house together, but we have to know how to live in it. We are growing every day and sometimes we make mistakes, but I do not want this to be a dead end. I want it to be the start of something better. After every battle I want to sit with you and learn to translate your silences. I know I am a man of deep habits, but for you I am willing to learn a new language. I do not want us to be in different rooms under the same roof. I want us to build that better world where my effort and your sensitivity finally speak the same language. If you were able to make my roots bloom in this cold soil, I am sure we can find our own way of saying I am here without any maps between us.</p> 
+                <p>After all, while I was editing that short photo session in that bookstore in Colombia, I saw your smile. It is that same smile I see in every photo I take of you, so unique and recognizable when our gazes meet. I realized that my best photograph will always be the one that manages to capture that light in your eyes when you recognize me, that moment where you stop being for the rest of the world and we simply find each other. That's what I want forever.</p>
+                <div class="signature">With a lot of love, Andrés.</div>
+            </div>
+        </div>
+    </div>
+
+
+    <footer>
+        <a href="index.html">BACK TO INDEX</a>
+    </footer>
+
+
+    <div id="imageModal" class="modal-overlay" onclick="closeModal()">
+        <span class="close-btn">&times;</span>
+        <div class="modal-scroll-container">
+            <img class="modal-img" id="img01">
+        </div>
+    </div>
+
+    <script>
+        var modal = document.getElementById("imageModal");
+        var modalImg = document.getElementById("img01");
+        function openModal(src) { modal.style.display = "block"; modalImg.src = src; }
+        function closeModal() { modal.style.display = "none"; }
+    </script>
+
+</body>
+</html>
