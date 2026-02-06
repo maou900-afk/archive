@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 12</title>
+    <link rel="icon" type="image/png" href="img/icono.jpg">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;700&family=Montserrat:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&family=Space+Mono&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Pacifico&family=Permanent+Marker&family=Rock+Salt&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- VARIABLES --- */
+        :root {
+            --bg-color: #fcfcfc;
+            --text-color: #111;
+            --gold: #d4af37;
+            --paper-color: #fdfbf7;
+            --pink-cute: #ffe0e9;
+            --shadow: 0 10px 30px rgba(0,0,0,0.08);
+            --danger: #b71c1c;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Montserrat', sans-serif;
+            margin: 0; padding: 0; overflow-x: hidden;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+        }
+
+        /* --- TYPOGRAPHY --- */
+        h1 { font-family: 'Cinzel', serif; font-size: 2.5rem; letter-spacing: 2px; margin-bottom: 10px; text-align: center; }
+        h2 { font-family: 'Cinzel', serif; font-size: 1.8rem; text-align: center; margin-bottom: 20px; display: block; padding-bottom: 5px; color: #000; }
+        h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-style: italic; text-align: center; color: #555; margin: 20px 0; }
+        
+        p { 
+            line-height: 1.8; color: #333; margin-bottom: 20px; font-size: 1rem; 
+            text-align: center; max-width: 700px; margin-left: auto; margin-right: auto;
+        }
+        
+        .caption { 
+            font-family: 'Space Mono', monospace; font-size: 0.7rem; color: #999; text-align: center; display: block; 
+            margin-top: 15px; text-transform: uppercase; letter-spacing: 2px; 
+        }
+
+        /* --- HEADER --- */
+        header { min-height: 40vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 40px 20px; }
+        .date-stamp { font-family: 'Space Mono', monospace; font-size: 0.8rem; letter-spacing: 3px; color: #888; margin-top: 15px; }
+
+        /* --- LAYOUT --- */
+        section { padding: 80px 0; position: relative; border-bottom: 1px solid #eee; }
+        .container-narrow { max-width: 800px; margin: 0 auto; padding: 0 20px; }
+        img { width: 100%; height: auto; display: block; box-shadow: var(--shadow); transition: transform 0.3s; }
+        img:hover { transform: scale(1.01); }
+
+        /* --- UTILS: SIZE CLASSES --- */
+        .w-30-smaller { width: 50%; margin: 0 auto; }
+        .w-40-smaller { width: 40%; margin: 0 auto; }
+        .w-super-small { width: 120px; margin: 0 auto; }
+        .w-small { width: 60%; margin: 0 auto; }
+        .w-medium { width: 70%; margin: 0 auto; }
+        .w-60-smaller { width: 40%; margin: 0 auto; }
+        .img-std { max-width: 50%; margin: 0 auto; } 
+
+        /* --- INTERACTIVE 1: COMPARISON SLIDER (OVERLAPPING) --- */
+        .comparison-container {
+            position: relative; width: 100%; max-width: 600px; height: 700px; margin: 0 auto; overflow: hidden; cursor: col-resize;
+            box-shadow: var(--shadow);
+        }
+        .comp-img { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            object-fit: cover;
+        }
+        .comp-overlay {
+            position: absolute; top: 0; left: 0; width: 50%; height: 100%; overflow: hidden;
+            border-right: 3px solid #fff; box-shadow: 5px 0 20px rgba(0,0,0,0.2);
+            transition: width 0.1s; background: #fff; z-index: 2;
+        }
+        .comp-label {
+            position: absolute; bottom: 20px; font-family: 'Space Mono'; background: #fff; padding: 5px 10px; font-size: 0.7rem; z-index: 10;
+        }
+        .slider-handle {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px; height: 40px; background: #fff; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; pointer-events: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2); z-index: 20;
+        }
+
+        /* --- INTERACTIVE 2: CONFIDENTIAL FILE --- */
+        .confidential-wrapper {
+            position: relative; cursor: pointer; max-width: 200px; margin: 20px auto;
+            border: 2px dashed #ccc; padding: 5px; background: #f9f9f9;
+        }
+        .confidential-cover {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: #111; color: #fff;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 10; transition: transform 0.6s; transform-origin: top;
+        }
+        .confidential-wrapper.revealed .confidential-cover { transform: rotateX(90deg); opacity: 0; }
+
+        /* --- SPECIAL SECTIONS --- */
+        
+        /* BLACK SQUARE (FIGHT) */
+        .fight-box {
+            background: #0f0f0f;
+            color: #ddd; 
+            padding: 80px 60px;
+            margin: 80px auto; 
+            max-width: 800px;
+            text-align: left;
+            border: 1px solid #333;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+        }
+        .fight-box h3 {
+            color: #d4af37;
+            text-align: center;
+            font-family: 'Cinzel', serif;
+            letter-spacing: 2px;
+            margin-bottom: 40px;
+        }
+        .fight-box p {
+            color: #ccc;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2rem;
+            line-height: 1.9;
+            text-align: left;
+            margin-bottom: 20px;
+            font-style: normal;
+        }
+
+        /* LLAMAS (CSS Kept for Dream Section usage) */
+        .llama-section {
+            background-color: var(--pink-cute);
+            background-image: radial-gradient(#fff 15%, transparent 16%), radial-gradient(#fff 15%, transparent 16%);
+            background-size: 60px 60px; background-position: 0 0, 30px 30px;
+            padding: 100px 0; text-align: center;
+        }
+        .llama-section h2 { font-family: 'Pacifico', cursive; color: #d81b60; font-size: 3rem; margin-bottom: 10px; }
+        .llama-frame {
+            border: 10px solid #fff; border-radius: 20px; transform: rotate(-2deg);
+            box-shadow: 0 20px 50px rgba(216, 27, 96, 0.2); width: 50%; margin: 0 auto; overflow: hidden;
+        }
+
+        /* --- DIVA SECTION --- */
+        .diva-section { 
+            background: #fff; padding: 100px 0; text-align: center; 
+        }
+        .diva-editorial-layout {
+            position: relative; display: inline-block; padding: 15px; border: 1px solid #ddd;
+        }
+        .diva-title { 
+            font-family: 'Playfair Display', serif; font-size: 3.5rem; font-style: italic; font-weight: 700;
+            color: #111; margin-bottom: 40px; letter-spacing: -1px; position: relative; z-index: 2;
+        }
+        .diva-title span {
+            display: block; font-size: 1rem; font-family: 'Montserrat', sans-serif; font-weight: 400;
+            font-style: normal; letter-spacing: 4px; margin-top: 10px; color: #999; text-transform: uppercase;
+        }
+        
+        /* --- COMUNA 13 --- */
+        .comuna-alive-section {
+            background: linear-gradient(135deg, #111 0%, #2a0845 100%);
+            color: #fff; padding: 100px 0; overflow: hidden;
+        }
+        .collage-container {
+            display: flex; justify-content: center; align-items: center; 
+            gap: 0; position: relative; height: 500px; width: 100%; max-width: 900px; margin: 0 auto;
+        }
+        .collage-img {
+            position: absolute; border: 5px solid #fff; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            transition: transform 0.3s;
+        }
+        .collage-img:hover { z-index: 10; transform: scale(1.05) !important; }
+        
+        .sticker {
+            position: absolute; font-family: 'Rock Salt', cursive; color: #ff00ff;
+            background: #fff; padding: 10px 20px; transform: rotate(-10deg);
+            box-shadow: 5px 5px 0 #00ffff; font-size: 1.2rem; z-index: 5;
+        }
+
+        /* --- ANNIVERSARY --- */
+        .anniversary-dark-section {
+            background: #0f0f0f; color: #fff; padding: 100px 0;
+            border-bottom: 1px solid #333;
+        }
+        .anniversary-dark-section h2 { color: #d4af37; border-bottom: none; }
+        .anniversary-dark-section p { color: #888; }
+        .anni-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 60px; max-width: 700px; margin-left: auto; margin-right: auto; }
+        .anni-grid img { border: 1px solid #333; opacity: 0.8; transition: opacity 0.3s; }
+        .anni-grid img:hover { opacity: 1; }
+
+        /* --- POOP QUEEN (COMIC STYLE - CLEAN BACKGROUND) --- */
+        .comic-section {
+            background-color: transparent; 
+            padding: 80px 0; text-align: center;
+        }
+        .comic-card {
+            background: #fff; 
+            border: 4px solid #000;
+            box-shadow: 10px 10px 0px #000; 
+            padding: 40px;
+            max-width: 600px; margin: 0 auto;
+            transform: rotate(-1deg);
+        }
+        .poop-game-area {
+            position: relative; height: 300px; 
+            background: #222; 
+            border: 3px solid #000; 
+            border-radius: 4px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            overflow: hidden; margin-top: 30px;
+        }
+        .poop-btn {
+            padding: 15px 30px; 
+            font-family: 'Permanent Marker', cursive; 
+            font-weight: 400; font-size: 1.2rem;
+            cursor: pointer; border: 3px solid #000; 
+            border-radius: 0; 
+            transition: all 0.1s; 
+            position: absolute; letter-spacing: 1px; 
+            box-shadow: 5px 5px 0px rgba(0,0,0,1); 
+        }
+        .poop-btn:active { transform: translate(3px, 3px); box-shadow: 2px 2px 0px #000; }
+
+        .btn-eunice { background: #ff4081; color: #fff; top: 60%; } 
+        .btn-andres { background: #fff; color: #000; top: 60%; } 
+
+        /* --- DREAM SECTION (LLAMA STYLE) --- */
+        .dream-section {
+            background-color: var(--pink-cute);
+            background-image: radial-gradient(#fff 15%, transparent 16%), radial-gradient(#fff 15%, transparent 16%);
+            background-size: 60px 60px; background-position: 0 0, 30px 30px;
+            padding: 100px 0; text-align: center;
+            position: relative; overflow: hidden;
+        }
+        .dream-section h2 { 
+            font-family: 'Pacifico', cursive; color: #d81b60; font-size: 3rem; margin-bottom: 10px; 
+        }
+        .arepita-frame {
+            border: 10px solid #fff; border-radius: 20px; transform: rotate(3deg);
+            box-shadow: 0 20px 50px rgba(216, 27, 96, 0.2); width: 250px; margin: 0 auto; overflow: hidden;
+        }
+
+        .floating-heart {
+            position: absolute; color: rgba(255, 182, 193, 0.6); font-size: 2rem;
+            animation: floatUp 4s infinite ease-in-out;
+        }
+        
+        @keyframes floatUp { 
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; } 
+            50% { opacity: 1; } 
+            100% { transform: translateY(-120px) rotate(20deg); opacity: 0; } 
+        }
+
+        .customs-grid { display: grid; grid-template-columns: 1fr; gap: 80px; margin-top: 60px; }
+        .customs-far-container { width: 50%; margin-left: auto; position: relative; }
+        .customs-far-container::before { content: ""; position: absolute; top: 50%; left: -100%; width: 80%; height: 1px; background: #ccc; z-index: -1; }
+
+        .envelope-section { padding: 80px 20px; background-color: #fff; display: flex; justify-content: center; margin-top: 0; }
+        .paper-letter {
+            background-color: var(--paper-color); width: 100%; max-width: 700px; padding: 60px;
+            position: relative; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid #f0f0f0; background-image: url("https://www.transparenttextures.com/patterns/cream-paper.png");
+        }
+        .letter-content p { 
+            font-family: 'Cormorant Garamond', serif !important; font-size: 1.3rem !important;
+            line-height: 1.8 !important; color: #2c2c2c !important; 
+            text-align: left !important; margin-bottom: 20px;
+        }
+        .letter-header { border-bottom: 1px solid var(--gold); padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end; }
+        .signature { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.5rem; text-align: right; margin-top: 40px; color: #333; }
+
+        footer { padding: 60px; text-align: center; font-size: 0.8rem; letter-spacing: 2px; background: #fff; border-top: 1px solid #eee; }
+        footer a { text-decoration: none; color: #999; }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.98); z-index: 10000; }
+        .modal-scroll-container { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .modal-img { max-width: 90vw; max-height: 90vh; object-fit: contain; }
+        .close-btn { position: fixed; top: 30px; right: 40px; color: #000; font-size: 30px; cursor: pointer; z-index: 10001; }
+
+        @media (max-width: 768px) {
+            .collage-container { flex-direction: column; height: auto; gap: 20px; }
+            .collage-img { position: relative; transform: none !important; width: 80% !important; height: auto !important; left: auto !important; top: auto !important; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div style="font-family: 'Cinzel'; font-size: 0.8rem; letter-spacing: 4px; color: #999;">DAY 12</div>
+        <h1>Goodbye Colombia</h1>
+        <div class="divider" style="width: 50px; height: 2px; background: var(--gold); margin: 20px auto;"></div>
+    </header>
+
+    <section>
+        <div class="container-narrow">
+            <h2 style="border-bottom: 1px solid var(--gold); display: table; margin: 0 auto 20px auto;">Transition</h2>
+            <p>I was looking for photos of Medellin and I found this masterpiece.</p>
+            
+            <div class="w-30-smaller">
+                <img src="day12/salento_kiss.jpg" onclick="openModal('day12/salento_kiss.jpg')" alt="Kiss">
+                <span class="caption">The Last Kiss in lumbre</span>
+            </div>
+
+            <p style="margin-top: 40px;"> I would like to say that everything went according to plan, but almost missing the flight was just the prelude to what was probably the worst night of our trip to Colombia. From the moment we boarded the plane, after the relief of knowing we had two seats reserved, we were still carrying the stress and anxiety of almost missing the flight and, for my part, being on the verge of ruining the itinerary. I wanted to take a photo anyway. And shortly after, we arrived in Medellin.</p>
+
+            <div class="w-30-smaller">
+                <img src="day12/plane_stress.jpg" onclick="openModal('day12/plane_stress.jpg')">
+                <span class="caption">The Calm Before</span>
+            </div>
+
+            <div class="fight-box">
+                <h3 style="text-transform: uppercase;">A fight</h3>
+                <div style="width: 50px; height: 1px; background: #555; margin: 0 auto 40px auto;"></div>
+                
+               <p>It is almost impressive how, in moments where distress accumulates, everything can explode. When I think about this fight we had in Medellín, I do not think about what happened on the plane, but about what came after, about the sequence of events that spread from a combination of misunderstandings and lack of communication.</p>
+
+<p>I remember the way to the Uber, my shock at what had just happened, and the small moments that led to what unfolded in the apartment. I still think the same about what I am sure of: nothing could justify touching the child of a stranger. That silence of mine, which carries so much meaning for you, you saw it as a punishment. It was rather the weight of processing everything that had happened. In the Uber we were sitting there, but oblivious to each other. Every minute we spent in silence we were hurting ourselves.</p>
+
+<p>For me, looking at our relationship in retrospect and at how I see the world, it makes me think that at some point in our lives we will see our partner do things that clash with what we believed and with everything that represents that divinity that is our bond. Love has different facets: pain, fear, and in this case one of them is when we stop looking for that idealized image of us and start negotiating with the reality of the other person.</p>
+
+<p>This for me has been a real conflict, a real conflict between two people. One of those where it is not enough to just hide or set things aside, but rather one that calls us to a deeper inner reality and to question whether we are truly reciprocated. Today I think that these conflicts are not destructive. They help us to clarify, almost like a catharsis from which both people emerge with more knowledge and much more strength, and in that sense, with much more tenderness.</p>
+
+<p>I was furious when we arrived at the Airbnb. Thirty thousand things went through my head, and I am sure through yours as well. I have always told you that for me many times you are like a scared little bunny, a delicate soul that in an attempt at self preservation flees. You told me you wanted to leave, that you did not want to spend the night with me. And I thought you were being silly, to be honest. It is just a matter of seeing the love I have for you. Of course I am furious, of course I do not feel like talking, but for God’s sake, I love you too much. From the second you told me you felt abandoned that time I left your apartment in Melbourne, I have never thought about doing it again, much less in Medellín.</p>
+
+<p>You asked me for the wifi password like someone asking for an emergency exit, convinced that for me you had already become a villain with no return. But what you did not see under my layer of anger is that for me there are no villains between us, only tired humans. I refused to give you that password not out of pride, but because my love is infinitely more rational than my rage. I could not let you go adrift in a strange city just because our words had become tangled. My protection toward you does not turn off when we yell at each other. On the contrary, that is when it becomes most alert, because you are the most precious thing I have to take care of in this world.</p>
+
+<p>When I finally sat on that bed and told you that you mattered to me, I felt how the air came back into the room. By hugging you and feeling how your body relaxed against mine, I understood that I was not hugging a villain, but the love of my life. I judged you too much that time. In the hunger of my morality and ethics I did not find your voice. With the contact of your body I remembered the value of loving you.</p>
+
+<p>It is the noise that sometimes deceives us into thinking that love has been extinguished. But remember, beautiful, that I am a man who loves your eyes, and even more, our gazes. If you ever notice that I look into your eyes and you recognize a streak of love in mine, do not think it is a delusion. Simply think that you can count on me.</p>
+
+<p>Because real love is that pact where, even if we have hurt each other with silences in a car or with words in a hallway, we decide that the refuge is still each other. Thank you for not leaving, for staying to fight for us, and for letting me be the place where your scared little bunny can always find peace.</p>
+
+            </div>
+
+            <p style="margin-top: 40px;">And then...</p>
+
+            <div class="w-30-smaller">
+                <img src="day12/salchipapas.jpg" onclick="openModal('day12/salchipapas.jpg')">
+                <span class="caption">Monster Salchipapa!!!</span>
+            </div>
+            <p style="margin-top:10px;">We forgave each other via cholesterol.</p>
+        </div>
+    </section>
+
+    <section>
+        <div class="container-narrow">
+            <h3>Chill day in Medellin</h3>
+            <p>We went to several places to look at clothes, perfumes, and try food. Honestly, it was a forgettable day, until...</p>
+            <div style="width: 250px; margin: 0 auto;">
+                <img src="day12/scarf_me.jpg" onclick="openModal('day12/scarf_me.jpg')" alt="Scarf Mode">
+            </div>
+        </div>
+    </section>
+
+    <section class="anniversary-dark-section">
+        <div class="container-narrow">
+            <h2>The Anniversary Night</h2>
+            <p>There we were at Idílico, with the most beautiful woman in all of Medellín and certainly the entire world. And then there was I, present, nothing more.</p>
+
+            <div class="comparison-container" id="compSlider" onmousemove="moveSlider(event)" ontouchmove="moveSlider(event)">
+                <img src="day12/anni_me_ugly.jpg" class="comp-img" alt="Me">
+                
+
+                <div class="comp-overlay" id="compOverlay" style="width: 100%;"> 
+                    <img src="day12/anni_her_goddess.jpg" class="comp-img" alt="Her"> 
+                    
+                </div>
+                <div class="slider-handle" id="sliderHandle">↔</div>
+            </div>
+
+            <p style="margin-top: 60px; font-style: italic; font-family: 'Playfair Display'; letter-spacing: 1px;">The Menu</p>
+            <div class="anni-grid">
+                <img src="day12/dinner_1.jpg" onclick="openModal('day12/dinner_1.jpg')">
+                <img src="day12/dinner_2.jpg" onclick="openModal('day12/dinner_2.jpg')">
+                <img src="day12/dinner_3.jpg" onclick="openModal('day12/dinner_3.jpg')">
+                <img src="day12/dinner_4.jpg" onclick="openModal('day12/dinner_4.jpg')">
+                <img src="day12/dinner_5.jpg" onclick="openModal('day12/dinner_5.jpg')">
+                <img src="day12/dinner_6.jpg" onclick="openModal('day12/dinner_6.jpg')">
+            </div>
+        </div>
+    </section>
+
+    <section style="background: #fdfdfd;">
+        <div class="container-narrow">
+            <h3>Guatape day!</h3>
+            
+            <div class="w-40-smaller">
+                <img src="day12/guatape_food.jpg" onclick="openModal('day12/guatape_food.jpg')">
+                <span class="caption">Asian queen with a colombian breakie</span>
+            </div>
+            
+            <p style="margin-top:40px;">The climb.</p>
+
+            <div style="width: 100%; overflow-x: scroll; border: 1px solid #eee;">
+                <div style="width: 2000px; height: 300px;">
+                    <img src="day12/penol_pano.jpg" style="width: 100%; height: 100%; object-fit: cover;" onclick="openModal('day12/penol_pano.jpg')">
+                </div>
+            </div>
+            <span class="caption">← SCROLL TO SEE THE VIEW →</span>
+
+            <div style="margin-top: 60px; max-width: 50%; margin-left: auto; margin-right: auto;">
+                <video controls style="width: 100%; box-shadow: var(--shadow);">
+                    <source src="day12/her_suffering.mp4" type="video/mp4">
+                </video>
+                <span class="caption">I mean, this was so funny. Who can be so scared?</span>
+            </div>
+
+            <div class="confidential-wrapper w-super-small" onclick="this.classList.add('revealed')">
+                <img src="day12/me_suffering.jpg" onclick="openModal('day12/me_suffering.jpg')">
+                <div class="confidential-cover">
+                    <div style="font-size: 0.6rem; letter-spacing: 1px;">Don't tap here</div>
+                </div>
+            </div>
+             <span class="caption">It's not funny!</span>
+
+             <div style="margin-top: 60px;" class="w-40-smaller">
+                 <img src="day12/guatape_llamas.jpg" onclick="openModal('day12/guatape_llamas.jpg')">
+                 <span class="caption">Llama Love! They only love that matter there was the llama and the carrot💕</span>
+             </div>
+        </div>
+    </section>
+
+    <section class="diva-section">
+        <div class="container-narrow">
+            <h3 style="margin-bottom: 40px; color: #999;">Comuna 13 day</h3>
+    
+            
+            <div class="diva-editorial-layout">
+                <div style="width: 300px; margin: 0 auto;"> 
+                    <img src="day12/comuna_bus.jpg" onclick="openModal('day12/comuna_bus.jpg')" style="box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                </div>
+            </div>
+            
+            <p style="margin-top: 30px; font-family: 'Playfair Display', serif; font-style: italic; color: #444; font-size: 1.1rem;">Diva on board</p>
+        </div>
+    </section>
+
+    <section class="comuna-alive-section">
+        <div class="container-narrow">
+            <h2 style="font-family: 'Permanent Marker'; font-size: 3rem; color: #00ffff; text-shadow: 4px 4px 0 #ff00ff; margin-bottom: 50px;">COMUNA 13 VIBES</h2>
+            
+            <div class="collage-container">
+                <div class="sticker" style="top: 10%; left: 10%;">A new life</div>
+                
+                <img src="day12/comuna_art1.jpg" class="collage-img" style="height: 350px; width: auto; transform: rotate(-5deg); left: 15%; top: 5%;" onclick="openModal('day12/comuna_art1.jpg')">
+                
+                <img src="day12/comuna_art2.jpg" class="collage-img" style="height: 200px; width: auto; transform: rotate(8deg); right: 10%; top: 20%;" onclick="openModal('day12/comuna_art2.jpg')">
+            </div>
+
+            <div style="margin-top: 100px; text-align: center;">
+                 <div style="border: 4px solid #fff; box-shadow: 0 20px 60px rgba(0,255,255,0.3); max-width: 50%; margin: 0 auto;">
+                    <img src="day12/comuna_view.jpg" style="width: 100%; display: block;" onclick="openModal('day12/comuna_view.jpg')">
+                 </div>
+                 <span class="caption" style="color: #fff; margin-top: 15px;">The View from the Top</span>
+            </div>
+
+        </div>
+    </section>
+
+    <section>
+        <div class="container-narrow">
+            <h3>Night at the Airbnb</h3>
+
+                        <p style="margin-top: 30px; font-family: 'Playfair Display', serif; font-style: italic; color: #444; font-size: 1.1rem;">The day in Comuna 13 was normal; it wasn't something that changed my life. I liked the fact that it felt like a real tour, so much so that I was afraid we would get robbed in the middle of it, but it went well. One thing I must confess is that I remember more those moments when we would arrive at the apartment, order something, and watch, of course, Love Island. </p>
+
+            <br>   <br>   <br>
+            <div style="width: 70%; margin: 0 auto 40px auto;">
+                <img src="day12/sushi_boxers.jpg" onclick="openModal('day12/sushi_boxers.jpg')">
+                <span class="caption">Caught in the flow state</span>
+            </div>
+
+            <div class="w-40-smaller">
+                <img src="day12/skincare.jpg" onclick="openModal('day12/skincare.jpg')">
+                <span class="caption">Happy as I could be</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="comic-section">
+        <div class="container-narrow">
+            <div class="comic-card">
+                <h2 style="font-family: 'Permanent Marker', cursive; color: #000; letter-spacing: 1px; font-size: 2.5rem; text-transform: uppercase;">THE VERDICT</h2>
+                <p style="font-family: 'Space Mono', monospace; font-weight: bold; margin-top: 20px; font-size: 1.1rem;">Who was the poo queen or king of Medellin?</p>
+                
+                <div class="poop-game-area" id="gameArea">
+                    <h3 style="color: #fff; font-family: 'Permanent Marker', cursive; margin-bottom: 40px; font-size: 1.2rem; letter-spacing: 1px;">SELECT THE ONE WHO CLOGGED THE TOILET</h3>
+                    
+                    <button class="poop-btn btn-eunice" style="left: 30%;" onclick="alert('CORRECT! 👑 THE QUEEN REMAINS UNDEFEATED!')">EUNICE</button>
+                    <button class="poop-btn btn-andres" id="btnAndres" style="left: 60%;" onmouseenter="runAway()">ANDRES</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container-narrow">
+            <h3>The center</h3>
+            
+            <div class="img-std">
+                <img src="day12/library.jpg" onclick="openModal('day12/library.jpg')">
+                <span class="caption">El Palacio de la Cultura </span>
+            </div>
+
+            <div class="w-40-smaller" style="margin-top: 40px;">
+                <img src="day12/me_contrast.jpg" style="filter: contrast(1.2);" onclick="openModal('day12/me_contrast.jpg')"> <span class="caption">Me</span>
+            </div>
+            
+            <p style="margin-top: 20px;">I often feel sad about the state of some parts of my beautiful country. You know well the fear and anxiety I felt when we walked those streets that day. Insecurity and violence force us to live with our eyes downcast and our senses on high alert. When in reality we should be able to relax and enjoy ourselves, but we can't. Perhaps what hurts me most is that we may never be able to do so in that square where we were almost attacked. From that moment on, I lost track of everything; I just wanted to leave Medellín. </p>
+        </div>
+    </section>
+
+    <section>
+        <div class="container-narrow">
+            <h3>Medellín → Bogotá</h3>
+            <p>Did you know this was the last flight we took together?</p>
+            
+            <div style="display: flex; gap: 20px; justify-content: center; margin-top: 40px; flex-wrap: wrap;">
+                 <div style="width: 45%; min-width: 250px;">
+                     <img src="day12/shoes_airport.jpg" onclick="openModal('day12/shoes_airport.jpg')">
+                     <span class="caption">Waiting</span>
+                 </div>
+                 <div style="width: 45%; min-width: 250px;">
+                     <img src="day12/flight_us.jpg" onclick="openModal('day12/flight_us.jpg')">
+                     <span class="caption">On board</span>
+                 </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="dream-section">
+        <div class="floating-heart" style="left: 10%; animation-duration: 5s;">❤</div>
+        <div class="floating-heart" style="left: 30%; animation-duration: 7s;">💖</div>
+        <div class="floating-heart" style="right: 20%; animation-duration: 6s;">💕</div>
+
+        <div class="container-narrow">
+            <h2 style="color: #d81b60;">Dreams of Home</h2>
+            <div class="arepita-frame">
+                <img src="day12/arepita.jpg" onclick="openModal('day12/arepita.jpg')">
+            </div>
+            <span class="caption" style="color: #d81b60; margin-top: 20px; font-weight: 500;">Arepita</span>
+        </div>
+    </section>
+
+    <section style="background: #111; padding: 40px 0;">
+        <div class="container-narrow">
+            <h3 style="color: #fff;">1:00 AM Sneaky Run</h3>
+            <div style="width: 50%; margin: 0 auto;">
+                <img src="day12/mcdonalds_night.jpg" style="transform: scaleX(-1);" onclick="openModal('day12/mcdonalds_night.jpg')">
+            </div>
+            <span class="caption" style="color: #666;">The sneaky treat</span>
+        </div>
+    </section>
+
+    <section class="departure-section">
+        <div class="container-narrow">
+            <h2>The Departure</h2>
+            
+            <div class="w-30-smaller">
+                <img src="day12/crying.jpg" onclick="openModal('day12/crying.jpg')">
+                <span class="caption">Tears</span>
+            </div>
+ <p style="margin-top: 80px; font-size: 1.2rem;">I was broken inside. I even remember not knowing why I was crying so much. I just cried and cried, nonstop. I cried when I saw you leave, I cried when you went through customs, I cried when I couldn't see you, I cried in the bathroom. It was the collapse of my reality. Every time you leave, it's like a little death, a reminder of how immense and hostile the world feels without you. 
+    </p>
+            <div class="customs-grid">
+                <div style="width: 50%;">
+                    <img src="day12/customs_enter.jpg" onclick="openModal('day12/customs_enter.jpg')">
+                    <span class="caption">Going In</span>
+                </div>
+   
+                <div class="customs-far-container">
+                    <div style="width: 80%; margin-left: auto;">
+                        <img src="day12/customs_far.jpg" onclick="openModal('day12/customs_far.jpg')">
+                    </div>
+                    <span class="caption">So Far Away</span>
+                </div>
+            </div>
+
+            <p style="margin-top: 80px; font-size: 1.2rem;">Separated again.
+                        <br>  <br> 
+                        Today, no letter my love. Because tomorrow is going to be special, writing letter. 
+<br> <br> 
+
+                        I love you.
+
+            </p>
+
+        </div>
+    </section>
+
+    <footer>
+        <a href="index.html">BACK TO INDEX</a>
+    </footer>
+
+    <div id="imageModal" class="modal-overlay" onclick="closeModal()">
+        <span class="close-btn">&times;</span>
+        <div class="modal-scroll-container">
+            <img class="modal-img" id="img01">
+        </div>
+    </div>
+
+    <script>
+        // Modal
+        var modal = document.getElementById("imageModal");
+        var modalImg = document.getElementById("img01");
+        function openModal(src) { modal.style.display = "block"; modalImg.src = src; }
+        function closeModal() { modal.style.display = "none"; }
+
+        // Comparison Slider
+        function moveSlider(e) {
+            const container = document.getElementById('compSlider');
+            const overlay = document.getElementById('compOverlay');
+            const handle = document.getElementById('sliderHandle');
+            let rect = container.getBoundingClientRect();
+            let x = (e.type === 'touchmove' ? e.touches[0].clientX : e.clientX) - rect.left;
+            
+            // Constrain
+            if (x < 0) x = 0; 
+            if (x > rect.width) x = rect.width;
+            
+            // Because overlay is absolute left 0, width changes reveal/hide content
+            overlay.style.width = x + 'px';
+            handle.style.left = x + 'px';
+        }
+
+        // Runaway Button
+        function runAway() {
+            const btn = document.getElementById('btnAndres');
+            const area = document.getElementById('gameArea');
+            const rect = area.getBoundingClientRect();
+            
+            // Random position within container
+            const newTop = Math.random() * (rect.height - 50);
+            const newLeft = Math.random() * (rect.width - 100);
+            
+            btn.style.top = newTop + 'px';
+            btn.style.left = newLeft + 'px';
+        }
+    </script>
+
+</body>
+</html>
