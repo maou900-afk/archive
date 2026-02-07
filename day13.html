@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 13</title>
+    <link rel="icon" type="image/png" href="img/icono.jpg">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Montserrat:wght@300;400&family=Space+Mono&family=Reenie+Beanie&family=Libre+Barcode+39+Text&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- VARIABLES --- */
+        :root {
+            --bg-color: #fcfcfc;
+            --text-color: #111;
+            --gold: #d4af37;
+            --suitcase-inner: #2c2c2c;
+            --suitcase-outer: #181818;
+            --leather-dark: #121212;
+            --metal-gradient: linear-gradient(135deg, #bf953f, #fcf6ba 50%, #b38728);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Montserrat', sans-serif;
+            margin: 0; padding: 0; overflow-x: hidden;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+            touch-action: pan-y; 
+        }
+
+        /* --- HEADER --- */
+        header { 
+            min-height: 40vh; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            text-align: center; padding: 40px 20px; 
+        }
+        
+        h1 { font-family: 'Cinzel', serif; font-size: 2.5rem; letter-spacing: 2px; margin-bottom: 10px; color: #111; }
+        .divider { width: 50px; height: 2px; background: var(--gold); margin: 20px auto; }
+        .date-stamp { font-family: 'Space Mono', monospace; font-size: 0.8rem; letter-spacing: 3px; color: #888; }
+
+        /* --- INTRO TEXT --- */
+        .intro-text {
+            max-width: 700px;
+            margin: 0 auto 40px auto;
+            text-align: center;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: #555;
+            padding: 0 20px;
+        }
+
+        /* --- SUITCASE WRAPPER --- */
+        .scene-container {
+            padding: 20px; 
+            display: flex; justify-content: center; margin-bottom: 60px;
+        }
+        
+        .suitcase-wrapper {
+            position: relative;
+            width: 100%; max-width: 900px;
+        }
+
+        /* --- THE HANDLE --- */
+        .suitcase-handle {
+            width: 180px; height: 60px;
+            background: #2a1a10; 
+            margin: 0 auto;
+            border-radius: 10px 10px 0 0;
+            position: relative;
+            top: 20px; 
+            z-index: 0;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+            border: 2px solid #111;
+        }
+        .suitcase-handle::after {
+            content: ''; position: absolute; bottom: 0; left: -10px; right: -10px; height: 25px;
+            background: var(--metal-gradient);
+            border-radius: 4px; z-index: 1;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.5);
+        }
+
+        /* --- THE SUITCASE (BOX) --- */
+        .suitcase {
+            width: 100%; height: 680px;
+            background-color: var(--suitcase-inner);
+            border: 20px solid var(--suitcase-outer);
+            border-radius: 40px;
+            position: relative;
+            box-shadow: 
+                inset 0 0 100px rgba(0,0,0,0.9),
+                0 30px 70px rgba(0,0,0,0.4),
+                0 0 0 2px #333;
+            overflow: hidden; 
+            background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png");
+            z-index: 2;
+        }
+
+        /* --- DECORATION --- */
+        .suitcase::after {
+            content: ''; position: absolute;
+            top: 10px; left: 10px; right: 10px; bottom: 10px;
+            border: 2px dashed rgba(255,255,255,0.15);
+            border-radius: 25px;
+            pointer-events: none; z-index: 5;
+        }
+
+        .latch {
+            position: absolute; top: -20px; width: 60px; height: 40px;
+            background: var(--metal-gradient); border-radius: 4px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.6), inset 0 0 5px rgba(255,255,255,0.4);
+            z-index: 20; pointer-events: none;
+        }
+        .latch.left { left: 20%; }
+        .latch.right { right: 20%; }
+        .latch::before {
+            content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 8px; height: 12px; background: #111; border-radius: 4px;
+        }
+
+        .corner-guard {
+            position: absolute; width: 100px; height: 100px;
+            background: radial-gradient(circle at center, transparent 30%, #000 100%);
+            background-color: #151515;
+            z-index: 6; pointer-events: none;
+            border: 1px dashed #444; opacity: 0.8;
+        }
+        .cg-tl { top: -20px; left: -20px; border-radius: 0 0 50px 0; transform: rotate(0deg); }
+        .cg-tr { top: -20px; right: -20px; border-radius: 0 0 0 50px; }
+        .cg-bl { bottom: -20px; left: -20px; border-radius: 0 50px 0 0; }
+        .cg-br { bottom: -20px; right: -20px; border-radius: 50px 0 0 0; }
+
+        .strap {
+            position: absolute; width: 100%; height: 40px; background: rgba(0,0,0,0.4);
+            top: 50%; left: 0; transform: translateY(-50%); 
+            z-index: 1; pointer-events: none;
+            border-top: 1px dashed rgba(255,255,255,0.1);
+            border-bottom: 1px dashed rgba(255,255,255,0.1);
+        }
+
+        /* --- OBJETOS COMUNES --- */
+        .item {
+            position: absolute; cursor: grab;
+            transition: transform 0.2s, filter 0.2s; 
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
+            z-index: 10;
+            touch-action: none; user-select: none;
+        }
+        .item:active { cursor: grabbing; }
+        .item.is-dragging {
+            z-index: 1000 !important;
+            filter: drop-shadow(0 20px 40px rgba(0,0,0,0.7));
+            transform: scale(1.05);
+        }
+
+        /* ================= VISA MALASIA ================= */
+        .visa-doc {
+            top: 28%; left: 42%; 
+            width: 280px; height: 180px;
+            transform: rotate(5deg);
+            background-color: #fff;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            font-family: Arial, Helvetica, sans-serif;
+            overflow: hidden; border: 1px solid #ddd;
+        }
+        .visa-header-strip {
+            background: linear-gradient(90deg, #003399, #0055cc);
+            height: 30px; width: 100%;
+            display: flex; align-items: center; padding-left: 10px;
+        }
+        .visa-header-text {
+            color: #fff; font-size: 10px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase;
+        }
+        .visa-content-grid { display: grid; grid-template-columns: 80px 1fr; gap: 10px; padding: 15px; }
+        
+        .visa-photo-box {
+            width: 70px; height: 90px; background: #f0f0f0; border: 1px solid #ccc;
+            display: flex; justify-content: center; align-items: center;
+            overflow: hidden;
+        }
+        .visa-photo-box img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+
+        .visa-details { display: flex; flex-direction: column; gap: 4px; }
+        .visa-row {
+            font-size: 8px; color: #555; text-transform: uppercase;
+            border-bottom: 1px dotted #eee; padding-bottom: 2px;
+        }
+        .visa-row span { font-weight: bold; color: #000; font-size: 9px; margin-left: 5px; }
+        .visa-status-stamp {
+            margin-top: 5px; border: 2px solid #2e7d32; color: #2e7d32;
+            font-size: 10px; font-weight: bold; display: inline-block; padding: 2px 6px;
+            border-radius: 2px; text-transform: uppercase;
+        }
+        .visa-barcode-strip {
+            position: absolute; bottom: 10px; right: 15px;
+            font-family: 'Libre Barcode 39 Text', cursive; font-size: 24px; color: #333; opacity: 0.8;
+        }
+
+        /* ================= CARTA EUNICE ================= */
+        .love-letter {
+            top: 15%; left: 25%;
+            width: 220px; height: 140px;
+            background-color: #f7f4ef;
+            transform: rotate(-5deg);
+            background-image: 
+                linear-gradient(to bottom right, transparent 50%, rgba(0,0,0,0.05) 50%, transparent 51%),
+                linear-gradient(to bottom left, transparent 50%, rgba(0,0,0,0.05) 50%, transparent 51%);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+            display: flex; justify-content: center; align-items: center;
+            border: 1px solid #e6e0d4; position: relative;
+        }
+        .love-letter::before {
+            content: ''; position: absolute; top: 0; left: 0;
+            width: 0; height: 0;
+            border-left: 110px solid transparent;
+            border-right: 110px solid transparent;
+            border-top: 75px solid #fffdf9;
+            filter: drop-shadow(0 2px 3px rgba(0,0,0,0.1));
+        }
+        .letter-name {
+            position: absolute; bottom: 20px;
+            font-family: 'Reenie Beanie', cursive; font-size: 1.5rem; color: #4a4a4a;
+            transform: rotate(-2deg); z-index: 5;
+        }
+        .wax-seal { 
+            width: 32px; height: 32px; 
+            background: radial-gradient(circle at 30% 30%, #d32f2f, #8b0000);
+            border-radius: 50%; 
+            box-shadow: 0 3px 6px rgba(0,0,0,0.4); 
+            border: 1px solid rgba(0,0,0,0.2);
+            position: relative; z-index: 6; margin-top: -30px;
+        }
+        .wax-seal::after {
+            content: ''; position: absolute; top: 5px; left: 5px; right: 5px; bottom: 5px;
+            border: 1px dashed rgba(255,255,255,0.3); border-radius: 50%;
+        }
+
+        /* ================= AREPA ================= */
+        .arepa {
+            top: 10%; right: 28%; 
+            width: 130px; height: 130px;
+            transform: rotate(15deg);
+            background-image: url('day13/arepa.png');
+            background-size: contain; background-repeat: no-repeat; background-position: center;
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.4));
+        }
+
+        /* --- OTROS OBJETOS --- */
+        .passport {
+            bottom: 5%; right: 5%;
+            width: 150px; height: 210px;
+            transform: rotate(-10deg);
+            background-image: url('day13/passport.webp'); 
+            background-size: contain; background-repeat: no-repeat; background-position: center;
+        }
+        .ticket {
+            top: 8%; left: 5%;
+            width: 100px; height: 240px;
+            background: #fffdf0; transform: rotate(5deg);
+            padding: 15px; font-family: 'Reenie Beanie'; font-size: 1rem; color: #333;
+            clip-path: polygon(0 0, 100% 0, 100% 98%, 95% 100%, 90% 98%, 85% 100%, 80% 98%, 75% 100%, 70% 98%, 65% 100%, 60% 98%, 55% 100%, 50% 98%, 45% 100%, 40% 98%, 35% 100%, 30% 98%, 25% 100%, 20% 98%, 15% 100%, 10% 98%, 5% 100%, 0 98%);
+        }
+        .photo-polaroid {
+            top: 42%; left: 32%;
+            width: 160px; height: 200px;
+            background: #fff; padding: 10px 10px 40px 10px; transform: rotate(-15deg);
+        }
+        .photo-inner {
+            width: 100%; height: 100%; background: #333; 
+            background-image: url('day13/her.jpeg'); background-size: cover; background-position: center;
+        }
+        .laptop-asus {
+            bottom: 12%; left: 18%;
+            width: 280px; height: 190px;
+            transform: rotate(8deg);
+            background-image: url('day13/laptop.png'); background-size: contain; background-repeat: no-repeat; background-position: center;
+        }
+
+        /* --- MODALES --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.95); z-index: 2000;
+            display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        
+        .modal-card {
+            background-color: #fff;
+            width: 90%; 
+            max-width: 800px;
+            padding: 60px;
+            border: 1px solid var(--gold); 
+            box-shadow: 0 30px 80px rgba(0,0,0,0.15);
+            position: relative;
+            max-height: 85vh; 
+            overflow-y: auto; 
+            transform: translateY(30px); transition: transform 0.4s ease; 
+        }
+
+        .modal-card::-webkit-scrollbar { width: 8px; }
+        .modal-card::-webkit-scrollbar-track { background: #f1f1f1; }
+        .modal-card::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+        .modal-card::-webkit-scrollbar-thumb:hover { background: #999; }
+
+        #m-letter .modal-card {
+            background-color: #f4f1ea; 
+            background-image: url("https://www.transparenttextures.com/patterns/cream-paper.png");
+            max-width: 600px;
+            padding: 80px 60px;
+            border: none;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            color: #1a1a1a;
+        }
+        
+        .modal-overlay.active .modal-card { transform: translateY(0); }
+        .close-modal { position: absolute; top: 20px; right: 20px; font-size: 2rem; cursor: pointer; color: #ccc; z-index: 10; }
+        .close-modal:hover { color: #000; }
+        
+        .modal-card h2 { font-family: 'Cinzel', serif; font-size: 1.8rem; margin-top: 0; color: #111; }
+        .modal-meta { font-family: 'Space Mono'; font-size: 0.7rem; color: var(--gold); letter-spacing: 2px; display: block; margin-bottom: 20px; text-transform: uppercase; }
+        .modal-card p { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; line-height: 1.7; color: #444; margin-bottom: 20px; text-align: justify; }
+        .highlight-red { color: #b71c1c; }
+
+        .letter-content { font-family: 'Cormorant Garamond', serif; color: #2c2c2c; }
+        .letter-date { font-family: 'Space Mono', monospace; text-transform: uppercase; font-size: 0.8rem; color: #888; text-align: right; margin-bottom: 40px; letter-spacing: 1px; }
+        .letter-body p { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; line-height: 1.8; margin-bottom: 25px; text-align: justify; color: #1a1a1a; }
+        .letter-signature { font-family: 'Cinzel', serif; font-style: italic; text-align: right; margin-top: 50px; font-size: 1.5rem; color: var(--gold); }
+
+        footer { padding: 60px; text-align: center; font-size: 0.8rem; letter-spacing: 2px; background: #fff; border-top: 1px solid #eee; }
+        footer a { text-decoration: none; color: #999; }
+        
+        @media (max-width: 768px) {
+            .suitcase { height: auto; min-height: 700px; }
+            .suitcase-wrapper { padding: 0 10px; }
+            .suitcase-handle { width: 120px; }
+            .modal-card { padding: 30px; width: 95%; max-height: 80vh; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div style="font-family: 'Cinzel'; font-size: 0.8rem; letter-spacing: 4px; color: #999;">DAY 13</div>
+        <h1>heavy</h1>
+        <div class="divider"></div>
+        <div class="date-stamp">The things I carry.</div>
+    </header>
+
+    <div class="intro-text">
+        <p>This is a symbolic representation of the things that happened during the time you were gone. I want to honor all the things that were in my heart, the things I love, and the things I left behind when I moved to another country. I remember this time as being hectic, with everything happening everywhere, and ultimately a time when it was easy to lose myself. Please, I invite you to start with the arepa, then explore the items. Ideally, the last item should be the letter.</p>
+    </div>
+
+    <div class="scene-container">
+        <div class="suitcase-wrapper">
+            
+            <div class="suitcase-handle"></div>
+
+            <div class="suitcase" id="suitcaseArea">
+                <div class="latch left"></div>
+                <div class="latch right"></div>
+                
+                <div class="corner-guard cg-tl"></div>
+                <div class="corner-guard cg-tr"></div>
+                <div class="corner-guard cg-bl"></div>
+                <div class="corner-guard cg-br"></div>
+
+                <div class="strap"></div>
+                
+                <div class="item ticket" data-modal="m-ticket">
+                    <div style="text-align: center; border-bottom: 1px dashed #999; margin-bottom: 10px;">Tottori Sushi Bar</div>
+                    <div>1x Sashimi Pez de Mantequilla</div>
+                    <div>4x Sushi Roll de Salmon</div>
+                     <div>8x Ventresca de Atún</div>
+                      <div>2x Gyozas de pollo</div>
+                    <div style="margin-top: 20px; color: red;">Mesa 5 espera!</div>
+                    <div style="margin-top: 50px; font-size: 0.8rem; color: #666;">Turno: 8h</div>
+                </div>
+
+                <div class="item love-letter" data-modal="m-letter">
+                    <div class="wax-seal"></div>
+                    <div class="letter-name">For Eunice</div>
+                </div>
+
+                <div class="item visa-doc" data-modal="m-visa">
+                    <div class="visa-header-strip">
+                        <span class="visa-header-text">IMMIGRATION DEPARTMENT OF MALAYSIA</span>
+                    </div>
+                    <div class="visa-content-grid">
+                        <div class="visa-photo-box">
+                            <img src="day13/me.jpg" alt="Andres Photo">
+                        </div>
+                        <div class="visa-details">
+                            <div class="visa-row">Name: <span>ANDRES</span></div>
+                            <div class="visa-row">Nationality: <span>COLOMBIAN</span></div>
+                            <div class="visa-row">Visa Type: <span>eVISA (Single Entry)</span></div>
+                            <div class="visa-row">Issued: <span>[24H BEFORE FLIGHT]</span></div>
+                            <div class="visa-status-stamp">APPROVED</div>
+                        </div>
+                    </div>
+                    <div class="visa-barcode-strip">KUL-9928</div>
+                </div>
+
+                <div class="item photo-polaroid" data-modal="m-photo">
+                    <div class="photo-inner"></div>
+                </div>
+
+                <div class="item arepa" data-modal="m-arepa"></div>
+
+                <div class="item laptop-asus" data-modal="m-laptop"></div>
+                <div class="item passport" data-modal="m-pass"></div>
+
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-bottom: 80px; font-family: 'Space Mono'; font-size: 0.7rem; color: #999;">DRAG TO ORGANIZE • CLICK TO OPEN</div>
+
+    <footer>
+        <a href="index.html">BACK TO INDEX</a>
+    </footer>
+
+
+    <div class="modal-overlay" id="m-pass">
+        <div class="modal-card">
+            <span class="close-modal" onclick="closeModal('m-pass')">&times;</span>
+            <span class="modal-meta">My Passport</span>
+            <h2>What I left behind</h2>
+            
+            <p>When I got on that plane to Spain, I left behind a version of me that was complete and comfortable. I traded the comfort of the known for the promise of a future that, upon arrival, felt colder and more foreign than the worst Madrid winter. To leave is to die a little. I have never been a man close to my family, but when I saw them with you, I felt proud of who they are, of their love, and of their affection. I love my parents, Manolo, and my grandmother. I traveled with the guilt of the empty chair at the Sunday table, and that gap will remain forever, but it is only compensated by the internal promise that this sacrifice will be worth it, that one day we will return with full hands to share what we lived, even though we know deep down that one never fully returns to what was before. Manolo will be a little more blind, my parents a little older, and my grandmother, well, she cannot have any more gray hairs.</p>
+
+            <div style="display: flex; justify-content: space-around; align-items: center; margin: 30px 0; gap: 10px; flex-wrap: wrap;">
+                <div style="width: 140px; height: 160px; background: #fff; padding: 5px 5px 25px 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transform: rotate(-3deg);">
+                    <img src="day13/manolo.jpg" alt="Manolo" style="width: 100%; height: 100%; object-fit: cover; background: #eee;"> 
+                </div>
+                <div style="width: 130px; height: 130px; border-radius: 50%; overflow: hidden; border: 4px solid var(--gold); box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+                     <video src="day13/mom.mp4" autoplay loop muted playsinline style="width: 100%; height: 100%; object-fit: cover; background: #000;"></video>
+                </div>
+                <div style="width: 140px; height: 160px; background: #fff; padding: 5px 5px 25px 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transform: rotate(3deg);">
+                    <img src="day13/grandma.jpg" alt="Grandmother" style="width: 100%; height: 100%; object-fit: cover; background: #eee;">
+                </div>
+            </div>
+
+            <p>And here I am, under a gray sky that does not recognize me, trying to prevent success from tasting like loneliness, fighting to be worthy in comparison to my classmates. Time over there did not stop because I crossed to Europe, on the contrary, it seems it accelerated to punish my absence. Manolo will look for me at the door by instinct, bumping into the furniture of a world that is fading for him, and I will not be there to be his eyes. My parents will tell me that everything is going well over a video call, but the pixels cannot hide those new wrinkles I did not see being born, that tiredness in the voice that only the one who loves can recognize.</p>
+
+            <p>I left to be someone, but at times I feel I left someone important for the people who love me. I run after the degree, after the contract, after what is to come, but the today escapes me in every WhatsApp audio I listen to three times just to feel I am still close, in every day I spend sitting here. In the end, as Bad Bunny says, life is about museums, but the price of admission is seeing how what you love most withers while you try to flourish in a foreign land. I will return, I know it, but I will return with my heart divided among all the cities that gave me shelter, with glory in my hands, I know it, but with an open wound from knowing that time is the only luxury this country cannot give back to me.</p>
+
+            <p>And in the middle of all this noise, of the exams, of the assignments, and of this cold that seems to freeze all my thoughts, there you are. In this country of strangers, you are the only home I keep intact, the port where my fears rest because I know you believe in me even when I lose myself among code and silence. I cry every time I think about what my life is today. Do not ever let me go, my love. You are the support that holds the weight of my ambition, the one who stays on the other side of the screen holding my pieces together when the winter breaks me. You are the most real thing I have in this puzzle of airports and promises. If this sacrifice has a meaning, it is because at the end of the road you are there waiting for me, or rather, walking with me even if your footsteps do not sound on these streets of the rich. Thank you for not letting me go, for being that echo of my voice in the middle of this chaos. Although my hands are here building a future, my heart never got on that plane, it stayed with you back there in Colombia, in Melbourne, in Malaysia.</p>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="m-photo">
+        <div class="modal-card">
+            <span class="close-modal" onclick="closeModal('m-photo')">&times;</span>
+            <span class="modal-meta">Your Photo</span>
+            <h2>What I almost left behind</h2>
+            <p>The days after you left were far too dull. Not much happened, however, as if it were a constant in my life, I was stressed about my visa for Spain. Until the day arrived, I had to prepare myself to go to Spain, I had to pick up my passport. So that was it, I went to get my passport. To be honest, the circumstances were not the best, I was stressed, and I do not even remember the exact words or the reason why. I only remember the feelings, I remember fighting with you, and the weight of feeling judged. It has always been a topic during our relationship, but there is something I never told you, not that time nor during these days. Thank you for having the courage to tell me how you need to be loved. I know that sometimes I get frustrated when I feel my effort is not enough, but I infinitely value that you do not give up on me and that you continue showing me the map of your heart. Because from the first day I knew you were the love of my life, and I promised to love you as you deserve.</p>
+            <p>I tried to make it clear that I am stupid, we both know that well. I get consumed by my own frustration and I end up hurting what I love most. But I want you to know that my commitment to you is not a formality like a visa, it is a choice I renew every morning, even when it is hard to understand each other, even when life gets difficult, you are always there, and I am a fool about thinking my life was better without you. Maybe the Andres of the past failed many times, but I hope my present self is showing up in the best way, in the way you need. I am willing to learn, to improve, because no matter which version it is, every single one of them is worth it and I could not love them more than I do today.</p>
+            <p>The words I let out back then do not represent me, but my presence here does. I am with you because in this chaos of visas and distances, you are the only constant that keeps me standing. I could not be luckier to choose you every day. I trust in what we have so much that I am willing to rebuild myself as many times as necessary. I am sure.</p>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="m-visa">
+        <div class="modal-card">
+            <span class="close-modal" onclick="closeModal('m-visa')">&times;</span>
+            <span class="modal-meta">The Malaysian Visa</span>
+            <h2>What I almost lost</h2>
+<p>Malaysia was never a point on the map or a stamp in my passport, for me, Malaysia was you. I can still feel the cold in my hands, but it was not the cold of Madrid, it was the cold of that emptiness in my chest when I realized that, because of my carelessness, our world was about to collapse. I remember calling you almost in tears at the thought of not seeing you. While I waited for that email, the only thing keeping me on my feet was the image of your smile waiting for me on the other side of the world, that light that does not go out even with the worst of fears. I blamed myself infinitely, and applying for the Malaysia visa only two weeks before was a stupid miscalculation, it was playing Russian roulette with the only thing that kept me afloat, the promise of seeing your face.</p>
+
+<p>I want to tell you how incredible you are. You are the woman who brings calm to my chaos, the one who transforms a mistake into a story to tell, the one who has a faith so great that it ended up pulling the strings of an entire embassy. I felt unworthy of your wait, carrying the guilt of having put at risk the ground we were going to walk on together. I was completely right. Sometimes I dare to think that it is not that we were lucky, it is that the world knows we belong by each other’s side and it did not dare to disagree with us. Either it was destiny or it would have been me. You are the person for whom I would cross any ocean, with or without papers. Heaven gave me permission to breathe at your rhythm again, to be able to be blessed by your presence , and the best part of receiving the confirmation was that Malaysia had already begun the moment I knew that nothing, not even my own head, was going to be able to separate me from you.</p>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="m-ticket">
+        <div class="modal-card">
+            <span class="close-modal" onclick="closeModal('m-ticket')">&times;</span>
+            <span class="modal-meta">Tottori Recipe</span>
+            <h2>What was given to me</h2>
+<p>At this point I do not know if you have realized, hermosa, that I prefer the pain of working a thousand times in Tottori than the emptiness of your absence. The beginning of my work in that place was promising, elegant, almost perfect in the eyes of anyone looking from the outside. But the reality was different, it was an experience to be forgotten, one of those that I do not want to occupy even one more second of my memory. However, today I smile when I remember it, because the amount of times you would stop the conversation to fight with me about Alfonso or Tamara seems to me like the most adorable thing in the world.</p>
+
+<p>It is beautiful to know that you always have my back no matter what life brings our way. And my love, I want to remind you today and always that I got yours always. If I was able to be strong in Tottori it was because you were my reward. Our lives are not divine intervention for the most part. And I do not want to give this away to destiny, I refuse. I am the one weaving this, us. I want to continue weaving the paths of destiny until they write your name. Because here I love you intentionally, I love you with every gram of energy I have left, those days in Tottori were days of noise. Sometimes after my first shift on the weekends I wanted to run far away from that place, but I thought of you, the reason why I was doing it. I looked out the windows thinking you were sleeping, I imagined myself close to you, feeling your warmth, that day in the restaurant, I closed my eyes and started to dream, thinking about us. That day I took a photo. It was the last day I worked there.</p>
+
+<img src="day13/tottori.jpg" alt="Foto Tottori" style="display: block; margin: 30px auto 0 auto; max-width: 400px; width: 100%; height: auto; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="m-laptop">
+        <div class="modal-card">
+            <span class="close-modal" onclick="closeModal('m-laptop')">&times;</span>
+            <span class="modal-meta">Object: The New Asus</span>
+            <h2>What I have</h2>
+<p>I love what I am studying but there are days when the tiredness does not help and the weight of this intensive course is felt in every muscle. There are moments, sitting in that class, in which I feel small front of the complexity of everything I have to learn, moments in which I look around and only see a noisy strange people who seem to understand better than me. But then you arrive and you call me intelligent. You tell me with such an overwhelming security, with a faith so pure, that I end up believing it myself. During all this time that I have been with you I have realized something that has been clear as water since the first second in which I felt that I felt you mine, my true success has ceased to be a perfect grade for a long time, it is having someone like you who looks at me and sees greatness where I only see someone scared. You are my constant word of affirmation. You are that beautiful melody that I choose to listen to to shield myself when the world becomes noisy and strange. You are the filter that I need when I am on that bus surrounded by forty different students, enduring the lack of respect of the loud guy or when the onion guy appears to put the bitter cherry on top of the cake of the day. In the middle of those smells and those screams, you are there ready to be kind, soft with me.</p>
+
+<p>I want to hug you so close that we mix with each other, until we feel at peace with ourselves, with life itself. The way in which I love you makes me feel quiet, not because I do not want to speak but because in you I found a love that does not demand that I perform, a love that chooses me, that sees me, that stays. Through you, you have shown me that love is not bought, it is not paid, it is only received. That in my inside, I am not that intelligent person that I say I am or that you think I am, but it does not matter, because you will love me just the same.</p>
+
+<p>Every day that I wake up in this country to face this challenge, I do it for you. You are that hope that motivates me, the certainty that this sacrifice is not in vain. Every hour of study, every exam passed and every difficult delivery are, in reality, a step closer to our life together. I am here to build the bridge that takes me back to your arms. Towards that future that awaits us. Thank you for being my entire life.</p>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="m-arepa">
+        <div class="modal-card">
+            <span class="close-modal" onclick="closeModal('m-arepa')">&times;</span>
+            <span class="modal-meta">The Arepa</span>
+            <h2>What I lost</h2>
+            <p>This begins when you left Colombia. Every time we say goodbye, it feels as if the world becomes much heavier, as if the air thickens, as if people become noisier, and as if walking were a superhuman effort. It is like leaving you there at the airport, in that corner of the world that has become a double edged sword. It violently cuts the distance because it allows me to go see you, but just as it joins us, it separates us.</p>
+            <p>I left you at El Dorado at the customs gate, knowing that my bed would no longer be shared, that the map of Bogota would stop being a world of options and bookstores, and would return to being that congested city. It would go back to being just a map. I found it hard to believe that things would continue existing without us, that the coffee would still smell the same, and that people would walk the streets without knowing that a universe had just broken.</p>
+            <p>The first thing I did when I arrived home was jump on my bed and smell your pillow, yes I am a pervert for you, I am beyond help. It is a constant, I had a need to see you, to smell your new perfume, I had hope of seeing you again, fear of not knowing when we would see each other again, and the certainty that our love can do anything. I felt the fear of the current of time that carries us, fear of the distance, fear that you would not reach Melbourne, and yet I was happy to have lived Colombia with you. So, in short, I was screwed and radiant, perhaps more the first than the second. Maybe I am very pessimistic, but did you know that time is round? You probably know it, since you are very smart, and time has no beginning or end. It is immortal. When loneliness looks for me or life calls me, I can grab those infinite memories that were never lost, but rather still remain alive within my existence. May our memories live for us, and every time I look back at our past, I can only be happy that we were joyful back then , that Colombia remains frozen in time, and those memories will be infinite as long as we live. And if one day I miss you, I know you will be there with me, in the memory of when we held hands watching the beautiful palm trees of Cocora, when the universe, finally conspired in our favor and made us eternal.</p>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="m-letter">
+        <div class="modal-card">
+            <span class="close-modal" onclick="closeModal('m-letter')">&times;</span>
+            <div class="letter-content">
+                <div class="letter-body">
+
+                    <p>Hello, Hermosa.<br>
+I am glad you have reached the end. This page has been incredibly long because every page is a letter. I do this with a lot of love. The next day will be Malaysia and in a blink this mini project will be over.</p>
+
+<p>I hope you did not cry during this page, my intention is only to celebrate your existence, your love, and your person in general. What a more beautiful way to remember you than looking at our past and at what we have shared. Today was special because we were coming in a format that I feared was tiring you, so I decided to change.</p>
+
+<p>I could write you 1 or 40 letters daily, I do not care. My mind is a bottomless pit because I am proud of what we are and when I write I let my feelings speak for you, in Spanish of course. You have taught me that one can be held so tightly that I forget what it is like not to be held. And it scares me just thinking about the fact that it might not happen, that you will not be by my side. I cannot wrap my head around it, I am very stubborn and I love you very much. I am convinced of our future, whether it is here in Spain or anywhere else. Even if you do not believe it I already imagined a future together, in secret, which is not so secret anymore, I take note of what you want, of the gifts you would like, and of the ring I will buy you.</p>
+
+<p>And it is because, my love, I want to build a life together, I want to dream, learn, and grow with you. I cannot wait to see you as the mother of my children, the person that one day I will call wife. I cannot wait to see your heart grow far from so many insecurities that follow us every day. I want to watch you grow and nurture you with that same grace and strength with which you capture my heart. This is a secret, love. A long time ago I married you in my head, it is just that we are building ourselves to get there. My life is yours, my love will be there regardless of the season or the place. I cannot wait one more second without seeing you. I miss the way the light rested on your face in Colombia, I miss the way you touched me, I miss your smell. I miss you.</p>
+
+<p>But do not fall for illusions, this is not a love letter, it is a business letter. Here in this letter I am offering you my heart, in these pages my thoughts. I am trying to resolve our business, yours and mine, so that both of us have something to gain, me more than you, because I win you, and you, instead, will only manage to get this disoriented and sick boy, little by little not so disoriented let us say, but certainly very lovesick for you.
+    <br>Thanks for picking me daily, pretty. 
+</p>
+
+                </div>
+                <div class="letter-signature">I love you, <br> Andrés
+</div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        function openModalById(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-overlay')) { e.target.classList.remove('active'); }
+        });
+
+        const items = document.querySelectorAll('.item');
+        const container = document.querySelector('.suitcase');
+
+        items.forEach(item => {
+            const rect = item.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+            item.style.bottom = 'auto';
+            item.style.right = 'auto';
+            item.style.top = (rect.top - containerRect.top) + 'px';
+            item.style.left = (rect.left - containerRect.left) + 'px';
+        });
+
+        let activeItem = null;
+        let initialX, initialY, isDragging = false, startX = 0, startY = 0;
+
+        items.forEach(item => {
+            item.addEventListener('mousedown', dragStart);
+            item.addEventListener('touchstart', dragStart, {passive: false});
+        });
+
+        document.addEventListener('mouseup', dragEnd);
+        document.addEventListener('touchend', dragEnd);
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('touchmove', drag, {passive: false});
+
+        function dragStart(e) {
+            activeItem = e.currentTarget;
+            if (e.type === "touchstart") {
+                initialX = e.touches[0].clientX - parseInt(activeItem.style.left || 0);
+                initialY = e.touches[0].clientY - parseInt(activeItem.style.top || 0);
+                startX = e.touches[0].clientX; startY = e.touches[0].clientY;
+            } else {
+                initialX = e.clientX - parseInt(activeItem.style.left || 0);
+                initialY = e.clientY - parseInt(activeItem.style.top || 0);
+                startX = e.clientX; startY = e.clientY;
+            }
+            isDragging = true;
+            activeItem.classList.add('is-dragging');
+        }
+
+        function dragEnd(e) {
+            if (!activeItem) return;
+            let endX, endY;
+            if (e.type !== "touchend") {
+                endX = e.clientX; endY = e.clientY;
+                const dist = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
+                if (dist < 5) {
+                    const modalId = activeItem.getAttribute('data-modal');
+                    if (modalId) openModalById(modalId);
+                }
+            }
+            isDragging = false;
+            activeItem.classList.remove('is-dragging');
+            activeItem = null;
+        }
+
+        function drag(e) {
+            if (!isDragging || !activeItem) return;
+            e.preventDefault();
+            let currentX, currentY;
+            if (e.type === "touchmove") {
+                currentX = e.touches[0].clientX - initialX;
+                currentY = e.touches[0].clientY - initialY;
+            } else {
+                currentX = e.clientX - initialX;
+                currentY = e.clientY - initialY;
+            }
+            const minX = 0, minY = 0;
+            const maxX = container.clientWidth - activeItem.offsetWidth;
+            const maxY = container.clientHeight - activeItem.offsetHeight;
+            activeItem.style.left = Math.min(Math.max(currentX, minX), maxX) + "px";
+            activeItem.style.top = Math.min(Math.max(currentY, minY), maxY) + "px";
+        }
+
+        let touchMoved = false;
+        items.forEach(item => {
+            item.addEventListener('touchmove', () => { touchMoved = true; });
+            item.addEventListener('touchend', () => {
+                if (!touchMoved) {
+                    const modalId = item.getAttribute('data-modal');
+                    if (modalId) openModalById(modalId);
+                }
+                touchMoved = false;
+            });
+        });
+    </script>
+</body>
+</html>
