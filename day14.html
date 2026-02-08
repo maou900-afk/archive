@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 14</title>
+    <link rel="icon" type="image/png" href="img/icono.jpg">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Montserrat:wght@300;400;500&family=Playfair+Display:ital,wght@1,400&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- ESTILO MUSEO --- */
+        :root {
+            --bg-color: #fcfcfc;
+            --text-color: #111111;
+            --accent-purple: #5D3A9B;
+            --paper-color: #fdfbf7;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Montserrat', sans-serif;
+            margin: 0; padding: 0; overflow-x: hidden;
+        }
+
+        /* HEADER */
+        header {
+            min-height: 50vh;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; padding: 40px 20px;
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif; font-size: 2.5rem; margin-bottom: 15px;
+            letter-spacing: 2px; color: var(--text-color);
+        }
+
+        .subtitle {
+            font-family: 'Playfair Display', serif; font-style: italic; color: var(--accent-purple);
+            font-size: 1.2rem; margin-bottom: 20px; max-width: 80%;
+        }
+
+        /* SECCIONES */
+        section { padding: 40px 20px; max-width: 600px; margin: 0 auto; }
+        .section-large { max-width: 900px; }
+
+        /* POLAROID ESTÁNDAR */
+        .polaroid {
+            background: white; padding: 10px 10px 35px 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid #eee;
+            width: 100%; box-sizing: border-box; transition: transform 0.3s ease;
+            margin-bottom: 20px; position: relative;
+        }
+
+        /* POLAROID GIGANTE */
+        .polaroid-large {
+            background: white; padding: 15px 15px 50px 15px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.15); margin: 40px auto;
+            width: 100%; transform: rotate(1deg) scale(1.02); border: 1px solid #ddd;
+            position: relative;
+        }
+
+        /* CLASE PARA REDUCIR TAMAÑO (Elementos destacados pero pequeños) */
+        .small-scale {
+            max-width: 60%; 
+            margin-left: auto; margin-right: auto;
+        }
+
+        /* CLASE PARA EXTRA PEQUEÑO (The glamorous reality) */
+        .tiny-scale {
+            max-width: 40%;
+            margin-left: auto; margin-right: auto;
+        }
+
+        /* CLASE PARA ELEMENTOS HORIZONTALES (SIN ROTACIÓN) */
+        .horizontal-item {
+            transform: rotate(0deg) !important;
+            max-width: 800px; margin: 30px auto;
+        }
+        
+        /* Estilo general para imágenes y videos */
+        img, video { width: 100%; height: auto; display: block; }
+
+        .caption {
+            font-family: 'Cinzel', serif; color: #777; margin-top: 15px;
+            text-align: center; font-size: 0.85rem; letter-spacing: 1px;
+        }
+
+        /* OVERLAP GIFT */
+        .overlap-container { position: relative; margin-bottom: 50px; }
+        .overlap-mini {
+            position: absolute;
+            bottom: -30px; left: -30px;
+            width: 40%;
+            z-index: 10;
+            transform: rotate(-8deg);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        /* GRIDS */
+        .photo-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 40px 0; align-items: start;
+        }
+        .photo-grid .polaroid:nth-child(odd) { transform: rotate(-2deg); }
+        .photo-grid .polaroid:nth-child(even) { transform: rotate(2deg); }
+
+        /* GRID DE COMIDA FIXED (3x3 Perfecto) */
+        .food-grid {
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 15px; margin: 40px 0;
+        }
+        /* Padding estándar para comida: 5px lados/top, 20px bottom */
+        .food-grid .polaroid { padding: 5px 5px 20px 5px; transform: rotate(0deg); }
+        .food-grid .caption { font-size: 0.6rem; margin-top: 5px; }
+
+        /* --- CORRECCIÓN: FORZAR AJUSTE DE IMÁGENES EN GRID DE COMIDA --- */
+        /* Esto asegura que todas las fotos (horizontales o verticales) llenen el mismo espacio */
+        .food-grid .polaroid img {
+            height: 180px; /* Altura fija para todas las celdas */
+            width: 100%;
+            object-fit: cover; /* Recorta la imagen para que llene el espacio sin deformarse */
+            object-position: center; /* Centra el recorte */
+        }
+
+        /* TEXTOS */
+        h2 { font-family: 'Cinzel', serif; font-size: 1.5rem; text-align: center; margin-bottom: 25px; font-weight: 400; }
+        p { line-height: 2; color: #444; font-weight: 300; margin-bottom: 25px; text-align: center; }
+
+        /* SPEECH BLOCK */
+        .speech-block {
+            background-color: #fafafa; border-left: 3px solid var(--accent-purple);
+            padding: 40px; margin: 40px 0;
+            font-family: 'Playfair Display', serif; font-style: italic;
+            font-size: 1.1rem; color: #333; line-height: 1.8; text-align: center;
+        }
+
+        /* CARTA */
+        .letter-container {
+            background-color: var(--paper-color); padding: 60px 50px;
+            border: 1px solid #eee; box-shadow: 0 20px 50px rgba(0,0,0,0.05);
+            text-align: left; margin-top: 30px;
+        }
+        .letter-text {
+            font-family: 'Montserrat', sans-serif; font-size: 1.1rem;
+            line-height: 1.9; color: #333; font-weight: 400; white-space: pre-wrap;
+        }
+        .letter-signature {
+            font-family: 'Playfair Display', serif; font-style: italic;
+            font-size: 1.4rem; margin-top: 40px; color: var(--accent-purple);
+        }
+
+        .divider { width: 50px; height: 2px; background: var(--accent-purple); margin: 20px auto 40px auto; }
+
+        footer { text-align: center; padding: 60px 20px; font-size: 0.8rem; color: #999; text-transform: uppercase; letter-spacing: 2px; }
+        footer a { text-decoration: none; color: #999; }
+        footer a:hover { color: var(--accent-purple); }
+        
+        @media (max-width: 768px) {
+            .food-grid { grid-template-columns: repeat(2, 1fr); }
+            .food-grid .polaroid img { height: 150px; /* Altura un poco menor en móviles */ }
+            .overlap-mini { bottom: -15px; left: -10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div style="font-family: 'Cinzel'; font-size: 0.8rem; letter-spacing: 4px; color: #999; margin-bottom: 15px;">DAY 14</div>
+        <h1>Home and Penang</h1>
+        <div class="divider"></div>
+        <div class="subtitle">Penang, the chaos, the flavors and the question.</div>
+    </header>
+
+    <section>
+        <h2>The Start and CHill Days</h2>
+        <p>This page starts with penang, but the first approach, my cultural shock, what I found different. And specially, finally meeting you.</p>
+        
+        <div class="overlap-container">
+            <div class="polaroid-large" style="transform: rotate(0deg); margin: 0;">
+                <img src="day14/navidad_regalo.jpg" alt="Christmas Anniversary Gift">
+                <div class="caption">My gifts!</div>
+            </div>
+            <div class="polaroid overlap-mini">
+                <img src="day14/mini_gift.jpg" alt="Mini detail">
+            </div>
+        </div>
+
+        <p>And then, we traveled to Penang. The true trip started there. Meeting your family terrified me, For you, 
+            it's clear that visiting Penang is like visiting a book you know by heart. For me, visiting the city center, 
+            seeing the streets you walked down, meeting your parents, not because of what you tell me about them but for who they are. 
+            Visiting your roots is, in a way, like meeting you for the first time, with new eyes.</p>
+
+        <div class="polaroid" style="max-width: 400px; margin: 0 auto;">
+            <img src="day14/her_brother.jpg" alt="Con su hermano">
+            <div class="caption">Fast and Furious. Holding myself in the back for my dear life.</div>
+        </div>
+
+        <p>We had arrived in Penang, and it was a whole new world for me. Its streets, the way space was distributed, the scents, the people. Almost like a castaway, I searched for signs of familiarity in its streets, but nothing was like the world I knew.</p>
+        <div class="polaroid horizontal-item">
+            <img src="day14/bridge.jpg" alt="El Puente de Penang">
+            <div class="caption">The Bridge.</div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Meeting The Boss</h2>
+        <p>Arriving at your home meant meeting the real boss of the house.</p>
+        
+        <div class="polaroid small-scale">
+            <img src="day14/puffy.jpg" alt="Puffy el perro">
+            <div class="caption">Puffy, the king</div>
+        </div>
+
+        <p>In the days that followed, we had things to do. The king had to be taken to daycare. I remember the trip to Thailand. It may be a regret of the trip, but I couldn't be happier with how things turned out. We meet a little grumpy friend</p>
+
+        <div class="photo-grid">
+            <div class="polaroid">
+                <img src="day14/cage.jpg" alt="Llevando a Puffy">
+                <div class="caption">Special cargo.</div>
+            </div>
+            <div class="polaroid">
+                <video src="day14/cat_playing.mp4" autoplay loop muted playsinline></video>
+                <div class="caption">Making friends.</div>
+            </div>
+        </div>
+
+        <div class="polaroid" style="max-width: 400px; margin: 0 auto 30px auto;">
+            <img src="day14/walking.jpg" alt="Me walking in Penang">
+            <div class="caption">Definitely not my proudest photo.</div>
+        </div>
+
+        <p>Walking around Penang, I wanted to be discreet, but when I set foot in your city, I understood that my books and my logic had no power here. I had to learn to walk again, understanding that life in Penang is not confined to pedestrian areas, but spills out everywhere. The most difficult thing was not the language, but understanding the logic of a space that seems chaotic, but beats with an ancient wisdom. You were my bridge to connect with the city. Without you, I would have been lost in the din. Seeing you move with such ease was like watching a magician. Of course, you understand the code of this disorder, you are the harmony in this noise that at first stunned me and that I now love, simply because it is part of you. </p>
+        <div class="polaroid" style="max-width: 500px; margin: 0 auto;">
+            <video src="day14/plaza.mp4" autoplay loop muted playsinline></video>
+            <div class="caption">Colombian in the plaza.</div>
+        </div>
+    </section>
+
+    <section class="section-large">
+        <div class="divider"></div>
+        <h2>The Question</h2>
+        <p>Holy shit, have you seen yourself? Do you grasp the beauty you carry? Sometimes I'm speechless because I can't believe you're my girlfriend. Latin power really is something else... you're simply unbelievable.</p>
+
+<p>I feel this constant urge to make you mine, the urge for your skin; I die from how unbearable I become when you're not near me. I love you at ten in the morning, at eleven, and at twelve noon. I love you in the books I read, I love you with every inch of my body, even the tips of my fingernails. I love Colombia because I love you; now I see my entire country reflected in your eyes. Before, my measure of love was what I felt for Manolo, but now, I also find Manolo in you.</p>
+
+<p>I love you with all my soul and with every one of my memories. I love you in the simplest things, in a plate of noodles, in the sound of songs. Our souls met long before my lips knew yours. That's why celebrating this anniversary is not just about remembering the day we met, but about being grateful for the moment when I finally recognized that you were what I had always been looking for.</p>
+
+        <div class="photo-grid">
+            <div class="polaroid">
+                <img src="day14/beautiful1.jpg" alt="Ella hermosa">
+            </div>
+            <div class="polaroid">
+                <img src="day14/beautiful2.jpg" alt="Ella hermosa 2">
+            </div>
+        </div>
+
+        <div class="speech-block">
+            <p><strong>My speech:</strong></p>
+           <p>Baby, I want to give you a little speech. I want to tell you this past year has been the most beautiful journey of my life, even with the distance, we know we hate it. But the reality is, a video call could never truly capture how incredible you are. It couldn't capture the way your eyes shine when you laugh, that little smile of yours, or the peace I feel just by being next to you.</p>
+
+<p>Now that Im finally standing here, right in front of you, with that beautiful face u have, Im so proud of being by your side, to call you, I say this beatufil girl is my girlfriend.. No screen could ever show the true depth of your eyes or the way your presence wramp the room. You are more incredible, more beautiful, and more important than myself from the past could dare to imagined. Trust me when I say this. I'm proud of you, my love and how far we have come.</p>
+
+<p>This is year has been tough in so many ways, but you made it easy. Your kindness and the way you’ve loved me from thousands of miles away have changed me. You’ve shown me that love doesn't need to be close to be powerful, to change and to compromise ourselfs with what really matters, to have a focus and to become better persons. 
+The first time I asked u officialy was through the screen. I want it to be this. I want this to be closer, just like now, in person, where I can look you in the eyes and tell you how much I truly love you. How much I want us to be real and not separated by the distance.</p>
+
+<p>You are my everything and rest asure that for me you are my priority. That there is no doubt of what i want for, I want you in my life, Eunice, for the rest of our lifes. From now, my love, can I officially be your boyfriend, now and for all the years to come?</p>
+
+        </div>
+
+        <p>The aftermath of a Yes.</p>
+        
+        <div class="polaroid tiny-scale">
+            <img src="day14/black_teeth.jpg" alt="Dientes negros">
+            <div class="caption">Happy as a clam (Didn't know the price of the wine)</div>
+        </div>
+
+        <div class="polaroid horizontal-item">
+            <img src="day14/selfie_speech.jpg" alt="Selfie juntos">
+            <div class="caption">Us.</div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Christmas in Penang</h2>
+        <p>No fancy dinners, just street burgers and the sound of your voice singing to me. That's all I needed.</p>
+        
+        <div class="polaroid" style="max-width: 500px; margin: 0 auto;">
+            <video src="day14/singing.mp4" controls style="border-radius: 4px;"></video>
+            <div class="caption">The best Christmas carol.</div>
+        </div>
+
+        <div class="polaroid horizontal-item">
+            <img src="day14/kissing_christmas.jpg" alt="Kissing in Christmas">
+            <div class="caption">Besos.</div>
+        </div>
+
+        <div class="polaroid" style="max-width: 400px; margin: 0 auto;">
+            <img src="day14/happy_christmas.jpg" alt="Me happy in Christmas">
+            <div class="caption">Retarded asf.</div>
+        </div>
+
+        <p style="margin-top: 40px;">And then, the road trip... The rest of penang and Malaysia are just coming soon.</p>
+        
+        <div class="polaroid small-scale">
+            <img src="day14/car_view.jpg" alt="Vista desde el carro">
+            <div class="caption">Our companion.</div>
+        </div>
+    </section>
+
+    <section class="section-large">
+        <div class="divider"></div>
+        <h2>The First flavors of Malaysia</h2>
+        <p>I can't lie, and it won't come as a surprise to you, but the first thing that comes out of my mouth when I talk about Penang is the food. What a wealth of flavors, of unique experiences. In the end, the body isn't meant to be saved, it's meant to be enjoyed, especially if it's by your side. I want to literally eat the world, try everything that comes our way, and in the end, I can always blame you for making me fat. However, this is only the first moment of what we ate in Malaysia.</p>
+
+<p>When I think about that first period, I think about your father, arriving with the smell of durian from a block away. You always told me about your father's kindness, but when he arrived with $3,000 worth of durian, it was the physical demonstration of your words. I said to myself, yep, it won't be that bad, the pain and disgust is mental. I thought, there must be someone in this household who doesn't like durian. I was quite wrong. Everyone began to eat as if it were the food of the heavens. Love, time for bed, I said. But how naive of me to think that this was over. That day was probably the day I ate the most durian in my life. I asked for rice as a cry for help. The first few bites were quite normal. After my hundred and first bite, I wanted to surrender. No joke, I'd rather die than look bad in front of your parents. The heat at the dinner table was making me dizzy, the smell and the taste. Yet there you were with that beautiful smile of yours, spending time with your family. And I knew that durian was worth it.</p>
+
+        <p>I ate. A lot. But there is one king among kings.</p>
+
+        <div class="polaroid small-scale">
+            <img src="day14/char_kway_teow.jpg" alt="Char Kway Teow">
+            <div class="caption" style="color: var(--accent-purple); font-weight: bold;">CHAR KWAY TEOW (My Favorite)</div>
+        </div>
+
+        <div class="polaroid" style="max-width: 500px; margin: 50px auto;">
+            <img src="day14/durian.jpg" alt="Durian">
+            <div class="caption">The Durian Experience.</div>
+        </div>
+
+        <p>And everything else we devoured...</p>
+
+        <div class="food-grid">
+            <div class="polaroid"><img src="day14/food1.jpg" alt="Food"></div>
+            <div class="polaroid"><img src="day14/food2.jpg" alt="Food"></div>
+            <div class="polaroid"><img src="day14/food3.jpg" alt="Food"></div>
+            <div class="polaroid"><img src="day14/food4.jpg" alt="Food"></div>
+            <div class="polaroid"><img src="day14/food5.jpg" alt="Food"></div>
+            <div class="polaroid"><img src="day14/food6.jpg" alt="Food"></div>
+            <div class="polaroid"><img src="day14/food7.jpg" alt="Food"></div>
+            <div class="polaroid"><img src="day14/food8.jpg" alt="Food Horizontal"></div>
+            <div class="polaroid"><img src="day14/food9.jpg" alt="Food"></div>
+        </div>
+    </section>
+
+    <footer>
+        <a href="index.html">Back to Index</a>
+    </footer>
+
+</body>
+</html>
