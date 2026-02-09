@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 15</title>
+    <link rel="icon" type="image/png" href="img/icono.jpg">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Montserrat:wght@300;400;500&family=Playfair+Display:ital,wght@1,400&family=Cormorant+Garamond:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- ESTILO BASE (Day 14) --- */
+        :root {
+            --bg-color: #fcfcfc;
+            --text-color: #111111;
+            --accent-purple: #5D3A9B;
+            --paper-color: #fdfbf7;
+            --gold: #d4af37;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Montserrat', sans-serif;
+            margin: 0; padding: 0; overflow-x: hidden;
+        }
+
+        /* HEADER */
+        header {
+            min-height: 50vh;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; padding: 40px 20px;
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif; font-size: 2.5rem; margin-bottom: 15px;
+            letter-spacing: 2px; color: var(--text-color);
+        }
+
+        .subtitle {
+            font-family: 'Playfair Display', serif; font-style: italic; color: var(--accent-purple);
+            font-size: 1.2rem; margin-bottom: 20px; max-width: 80%;
+        }
+
+        .divider { width: 50px; height: 2px; background: var(--accent-purple); margin: 20px auto 40px auto; }
+
+        /* SECCIONES */
+        section { padding: 40px 20px; max-width: 600px; margin: 0 auto; }
+        .section-large { max-width: 900px; }
+
+        /* TEXTOS */
+        h2 { font-family: 'Cinzel', serif; font-size: 1.5rem; text-align: center; margin-bottom: 25px; font-weight: 400; }
+        p { line-height: 2; color: #444; font-weight: 300; margin-bottom: 25px; text-align: center; }
+
+        /* POLAROID BASE */
+        .polaroid {
+            background: white; padding: 10px 10px 35px 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid #eee;
+            width: 100%; box-sizing: border-box; transition: transform 0.3s ease;
+            margin-bottom: 20px; position: relative; margin-left: auto; margin-right: auto;
+        }
+
+        img, video { width: 100%; height: auto; display: block; }
+
+        .caption {
+            font-family: 'Cinzel', serif; color: #777; margin-top: 15px;
+            text-align: center; font-size: 0.85rem; letter-spacing: 1px;
+        }
+
+        /* --- CLASES DE TAMAÑO --- */
+        .tiny { max-width: 40%; }
+        .small { max-width: 60%; }
+        .medium { max-width: 80%; }
+        .large { max-width: 100%; transform: scale(1.02); }
+        .huge { max-width: 100%; width: 100%; margin-bottom: 40px; }
+
+        /* GRIDS */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; align-items: start; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0; }
+
+        /* --- INTERACCIÓN: REVEAL GAME (MEJORADO PARA LEGIBILIDAD) --- */
+        .reveal-wrapper { position: relative; overflow: hidden; cursor: pointer; }
+        
+        .reveal-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--accent-purple); color: white;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 10; transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            /* AJUSTES AÑADIDOS PARA ESTÉTICA */
+            padding: 25px; /* Espacio interno para que el texto no toque bordes */
+            box-sizing: border-box; /* Para que el padding no rompa el tamaño */
+            text-align: center;
+        }
+        
+        .reveal-overlay h3 { 
+            font-family: 'Cinzel', serif; 
+            font-size: 1.1rem; /* Un poco más grande */
+            letter-spacing: 2px; 
+            margin: 0 0 15px 0; /* Espacio debajo del título */
+            text-transform: uppercase; 
+            line-height: 1.4;
+        }
+        
+        .reveal-overlay span { 
+            font-family: 'Montserrat', sans-serif; 
+            font-size: 0.85rem; /* Aumentado de 0.6rem para que se lea bien */
+            margin-top: 0; 
+            opacity: 0.95; /* Más visible */
+            letter-spacing: 0.5px; 
+            line-height: 1.6; /* Mejor lectura para párrafos largos */
+            font-weight: 300;
+        }
+        
+        .reveal-wrapper.revealed .reveal-overlay { transform: translateY(-100%); }
+
+        /* --- INTERACCIÓN: FEAST STACK --- */
+        .feast-stack-container {
+            position: relative; height: 350px; width: 280px; margin: 40px auto; perspective: 1000px;
+        }
+        .stack-card {
+            position: absolute; top: 0; left: 0; width: 100%; transition: all 0.5s ease;
+            cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            background: white; padding: 6px 6px 25px 6px; border: 1px solid #eee;
+        }
+        .stack-card:nth-child(odd) { transform: rotate(2deg); }
+        .stack-card:nth-child(even) { transform: rotate(-3deg); }
+        .stack-card.eaten { transform: translate(120px, -60px) rotate(30deg); opacity: 0; pointer-events: none; }
+
+        /* --- DAY 12 LETTER STYLE --- */
+        .envelope-section { padding: 80px 20px; background-color: #fff; display: flex; justify-content: center; margin-top: 0; }
+        .paper-letter {
+            background-color: var(--paper-color); width: 100%; max-width: 700px; padding: 60px;
+            position: relative; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid #f0f0f0; background-image: url("https://www.transparenttextures.com/patterns/cream-paper.png");
+        }
+        .letter-content p { 
+            font-family: 'Cormorant Garamond', serif !important; font-size: 1.3rem !important;
+            line-height: 1.8 !important; color: #2c2c2c !important; 
+            text-align: left !important; margin-bottom: 20px;
+        }
+        .letter-header { border-bottom: 1px solid var(--gold); padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end; }
+        .signature { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.5rem; text-align: right; margin-top: 40px; color: #333; }
+
+        /* FOOTER */
+        footer { text-align: center; padding: 60px 20px; font-size: 0.8rem; color: #999; text-transform: uppercase; letter-spacing: 2px; }
+        footer a { text-decoration: none; color: #999; }
+        footer a:hover { color: var(--accent-purple); }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div style="font-family: 'Cinzel'; font-size: 0.8rem; letter-spacing: 4px; color: #999; margin-bottom: 15px;">DAY 15</div>
+        <h1>The high life</h1>
+        <div class="divider"></div>
+        <div class="subtitle">Just us living our best lives.</div>
+    </header>
+
+    <section>
+        <h2>A small trip</h2>
+        <p>I believe that during that time in my life, I entered the greatest flow state of my life. Today, I am certain that my depression was due to my lack of doses of those days I spent with you. 
+<br><br>We began with the short trip to the Cameron Highlands, and of course, we were eating in the car. </p>
+        
+        <div class="polaroid small">
+            <video src="day15/road_video.mp4" autoplay loop muted playsinline></video>
+            <div class="caption">On the road.</div>
+        </div>
+        
+        <div class="polaroid tiny">
+            <img src="day15/sneaky_snack.jpg" alt="Sneaky snack">
+            <div class="caption">Sneaky Snack.</div>
+        </div>
+
+        <p>When we arrived in the city, I felt like a prince; you always have a way of making me feel special. I'm nothing special, but when I'm by your side, I feel like I can take on the world.
+<br><br>
+You drove me there, and that day you were busy with the BBQ while I stood there watching you as if you had fallen from heaven, my angel.<br><br>
+I must confess, my love, that I could mention how we ate fried chicken, watched Home Alone, or any of those little details from the first day of our trip. But the truth is, when I close my eyes, I imagine you nude on the side of the bed. My hands around your hips. One of the many times I couldn't help myself around your body. 
+
+</p>
+        
+        <div class="polaroid small">
+            <video src="day15/her_cooking.mp4" autoplay loop muted playsinline></video>
+            <div class="caption">Chef Eunice in action.</div>
+        </div>
+        <div class="polaroid small">
+            <img src="day15/hotel_tv.jpg" alt="Hotel Home Alone">
+            <div class="caption">Cozy hotel, Cozy Night.</div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Tea and Drive</h2>
+        <p>I want you to play a game throughout the entire page. There will be hidden photos, and you will have to guess who is doing what in each of the photos. You will have to click on the photo to reveal it.
+<br><br>
+It's morning at the hotel. </p>
+        
+        <div class="polaroid large reveal-wrapper" onclick="reveal(this)">
+            <div class="reveal-overlay">
+                <h3>Who is this?</h3>
+                <span>Who will it be, who will it be? This person rarely makes funny faces on camera. </span>
+            </div>
+            <img src="day15/breakfast_funny.jpg" alt="Her funny at breakfast">
+            <div class="caption">Love to start my mornings with this energy, with this face.</div>
+        </div>
+        
+        <div class="polaroid small">
+            <img src="day15/breakfast_food.jpg" alt="Breakfast">
+            <div class="caption">MID ASF</div>
+        </div>
+
+        <p>We arrived at the tea plantations, which for me were the most beautiful place we visited in Malaysia. The lighting was beautiful, the landscape was beautiful.</p>
+        
+        <div class="polaroid huge">
+            <img src="day15/tea_main_her.jpg" alt="Her at Tea Plantation">
+            <div class="caption">My view.</div>
+        </div>
+
+        <div class="polaroid medium">
+            <img src="day15/tea_1.jpg" alt="Tea Plantation">
+            <div class="caption">Such a beautiful photo.</div>
+        </div>
+
+        <p>Let's play again, this time we'll go to the strawberry farm. I wonder who's behind those photos. </p>
+        <div class="grid-2">
+            <div class="polaroid reveal-wrapper" onclick="reveal(this)">
+                <div class="reveal-overlay">
+                    <h3>This person has been looking for the photo since arriving at this place.</h3>
+                    <span>Tap to see</span>
+                </div>
+                <img src="day15/me_silly_strawberry.jpg" alt="Me Silly">
+                <div class="caption">And I would do it again.</div>
+            </div>
+            
+            <div class="polaroid reveal-wrapper" onclick="reveal(this)">
+                <div class="reveal-overlay">
+                    <h3>This person had a lot of style with these glasses.</h3>
+                    <span>Tap to see</span>
+                </div>
+                <img src="day15/me_glasses.jpg" alt="Strawberry Glasses">
+                <div class="caption">Pure style, my girl.</div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Return to Penang</h2>
+        <p>It was a short trip, we did what we could and left!
+Of course, our ambition knows no bounds. As if that weren't enough, we went to Malatan, I drank half a liter of tea, and you ordered half a kilo of food. Well fed, we went to take a nap at Avatar.</p>
+        
+        <div class="polaroid tiny">
+            <img src="day15/malatang.jpg" alt="Malatang">
+            <div class="caption">Yummy.</div>
+        </div>
+        
+        <div class="polaroid medium reveal-wrapper" onclick="reveal(this)">
+            <div class="reveal-overlay">
+                <h3>The King and the jester</h3>
+                <span>Tap to reveal</span>
+            </div>
+            <img src="day15/me_puffy_silly.jpg" alt="Me and Puffy">
+            <div class="caption">Reunited with Puffy.</div>
+        </div>
+    </section>
+
+    <section>
+        <h2>The feast</h2>
+        <div class="polaroid tiny">
+            <img src="day15/plaza.jpg" alt="Plaza">
+            <div class="caption">With the guides at Hawker.</div>
+        </div>
+
+        <p>Each photo was a dish that night. Click to reveal all the dishes. (Help)</p>
+        
+        <div class="feast-stack-container">
+            <div class="stack-card" style="z-index: 6;"><img src="day15/fam_food1.jpg" alt="Food"></div>
+            <div class="stack-card" style="z-index: 5;"><img src="day15/fam_food2.jpg" alt="Food"></div>
+            <div class="stack-card" style="z-index: 4;"><img src="day15/fam_food3.jpg" alt="Food"></div>
+            <div class="stack-card" style="z-index: 3;"><img src="day15/fam_food4.jpg" alt="Food"></div>
+            <div class="stack-card" style="z-index: 2;"><img src="day15/fam_food5.jpg" alt="Food"></div>
+            <div class="stack-card" style="z-index: 1;"><img src="day15/fam_food6.jpg" alt="Food"></div>
+        </div>
+        
+        <div class="caption" style="color: var(--accent-purple); font-weight: bold; margin-bottom: 40px; margin-top: -20px;">
+            And wait, we're not done yet, dessert is still to come D:
+        </div>
+
+        <div class="polaroid tiny">
+            <img src="day15/pink_dessert.jpg" alt="Pink Dessert">
+            <div class="caption">Pink Batu Campur.</div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Chill Days</h2>
+        <div class="polaroid medium">
+            <img src="day15/nasi_lemak.jpg" alt="Nasi Lemak">
+            <div class="caption">Mandatory Nasi Lemak. It doesn't look that great, but I would eat it every day.</div>
+        </div>
+
+        <p>We walked and walked that day, looking for the market, looking for something to do, we went to the thrift store. I told you I wanted to take a picture of the street, but I also took a picture of you. Let's play.</p>
+
+        <div class="polaroid medium reveal-wrapper" onclick="reveal(this)">
+            <div class="reveal-overlay">
+                <h3>Always down to earth, always a diva</h3>
+                <span>Tap to reveal</span>
+            </div>
+            <img src="day15/diva_fan_1.jpg" alt="Diva with fan">
+            <div class="caption">Better dead than ordinary.</div>
+        </div>
+
+        <div class="grid-2">
+             <div class="polaroid medium" style="margin: 0 auto;"><img src="day15/cafe_drinks.jpg" alt="Drinks"><div class="caption">The loudest couple in the area.</div></div>
+             <div class="polaroid medium" style="margin: 0 auto;"><img src="day15/steamboat_dirty.jpg" alt="Steamboat"><div class="caption">Steamboat Experience.</div></div>
+        </div>
+
+        <div class="polaroid small">
+            <img src="day15/scary_dessert.jpg" alt="Scary Dessert">
+            <div class="caption">Sugar Overload.</div>
+        </div>
+                <p>I remember it well. I always have that naive courage to face this type of situation, but that time, I felt a little self-conscious, a little out of place. There were your parents, watching me with that curiosity that parents have when investigating the person who has won their daughter's heart. It was a mixture of fondness and final judgment. The usual questions, but suddenly some disguised knives. I put on my best face, with a few anecdotes prepared, with answers ready, trying not to look like an idiot who doesn't know how to treat their daughter right, my biggest fear. In the end, it's a strange experience, I know, talking about the future, the past, our present, any word can determine the final verdict, judges who can give me the maximum penalty, a death sentence. While I was answering, part of me was desperately looking for a sign from her that said, “Relax, you're doing fine.” I remember that day well. We arrived at your house, that same house that weighed heavily on me, where every picture on the wall, with each of your family members, asked me what right I had to be there, disrupting the balance of their lives. That little Colombian in the middle of Malaysia. With no destination other than love.</p>
+
+    </section>
+
+    <section>
+        <h2>George Town</h2>
+        <div class="grid-3">
+            <div class="polaroid"><img src="day15/next_food1.jpg" alt="Food"></div>
+            <div class="polaroid"><img src="day15/next_food2.jpg" alt="Food"></div>
+            <div class="polaroid"><img src="day15/next_food3.jpg" alt="Food"></div>
+        </div>
+
+        <p>Lots of streets, lots of passageways. Quite a lot of traffic and yet no sidewalks. The freestyle of walking.
+<br><br>
+            We were looking for those little people, hidden throughout the center. What fond memories! We walked with purpose, but without any sense of time.
+        </p>
+        <div class="polaroid large">
+             <img src="day15/street1.jpg" alt="Street" style="margin-bottom: 10px;">
+             <img src="day15/street2.jpg" alt="Street" style="margin-bottom: 10px;">
+             <img src="day15/street3.jpg" alt="Street">
+        </div>
+
+        <div class="polaroid large reveal-wrapper" onclick="reveal(this)">
+            <div class="reveal-overlay">
+                <h3>It's very hot, and we both hate sweating. On such a long hike, I wonder what kind of person would be doing everything possible to avoid the heat. </h3>
+                <span>Tap to reveal</span>
+            </div>
+            <img src="day15/diva_fan_2.jpg" alt="Diva Fan 2">
+            <div class="caption">Simply Iconic.</div>
+        </div>
+        <p> We spent the evening with Kelly.</p>
+        <div class="grid-2">
+            <div class="polaroid"><img src="day15/kelly_food1.jpg" alt="Food with Kelly"></div>
+            <div class="polaroid"><img src="day15/kelly_food2.jpg" alt="Food with Kelly"></div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Penang Hill</h2>
+        <div class="polaroid huge">
+            <img src="day15/panoramic.jpg" alt="Penang Panoramic">
+        </div>
+
+        <div class="polaroid large">
+            <img src="day15/jungle_her.jpg" alt="Beautiful in Jungle">
+            <div class="caption">Nature Goddess.</div>
+        </div>
+        
+        <div class="polaroid medium reveal-wrapper" onclick="reveal(this)">
+            <div class="reveal-overlay">
+                <h3>What am I doing here?</h3>
+                <span>Tap to reveal</span>
+            </div>
+            <img src="day15/jungle_me.jpg" alt="Me in Jungle">
+            <div class="caption">Copycat.</div>
+        </div>
+
+        <div class="polaroid medium">
+            <img src="day15/habitat_scared.jpg" alt="The Habitat">
+            <div class="caption">Terrifying (I was about to throw a child off the bridge)</div>
+        </div>
+    </section>
+
+    <section>
+        <h2>The king of the kings</h2>
+        
+        <div class="polaroid small">
+            <img src="day15/best_ckt.jpg" alt="Char Kway Teow">
+            <div class="caption" style="color: var(--accent-purple); font-weight: bold;">THE BEST LUNCH EVER.</div>
+        </div>
+   <p> That hot pot was the best culinary experience. At that point, I felt that your mother was fond of me, and it turned out to be a pleasant evening. </p>
+        <div class="polaroid medium">
+            <img src="day15/hotpot_parents.jpg" alt="Hotpot Parents">
+            <div class="caption">Lots of food, happy tummy.</div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Dec 31 & NYE</h2>
+        
+        <div class="polaroid small">
+            <img src="day15/dec31_food.jpg" alt="Dec 31 Food">
+        </div>
+
+        <div class="polaroid medium reveal-wrapper" onclick="reveal(this)">
+            <div class="reveal-overlay">
+                <h3>The aftermath of eating 40 dishes over 7 days. Who is holding the camera and in what position? ?</h3>
+                <span>Tap to see damage</span>
+            </div>
+            <img src="day15/me_fat.jpg" alt="Me Fat">
+            <div class="caption">The result of a happy belly.</div>
+        </div>
+
+        <p>The Blue Mansion.</p>
+        <div class="polaroid large">
+            <img src="day15/blue_mirror.jpg" alt="Mirror Selfie" style="margin-bottom: 10px;">
+            
+            <div class="reveal-wrapper" onclick="reveal(this)" style="margin-bottom: 10px;">
+                <div class="reveal-overlay">
+                    <h3>The most valuable treasure in the place</h3>
+                    <span>Tap to reveal</span>
+                </div>
+                <img src="day15/blue_her_sitting.jpg" alt="Her Sitting">
+            </div>
+            
+            <img src="day15/blue_hall.jpg" alt="The Hall">
+        </div>
+
+        <div class="divider"></div>
+        <h2>New Year's Eve</h2>
+        
+        <div class="polaroid large">
+            <img src="day15/nye_family.jpg" alt="Family Dinner NYE">
+            <div class="caption">Family Dinner.</div>
+        </div>
+        <br>
+    <p>What can I say about New Year's Eve dinner? We had already had several dinners together and spent more time with your parents. In an almost unexpected burst of enthusiasm, your parents wanted to show us your grandmother's white house. That dinner didn't feel like an exam,  yet I couldn't relax or talk about those burning issues, of course. The time I spent that day with your family felt like a celebration.  
+<br><br>
+
+My dear, there is a profound beauty in sitting at the table with the person you love and their family and seeing their gestures repeated in their father's face, or hearing their laughter in their mother's voice. It's like looking at a treasure map. Getting to know your family was understanding that no one is an island. I bet you noticed it too in Colombia. We are all the result of a series of previous affections and mistakes, of fears that never had the chance to surface. When that family opens a place for you, as yours did during those days we spent in Penang, they are somehow telling you that they trust you to take care of the most precious thing they have. It is a moment of immense gratitude, which I keep in my heart, which I keep in these photos, in the hugs and kisses I gave you, the gratitude of being able to contemplate with my own eyes a dinner where words were unnecessary because the gesture of passing you the pork, or the food they love, or asking you how our relationship has come this far, implicitly conveyed a “welcome to our history.” That day we ate typical dishes of the Nyonya culture and I had never tasted anything so different, I never thought that one day I would end up in Penang on New Year's Eve, proud and thrilled to share my life with your family. </p>
+        <div class="polaroid medium">
+            <img src="day15/walking_home_nye.jpg" alt="Walking Home">
+            <div class="caption">First steps of 2026.</div>
+        </div>
+            
+        <div class="polaroid medium reveal-wrapper" onclick="reveal(this)">
+            <div class="reveal-overlay">
+                <h3>This person was caught red-handed after New Year's. </h3>
+                <span>Tap to reveal</span>
+            </div>
+            <img src="day15/sneaky_icecream.jpg" alt="Sneaky Ice Cream">
+            <div class="caption">Always room for supper.</div>
+        </div>
+
+    </section>
+
+    <section>
+        <h2>The last day</h2>
+        
+        <div class="polaroid tiny reveal-wrapper" onclick="reveal(this)">
+            <div class="reveal-overlay">
+                <h3>This person was approved by a family member.</h3>
+                <span>Tap to reveal</span>
+            </div>
+            <img src="day15/approved_silly.jpg" alt="Me Silly Approved">
+            <div class="caption">Here enjoying</div>
+        </div>
+        
+        <div class="polaroid small">
+            <img src="day15/last_meal.jpg" alt="Last Meal">
+            <div class="caption">The Last lunch with your family.</div>
+        </div>
+    </section>
+
+    <section class="envelope-section">
+        <div class="paper-letter">
+            <div class="letter-header">
+                <span class="date-stamp" style="font-family: 'Montserrat', monospace; color: #888; font-size: 0.8rem; letter-spacing: 2px;">A NOTE FROM WHAT I FELT IN PENANG</span>
+            </div>
+            
+            <div class="letter-content">
+                <p>Hola, Hermosa</p> 
+
+                <p>I realized something and it happened at a specific moment, one that might seem curious to you but for me was transformative. When we went to your dad brother house, it changed the way I see many things. You see, it might be the language but your father is a person who can sometimes seem a bit reserved in interaction, even a bit imposing. But seeing the house where his brother lives, seeing him talk with his own people, seeing the fish swimming in his tank and the pineapples in his garden, was like turning on a lamp in a dark room.</p>
+
+<p>He was no longer just the man in front of me, the man who gave you life, but the son of so and so and the grandson of so and so, the result of a sum of affections and customs that he was now sharing with me in front of your uncle. I watched his smile, I watched his hands repeated in his brother’s gestures... I saw in his eyes the admiration and respect he feels for him. I felt deeply moved by what was happening before my eyes. That day I felt, in the enthusiasm of his brother’s words, who said I was welcome a second time to share more about his countless trips to China, I knew that my story, that of the Colombian who knows how to dance, who rolls his tongue to pronounce the R, and yours, didn't seem separate at all. That day I felt like just another member of the family. My story entangled with yours forever.</p>
+
+<p>Seeing photos of when you were a little girl, listening to stories of your grandparents who are no longer here, participating in dinner and in your family’s conversations is invaluable. Walking through the hallways of that house was breathing a different air, almost sacred. Although I didn't know your grandmother, I felt you were introducing her to me in every corner, in the way the furniture seems to keep silence or in that meticulous order one breathes in the atmosphere. Seeing your face light up telling anecdotes about her, or pointing out the place where she used to sit, I understood that she hasn't entirely gone. She lives on in the way you treat those you love most, in that sweet stubbornness you have sometimes. Entering there wasn't just visiting a building created in a mix of cultures, it was entering a system of affections perfected over generations, where every object seems to have a secret story that now, generously, you have shared with me. I felt that upon crossing that threshold, her memory welcomed me, allowing me to be a late but sincere witness to the woman who cemented the home where you learned to be who you are.</p>
+
+<p>And then, observing your parents in the quiet of the afternoon, I saw you clearer than ever, as if a veil had been lifted. Loving them, with their differences, with their language that sometimes escapes me and with their rituals, is the most honest and profound way of loving you completely. You are not an island, my love. You are the precious result of all that accumulated affection. It moves me to my soul to think that all that history, all those efforts and days lived by them, the sweat shed, conspired in my favor through time solely so that you would exist, so that you would be just as you are and could coincide with me, back in my short time in Melbourne, in that exact point of the world so far from everything, at the perfect moment. I think about it and I cannot stop feeling like the luckiest man.</p>
+
+<p>I feel the sacred weight of my past and your history. I see you singing in Spanish, enjoying Bad Bunny, and I find myself constantly thinking about the time when Malaysia gave me shelter. Little by little I feel how the pieces are fitting with yours, less rough each time, more familiar. The traditions and our stories are gradually mixing until I no longer know where one ends and the others begin, and there, my love, is where our family has started to grow. We are planting a new garden, made of patches of distant worlds, where our children will tell stories of a grandfather in Penang and of a coffee land on the other side of the sea. Blessed be the history that brought you to my arms, with all its baggage of customs and memories, because today I know that your past is the garden where I want to sow my future forever. And I think of you, of Malaysia, and I feel proud to have you in my life, just as you are.</p>
+
+            </div>
+            
+            <div class="signature">From the other side of the world with love, Andrés.</div>
+        </div>
+    </section>
+
+    <footer>
+        <a href="index.html">Back to Index</a>
+    </footer>
+
+    <script>
+        // Lógica para el juego de revelar
+        function reveal(element) {
+            element.classList.add('revealed');
+        }
+
+        // Lógica para el stack de comida
+        document.querySelectorAll('.stack-card').forEach(card => {
+            card.addEventListener('click', function() {
+                this.classList.add('eaten');
+            });
+        });
+    </script>
+
+</body>
+</html>
