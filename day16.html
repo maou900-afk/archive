@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 16</title>
+    <link rel="icon" type="image/png" href="img/icono.jpg">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Montserrat:wght@300;400;500&family=Playfair+Display:ital,wght@1,400&family=Cormorant+Garamond:ital,wght@0,400;1,400&family=Space+Mono&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- ESTILOS GENERALES --- */
+        :root {
+            --bg-color: #fcfcfc;
+            --text-color: #111111;
+            --accent-purple: #5D3A9B;
+            --gold: #c5a059;
+            --paper-color: #fdfbf7;
+            --card-shadow: 0 10px 30px rgba(0,0,0,0.06);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Montserrat', sans-serif;
+            margin: 0; padding: 0; overflow-x: hidden;
+        }
+
+        /* HEADER */
+        header {
+            min-height: 30vh;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; padding: 60px 20px 20px 20px;
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif; font-size: 2.5rem; margin-bottom: 15px;
+            letter-spacing: 2px; color: var(--text-color);
+        }
+
+        .subtitle {
+            font-family: 'Playfair Display', serif; font-style: italic; color: var(--accent-purple);
+            font-size: 1.1rem; margin-bottom: 20px; max-width: 600px;
+        }
+
+        .divider { width: 60px; height: 1px; background: var(--gold); margin: 20px auto 40px auto; }
+
+        section { padding: 40px 20px; max-width: 900px; margin: 0 auto; }
+
+        /* --- CONTADOR GIGANTE (REAL TIME) --- */
+        .hero-counter {
+            text-align: center;
+            padding: 40px 0;
+            margin-bottom: 40px;
+        }
+        
+        .counter-title {
+            font-family: 'Montserrat', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            font-size: 0.9rem;
+            color: #888;
+            margin-bottom: 20px;
+        }
+
+        .live-timer {
+            font-family: 'Cinzel', serif;
+            font-size: 4rem;
+            color: var(--accent-purple);
+            font-weight: 600;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .timer-block { display: flex; flex-direction: column; align-items: center; }
+        .timer-val { line-height: 1; }
+        .timer-label { font-size: 0.8rem; font-family: 'Space Mono', monospace; color: #aaa; margin-top: 10px; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* --- KILOMETER CARD (MEDIUM) --- */
+        .km-card {
+            background: white; border: 1px solid #eee; padding: 40px;
+            text-align: center; box-shadow: var(--card-shadow);
+            margin-bottom: 30px; border-top: 3px solid var(--gold);
+        }
+        .km-number { font-family: 'Cinzel', serif; font-size: 2.5rem; color: var(--text-color); margin-bottom: 10px; }
+        .km-label { font-family: 'Montserrat', sans-serif; font-size: 0.8rem; color: #888; text-transform: uppercase; letter-spacing: 2px; }
+        .km-detail { margin-top: 15px; font-family: 'Cormorant Garamond', serif; font-style: italic; color: #555; }
+
+        /* --- SMALL STATS GRID --- */
+        .small-stats-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+            max-width: 600px; margin: 0 auto 80px auto;
+        }
+        .small-stat {
+            background: #fafafa; border: 1px solid #eee; padding: 20px; text-align: center;
+        }
+        .small-num { font-family: 'Cinzel', serif; font-size: 1.5rem; color: var(--text-color); }
+        .small-lbl { font-size: 0.7rem; color: #999; text-transform: uppercase; letter-spacing: 1px; margin-top: 5px; }
+
+        /* --- THE ARCHIVE (LONG FRAGMENTS) --- */
+        .memory-section {
+            background-color: #0a0a0a; color: #fff; padding: 100px 20px;
+            text-align: center; margin-top: 60px; border-top: 3px solid var(--gold);
+        }
+
+        .memory-container { max-width: 700px; margin: 0 auto; position: relative; }
+
+        .memory-box {
+            padding: 40px; min-height: 350px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+
+        .memory-text {
+            font-family: 'Cormorant Garamond', serif; font-size: 1.4rem;
+            line-height: 1.8; font-style: italic; color: #e0e0e0;
+            opacity: 0; transition: opacity 0.8s ease; 
+            text-align: center;
+        }
+        .memory-text.visible { opacity: 1; }
+
+        .memory-source {
+            font-family: 'Space Mono', monospace; font-size: 0.7rem;
+            color: var(--gold); margin-top: 40px; text-transform: uppercase;
+            letter-spacing: 2px; opacity: 0; transition: opacity 0.8s ease 0.3s;
+        }
+        .memory-source.visible { opacity: 1; }
+
+        .shuffle-btn {
+            margin-top: 30px; background: transparent; color: var(--gold);
+            border: 1px solid var(--gold); padding: 15px 30px;
+            font-family: 'Montserrat', sans-serif; text-transform: uppercase;
+            letter-spacing: 3px; font-size: 0.75rem; cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .shuffle-btn:hover { background: var(--gold); color: #000; }
+
+        /* --- LETTER SECTION --- */
+        .envelope-section { padding: 80px 20px; background-color: #fff; display: flex; justify-content: center; margin-top: 0; }
+        .paper-letter {
+            background-color: var(--paper-color); width: 100%; max-width: 700px; padding: 60px;
+            position: relative; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid #f0f0f0; background-image: url("https://www.transparenttextures.com/patterns/cream-paper.png");
+        }
+        .letter-content p { 
+            font-family: 'Cormorant Garamond', serif !important; font-size: 1.3rem !important;
+            line-height: 1.8 !important; color: #2c2c2c !important; 
+            text-align: left !important; margin-bottom: 20px;
+        }
+        .letter-header { border-bottom: 1px solid var(--gold); padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end; }
+        .signature { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.5rem; text-align: right; margin-top: 40px; color: #333; }
+
+        footer { padding: 60px 20px; text-align: center; font-size: 0.7rem; color: #999; text-transform: uppercase; letter-spacing: 2px; }
+        footer a { text-decoration: none; color: #999; }
+        footer a:hover { color: var(--accent-purple); }
+
+        @media (max-width: 768px) {
+            .live-timer { font-size: 2.5rem; }
+            .km-number { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div style="font-family: 'Cinzel'; font-size: 0.8rem; letter-spacing: 4px; color: #999; margin-bottom: 15px;">DAY 16</div>
+        <h1>Pit Stop</h1>
+        <div class="divider"></div>
+        <div class="subtitle">A brief summary of our pages.</div>
+    </header>
+
+    <section>
+        <div class="hero-counter">
+            <div class="counter-title">Time Since August 10, 2024</div>
+            <div id="liveTimer" class="live-timer">
+                </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="km-card">
+            <div class="km-number">48,420</div>
+            <div class="km-label">Kilometers Traveled to See Each Other</div>
+            <div class="km-detail">
+                Geneva → Melbourne<br>
+                Melbourne → Bogotá<br>
+                Madrid → Kuala Lumpur<br>
+                Melbourne → Kuala Lumpur
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="small-stats-grid">
+            <div class="small-stat">
+                <div class="small-num">3</div>
+                <div class="small-lbl">Continents</div>
+                <div style="font-size: 0.8rem; color: #aaa; margin-top: 5px;">Oceania, South America, Asia</div>
+            </div>
+            <div class="small-stat">
+                <div class="small-num">5</div>
+                <div class="small-lbl">Major Cities</div>
+                <div style="font-size: 0.8rem; color: #aaa; margin-top: 5px;">Melbourne, Bogotá, Medellín, Madrid, KL</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="memory-section">
+        <h2 style="font-family: 'Cinzel'; color: var(--gold); margin-bottom: 10px;">The collection</h2>
+        <p style="font-family: 'Space Mono'; font-size: 0.8rem; margin-bottom: 50px; color: #888;">DEEP EXTRACTIONS FROM THE PAGES (DAYS 1-15)</p>
+
+        <div class="memory-container">
+            <div class="memory-box">
+                <div id="memoryText" class="memory-text">"The archive is initialized. Press the button to retrieve a fragment..."</div>
+                <div id="memorySource" class="memory-source">WAITING FOR INPUT</div>
+            </div>
+            
+            <button class="shuffle-btn" onclick="shuffleMemory()">Retrieve Fragment</button>
+        </div>
+    </div>
+
+    <section class="envelope-section">
+        <div class="paper-letter">
+            <div class="letter-header">
+                <span style="font-family: 'Montserrat', monospace; color: #888; font-size: 0.8rem; letter-spacing: 2px;">THE CONCLUSION</span>
+            </div>
+            
+            <div class="letter-content">
+                <p>Hola, Hermosa</p>
+                <p>Did you think I would leave you without a page? I know we are finishing this gift and that there is no longer any rush to finish it, but inside me I don't want it to ever end. I didn't do anything crazy this time, I reutilized the logic of the code on other pages and restructured it.</p>
+                <p>I know that if we were together, everything would be easier. Even when I make this page, I feel somewhat frustrated. What can I say to connect with you? All these letters and details are made with love, of that I am certain. Sometimes I spend hours thinking about a single sentence, not because I want to be literary or presumptuous, but because I want that sentence to be a bridge strong enough for you to walk across and reach me. The gift is not these pages, in these letters I write to you, it is the fact that my mind has not stopped working for you for a single second since we said goodbye, that I always think of you. And yet at some point I think that these letters should be without words. Just filled with kisses and the great love I have for you. For now, I let the words carry everything that my hands still cannot give you.</p>
+            </div>
+            
+            <div class="signature">Forever yours, Andrés.</div>
+        </div>
+    </section>
+
+    <footer>
+        <a href="index.html">Back to Index</a>
+    </footer>
+
+    <script>
+        // --- 1. REAL TIME COUNTER ---
+        function updateCounter() {
+            const startDate = new Date('2024-08-10T00:00:00'); // Fecha de inicio
+            const now = new Date();
+            const diff = now - startDate;
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            const timerDiv = document.getElementById('liveTimer');
+            timerDiv.innerHTML = `
+                <div class="timer-block"><span class="timer-val">${days}</span><span class="timer-label">Days</span></div>
+                <div class="timer-block"><span class="timer-val">${hours}</span><span class="timer-label">Hrs</span></div>
+                <div class="timer-block"><span class="timer-val">${minutes}</span><span class="timer-label">Min</span></div>
+                <div class="timer-block"><span class="timer-val">${seconds}</span><span class="timer-label">Sec</span></div>
+            `;
+        }
+        setInterval(updateCounter, 1000);
+        updateCounter();
+
+        // --- 2. ARCHIVE MEMORIES (ALL 15 DAYS - AUTHENTIC TEXT RE-SELECTED) ---
+        const memories = [
+            // DAY 1
+            { text: "The curated jokes, the quiet walks in North Melbourne, the silent gratitude to Sketch. I see a man who was already reorganizing his entire world to make space for you. It’s a fascinating retrospective. I was building a memory of you before I had even learned the sound of your laugh.", source: "Day 1: Where it started" },
+            { text: "My meticulous plans were just the world turning silent, one by one, until the only thing left to hear was the music guiding me to you. The night before we met, the staging was finally complete. All the pieces in the right place, all the right decisions at the perfect time.", source: "Day 1: Where it started" },
+            { text: "I have come to the conclusion that it wasn’t just a first date. I was arriving at a destination itself, following an invisible thread. It was never accidental. I simply surrendered to the fact that you had already become my world. And the music was loud enough to be impossible to ignore.", source: "Day 1: Where it started" },
+
+            // DAY 2
+            { text: "The beauty of the world has two edges, one of joy and one of anguish, cutting the heart in so many pieces with the sudden realization that everything has changed. I was enchanted and repelled by the inexhaustible variety of life, until I looked at you and realized the world could be quiet and calm by a brief second.", source: "Day 2: Clean Cut" },
+            { text: "I wanted you with an intensity that surprised me. You carried a scent that took over my senses. The dinner felt almost too quiet, so a bar was the best place to let the conversation flow. I thought I could take the lead and allow you to find ease in my company. I was completely wrong. You shocked me like a thunderstorm.", source: "Day 2: Clean Cut" },
+            { text: "Watching films has always been my sanctuary, but as you have seen during our relationship, every frame is more beautiful when your presence is the light beside me. I was a man still fighting the interference of a world that taught me to be suspicious, slowly realizing that the best stories are the ones we watch together.", source: "Day 2: Clean Cut" },
+
+            // DAY 3
+            { text: "My love, can you sense all the beautiful photos and memories of what we have lived? Creating this day, made me sense the immensity of this history we have shared. These images are the physical evidence that our love is a recurring line in an infinite, vast joined memory, a specific miracle where the future was already nesting.", source: "Day 3: Distance" },
+            { text: "To be honest, what lingered in my mind during those days of silence was a deep thought of you. I realized then that you had bravely exposed your delicate heart, offering a vulnerability that I now hold as sacred, while I was merely following the slow and analytical rhythm of my own nature.", source: "Day 3: Distance" },
+            { text: "When I look at the strength of our relationship bond now and I look at the man I have become through the act of loving you, I realize I have blended into the river of our memories. I'm built from the essence of us that when I look at the monument of my life, I see only you in me.", source: "Day 3: Distance" },
+
+            // DAY 4
+            { text: "No one has that maracuya smell; how can I replace that? I don't love you because you are perfect. At the end, we are all a little broken, a bit crazy. But you are my miracle; you look at me, you saw that wreckage, and you chose to sit in it with me.", source: "Day 4: Departure" },
+            { text: "I knew that if I have to travel through the dark to get back to you, then the dark is just part of the road. I was scared of the dark for sure, but I knew that you are the place where I finally put down my bags. No matter the destination, you are the only map I need.", source: "Day 4: Departure" },
+            { text: "I know that distance hurts, and even more so remembering our past life, but it’d hurt more to have you only as a memory, because memories don't hug, hermosa. I love you, because your specific way of being alive makes the world feel habitable.", source: "Day 4: Departure" },
+
+            // DAY 5
+            { text: "I carry with me, like a wound that will not close, the certainty that I will never again be the person I was in your arms during those days in Melbourne. When I said goodbye to you, a part of me died there. But love isn't simply a safe haven, it's a promise of reconstruction.", source: "Day 5: Far Away" },
+            { text: "It’s curious how in a single instant of shared silence we can promise each other a whole life without saying a word. Today is just the start of what we have lived and I couldn't be more excited about the things we have left to experience. I see you in myself and couldn't be prouder.", source: "Day 5: Far Away" },
+            { text: "You are the architecture of my life because I see you in the way I think, in the way I speak, in the very way I breathe. I don't see my life without you, my life is so tangled with yours, that I don't see myself out of you and I never want to find out how it is.", source: "Day 5: Far Away" },
+
+            // DAY 6
+            { text: "Upon returning to Melbourne, I not only conversed with the city that had given me shelter, but also with myself. Despite having been away for only a short time, I felt like a stranger; I understood that one does not settle in a country, but rather in a time, and mine there was gone.", source: "Day 6: Goodbye Melbourne" },
+            { text: "I realized then that I would gladly trade a thousand falls. Why? Because all those scars would simply be the price I’d pay just to see you smile across a dinner table. It’s strange how in a moment of crisis, your mind strips everything away until only one single line of thought remains and for me, that was you.", source: "Day 6: Goodbye Melbourne" },
+            { text: "Those old past days didn’t stay frozen in time, of course. Those days when we lived just 20 minutes apart moved forward with us, they transformed and became the solid ground we walk on today. Because of that, I don’t love you the way I did in Australia, I love you more and more importantly, better.", source: "Day 6: Goodbye Melbourne" },
+
+            // DAY 7
+            { text: "We are not together out of habit or geographical convenience, but because of a choice we renew every time we decide to call each other every day. The ocean that separates us is not a wall, it is a space we are filling with our determination not to forget each other.", source: "Day 7: The Gap" },
+            { text: "We have stood, more than once, at the absolute threshold of departure, that cold doorway where the ego whispers that it would be easier to simply cease to exist in each other's lives. We have exchanged words like knives, fragments of a temporary hatred. And yet, this is the miracle, we remain.", source: "Day 7: The Gap" },
+            { text: "Love in the end consists of navigating each others neuroses with patience recognizing that we are both on some level survivors of our own stories. I love you bravely with your wounds and I want to be a witness to your reconstruction.", source: "Day 7: The Gap" },
+
+            // DAY 8
+            { text: "You are the owner of all my thoughts and every small detail of my life. Even when we watched Chernobyl I felt a depth of emotion that I had felt before and I put myself in the boots of the fireman and I thought about the weight of our promises. I realized I would walk into fire for you.", source: "Day 8: Consolidation" },
+            { text: "We share the same space in our heads and we share the same thoughts even when the distance is vast. You are the most real presence in my life even when I cannot touch you. You are present in how I move and how I see the world and in the things that stay with me forever.", source: "Day 8: Consolidation" },
+            { text: "I think of that album and I think about how our anniversary is a way for me to stop, to tell you that this is not a habit, but a necessity of my soul to recognize that every year by your side is the only year that has truly been worth living.", source: "Day 8: Consolidation" },
+
+            // DAY 9
+            { text: "Before you, my life was a succession of identical days, an empty calendar. Now that I’ve found you, the past no longer hurts, because every mistake was leading me, every self doubt, without knowing it, toward this precise moment when I looked at you in that airport in Colombia that time.", source: "Day 9: Roots" },
+            { text: "I feel that my roots, those roots, the ones that were buried in this cold, arid soil, neglected by my indifference, have finally bloomed because you have come to water them with your presence. I am no longer the one who left Colombia 3 years ago, I am the one who returns with you, planting a new world.", source: "Day 9: Roots" },
+            { text: "In the end, my past wasn't a bunch of disconnected points, I wasn't running from my past, I was taking the long way around so that, when I finally reached you, I would have an entire world to give you. I feel lucky that you now walk through my memories with the same naturalness as you walk through my present.", source: "Day 9: Roots" },
+
+            // DAY 10
+            { text: "You know my passion for photography, the idea that a picture is more than a memory, it’s a decision. It’s my way of saying, I see you, and what I see is so important that I want time to stop right here. I have so many photos of you because they represent exactly that.", source: "Day 10: The Chaotic City" },
+            { text: "I am determined to spend every cent I have, even if it is not much, and every ounce of my energy, to ensure you lack nothing this world can offer. My only luxury is watching how you enjoy what I can give you. For you, I would conquer the world.", source: "Day 10: The Chaotic City" },
+            { text: "If you were able to make my roots bloom in this cold soil, I am sure we can find our own way of saying I am here without any maps between us. We are creating our own geography. I realized that my best photograph will always be the one that manages to capture that light in your eyes.", source: "Day 10: The Chaotic City" },
+
+            // DAY 11
+            { text: "Being with you is the only way I have to not be myself for a moment, to become the lens of my camera and simply be someone who gazes at the beauty. It is not just your face, it is the way you occupy the space you inhabit and how you walk as if the ground were a gift.", source: "Day 11: The Valley" },
+            { text: "Our relationship has different facets and in that exact moment under the torrential rain of Cocora I realized that I loved you not only for your joy but because you are the only person with whom I can bear my own pain just to know that you will be okay.", source: "Day 11: The Valley" },
+            { text: "That is why, while I have breath, I am going to keep going up this river of mud a thousand times more, without mattering how steep or slippery the path gets, just to find you on the other side, smiling. Because I am proud to have lived a life with you.", source: "Day 11: The Valley" },
+
+            // DAY 12
+            { text: "Because real love is that pact where, even if we have hurt each other with silences in a car or with words in a hallway, we decide that the refuge is still each other. Thank you for not leaving, for staying to fight for us, and for letting me be the place where your scared little bunny can always find peace.", source: "Day 12: Goodbye Colombia" },
+            { text: "Every time you leave, it's like a little death, a reminder of how immense and hostile the world feels without you. I cried when I couldn't see you, I cried in the bathroom. It was the collapse of my reality. I judged you too much that time. With the contact of your body I remembered the value of loving you.", source: "Day 12: Goodbye Colombia" },
+            { text: "My protection toward you does not turn off when we yell at each other. On the contrary, that is when it becomes most alert, because you are the most precious thing I have to take care of in this world. If you ever notice that I look into your eyes and you recognize a streak of love in mine, do not think it is a delusion.", source: "Day 12: Goodbye Colombia" },
+
+            // DAY 13
+            { text: "I traveled with the guilt of the empty chair at the Sunday table, and that gap will remain forever, but it is only compensated by the internal promise that this sacrifice will be worth it, that one day we will return with full hands to share what we lived, even though we know deep down that one never fully returns.", source: "Day 13: Heavy" },
+            { text: "In this country of strangers, you are the only home I keep intact, the port where my fears rest because I know you believe in me even when I lose myself among code and silence. You are the most real thing I have in this puzzle of airports and promises.", source: "Day 13: Heavy" },
+            { text: "You are the person for whom I would cross any ocean, with or without papers. Heaven gave me permission to breathe at your rhythm again, to be able to be blessed by your presence, and the best part of receiving the confirmation was that Malaysia had already begun the moment I knew that nothing was going to be able to separate me from you.", source: "Day 13: Heavy" },
+
+            // DAY 14
+            { text: "I love you at ten in the morning, at eleven, and at twelve noon. I love you in the books I read, I love you with every inch of my body. Our souls met long before my lips knew yours. That's why celebrating this anniversary is not just about remembering the day we met, but about being grateful.", source: "Day 14: Home and Penang" },
+            { text: "You’ve shown me that love doesn't need to be close to be powerful, to change and to compromise ourselves with what really matters. I'm proud of you, my love and how far we have come. This year has been tough in so many ways, but you made it easy.", source: "Day 14: Home and Penang" },
+            { text: "Before, my measure of love was what I felt for Manolo, but now, I also find Manolo in you. You have unlocked a chamber in my heart that I didn't know existed, a place where family, love, and future all blend into one. I love you with all my soul and with every one of my memories.", source: "Day 14: Home and Penang" },
+
+            // DAY 15
+            { text: "We are planting a new garden, made of patches of distant worlds, where our children will tell stories of a grandfather in Penang and of a coffee land on the other side of the sea. Blessed be the history that brought you to my arms, with all its baggage of customs and memories.", source: "Day 15: The High Life" },
+            { text: "Loving them, with their differences, with their language that sometimes escapes me and with their rituals, is the most honest and profound way of loving you completely. You are the precious result of all that accumulated affection. It moves me to my soul to think that all that history conspired in my favor.", source: "Day 15: The High Life" },
+            { text: "I feel the sacred weight of my past and your history. I see you singing in Spanish, enjoying Bad Bunny, and I find myself constantly thinking about the time when Malaysia gave me shelter. Little by little I feel how the pieces are fitting with yours, less rough each time, more familiar.", source: "Day 15: The High Life" }
+        ];
+
+        function shuffleMemory() {
+            const textBox = document.getElementById('memoryText');
+            const sourceBox = document.getElementById('memorySource');
+            
+            // 1. Fade out
+            textBox.classList.remove('visible');
+            sourceBox.classList.remove('visible');
+
+            // 2. Wait, Change, Fade in
+            setTimeout(() => {
+                const random = memories[Math.floor(Math.random() * memories.length)];
+                
+                textBox.innerText = random.text;
+                sourceBox.innerText = random.source.toUpperCase();
+
+                textBox.classList.add('visible');
+                sourceBox.classList.add('visible');
+            }, 800); 
+        }
+    </script>
+
+</body>
+</html>
