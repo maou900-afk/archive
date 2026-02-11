@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 17</title>
+    <link rel="icon" type="image/png" href="img/icono.jpg">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;700&family=Montserrat:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&family=Space+Mono&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Pacifico&family=Permanent+Marker&family=Rock+Salt&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- VARIABLES --- */
+        :root {
+            --bg-color: #fcfcfc;
+            --text-color: #111;
+            --gold: #d4af37;
+            --paper-color: #fdfbf7;
+            --pink-cute: #ffe0e9;
+            --shadow: 0 10px 30px rgba(0,0,0,0.08);
+            --danger: #b71c1c;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Montserrat', sans-serif;
+            margin: 0; padding: 0; overflow-x: hidden;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+        }
+
+        /* --- TYPOGRAPHY --- */
+        h1 { font-family: 'Cinzel', serif; font-size: 2.5rem; letter-spacing: 2px; margin-bottom: 10px; text-align: center; }
+        h2 { font-family: 'Cinzel', serif; font-size: 1.8rem; text-align: center; margin-bottom: 30px; display: block; padding-bottom: 5px; color: #000; }
+        h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-style: italic; text-align: center; color: #555; margin: 30px 0; }
+        
+        p { 
+            line-height: 1.9; color: #333; margin-bottom: 40px; font-size: 1rem; 
+            text-align: center; max-width: 700px; margin-left: auto; margin-right: auto;
+        }
+        
+        .caption { 
+            font-family: 'Space Mono', monospace; font-size: 0.7rem; color: #999; text-align: center; display: block; 
+            margin-top: 15px; text-transform: uppercase; letter-spacing: 2px; 
+        }
+
+        /* --- HEADER --- */
+        header { min-height: 40vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 40px 20px; }
+        .divider { width: 50px; height: 2px; background: var(--gold); margin: 20px auto; }
+
+        /* --- LAYOUT UTILS --- */
+        section { padding: 100px 0; position: relative; border-bottom: 1px solid #eee; }
+        .container-narrow { max-width: 800px; margin: 0 auto; padding: 0 20px; }
+        img, video { width: 100%; height: auto; display: block; box-shadow: var(--shadow); }
+
+        /* Grids with extra spacing */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin: 50px 0; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin: 50px 0; }
+        
+        .grid-3 img { height: 300px; object-fit: cover; width: 100%; }
+        .grid-2 img { height: 400px; object-fit: cover; width: 100%; }
+
+        /* --- INTERACTIVE ELEMENTS --- */
+        
+        /* 1. Parallax Cards */
+        .parallax-card { transition: transform 0.1s linear; will-change: transform; transform-style: preserve-3d; perspective: 1000px; }
+        
+        /* 2. Stack (Fixed height container to prevent overlap) */
+        .stack-container { position: relative; width: 300px; height: 450px; margin: 60px auto; cursor: pointer; }
+        .stack-card { position: absolute; top: 0; left: 0; width: 100%; height: 400px; background: #fff; padding: 10px 10px 40px 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); transition: transform 0.2s; border: 1px solid #ddd; }
+        .stack-card img { width: 100%; height: 100%; object-fit: cover; }
+        .stack-card:nth-child(1) { transform: rotate(-5deg); z-index: 3; }
+        .stack-card:nth-child(2) { transform: rotate(3deg); z-index: 2; }
+        .stack-card:nth-child(3) { transform: rotate(-2deg); z-index: 1; }
+
+        /* 3. Chaos Box (Loop) */
+        .chaos-box { border: 2px solid var(--danger); padding: 50px; text-align: center; background: rgba(183, 28, 28, 0.05); margin: 60px 0; overflow: hidden; }
+        .spinning-highway { transition: transform 0.1s linear; border-radius: 50%; border: 5px dashed #333; display: block; margin: 30px auto; }
+
+        /* 4. Draggable Turtles (Fixed height container) */
+        .turtle-zone { position: relative; height: 600px; background: #e0f7fa; border: 2px dashed #4dd0e1; border-radius: 20px; overflow: hidden; margin-bottom: 50px; margin-top: 30px; }
+        .draggable-turtle { position: absolute; width: 150px; cursor: grab; transition: transform 0.1s; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.2)); }
+        .draggable-turtle:active { cursor: grabbing; transform: scale(1.1); }
+        .zone-label { position: absolute; bottom: 10px; left: 0; width: 100%; text-align: center; font-family: 'Space Mono'; opacity: 0.5; pointer-events: none; }
+
+        /* 5. Paella Particles */
+        .paella-section { background-color: #fff9f0; padding: 100px 0; position: relative; overflow: hidden; }
+        .particle { position: absolute; pointer-events: none; animation: pop 0.8s ease-out forwards; font-size: 2rem; z-index: 100; }
+        @keyframes pop { 0% { transform: translateY(0) scale(0.5); opacity: 1; } 100% { transform: translateY(-100px) scale(1.5) rotate(180deg); opacity: 0; } }
+
+        /* 6. Depression Rain */
+        .depression-section { background: #0a0a0a; color: #fff; padding: 120px 0; border-bottom: none; text-align: center; position: relative; }
+        .depression-section h2 { color: #ffffff !important; text-shadow: 0 0 10px rgba(255,255,255,0.5); position: relative; z-index: 10; }
+        .depression-section p { color: #888; position: relative; z-index: 10; }
+        
+        .rain { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('https://www.transparenttextures.com/patterns/stardust.png'); opacity: 0.3; animation: rainAnim 2s linear infinite; pointer-events: none; z-index: 1; }
+        @keyframes rainAnim { from { background-position: 0 0; } to { background-position: 0 500px; } }
+
+        /* Letter */
+        .letter-section { background-color: var(--paper-color); background-image: url("https://www.transparenttextures.com/patterns/cream-paper.png"); padding: 100px 20px; }
+        .letter-container { max-width: 700px; margin: 0 auto; padding: 80px 60px; border: 1px solid rgba(0,0,0,0.1); box-shadow: var(--shadow); background: #fff; }
+        .letter-content p { font-family: 'Cormorant Garamond', serif !important; font-size: 1.3rem !important; color: #222 !important; text-align: left !important; margin-bottom: 20px; }
+        .signature { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.5rem; text-align: right; margin-top: 50px; color: #333; }
+
+        /* Footer */
+        footer { padding: 60px; text-align: center; font-size: 0.8rem; letter-spacing: 2px; background: #fff; border-top: 1px solid #eee; }
+        footer a { text-decoration: none; color: #999; }
+
+        /* Modal */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.98); z-index: 10000; }
+        .modal-scroll-container { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .modal-img { max-width: 90vw; max-height: 90vh; object-fit: contain; }
+        .close-btn { position: fixed; top: 30px; right: 40px; color: #000; font-size: 30px; cursor: pointer; z-index: 10001; }
+        
+        .w-medium { width: 60%; margin: 0 auto; }
+        .w-40-smaller { width: 40%; margin: 0 auto; }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div style="font-family: 'Cinzel'; font-size: 0.8rem; letter-spacing: 4px; color: #999;">DAY 17</div>
+        <h1>The Concrete End</h1>
+        <div class="divider"></div>
+    </header>
+
+    <section>
+        <div class="container-narrow">
+            <h2 style="border-bottom: 1px solid var(--gold); display: table; margin: 0 auto 30px auto;">A Shift in Atmosphere</h2>
+            <p>Completely different mood from Penang. Super busy, metallic noise vs. our small and cute penang</p>
+            
+            <div class="grid-2">
+                <div>
+                    <video src="day17/kl_crowd.mp4" autoplay loop muted playsinline style="height: 300px; object-fit: cover; width: 100%;"></video>
+                    <span class="caption">The Chaos of KL</span>
+                </div>
+                <div>
+                    <img src="day17/pizza.jpg" onclick="openModal('day17/pizza.jpg')" style="height: 300px; object-fit: cover; width: 100%;">
+                    <span class="caption">At least it was yummy</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container-narrow" onmousemove="parallax(event)">
+            <h3>Petrona</h3>
+            <p>We found a corner at the Towers. It was massive. I really loved those towers. Hehe</p>
+            
+            <div style="width: 100%; margin-bottom: 80px;">
+                <img src="day17/petronas.jpg" class="parallax-card" data-speed="2" onclick="openModal('day17/petronas.jpg')" style="height: 80vh; object-fit: cover; width: 100%;">
+                <span class="caption">HUGE</span>
+            </div>
+
+            <p>I wonder how hard your brother was judging us. <span style="font-size: 0.8rem; color: #999;">(Click stack to shuffle)</span></p>
+            <div class="stack-container" id="photoStack">
+                <div class="stack-card" onclick="shuffleStack()">
+                    <img src="day17/silly1.jpg">
+                </div>
+                <div class="stack-card" onclick="shuffleStack()">
+                    <img src="day17/silly2.jpg">
+                </div>
+                <div class="stack-card" onclick="shuffleStack()">
+                    <img src="day17/silly3.jpg">
+                </div>
+            </div>
+            
+            <p style="margin-top: 80px;">And just Us.</p>
+            <div class="grid-2">
+                <img src="day17/us_petronas1.jpg" class="parallax-card" data-speed="-1" onclick="openModal('day17/us_petronas1.jpg')" style="height: 500px; object-fit: cover;">
+                <img src="day17/us_petronas2.jpg" class="parallax-card" data-speed="1" onclick="openModal('day17/us_petronas2.jpg')" style="height: 500px; object-fit: cover;">
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container-narrow">
+            <h3>Small trip to india</h3>
+            <p>The truth is that it was a potentially beautiful place, but in the end I think that the atmosphere, with so many people and feeling somewhat unwelcome by the people who work there, made me want to leave. I loved the monkeys though. </p>
+            
+            <div class="w-medium" style="margin-bottom: 50px;">
+                <img src="day17/golden_thing.jpg" onclick="openModal('day17/golden_thing.jpg')">
+            </div>
+
+            <div class="grid-2">
+                <img src="day17/monkey1.jpg" onclick="openModal('day17/monkey1.jpg')">
+                <img src="day17/me_monkey.jpg" onclick="openModal('day17/me_monkey.jpg')">
+            </div>
+            <span class="caption">Cheeky Monkeys(Including me)</span>
+        </div>
+    </section>
+
+    <section>
+        <div class="container-narrow">
+            <div class="chaos-box">
+                <h2 style="font-family: 'Permanent Marker'; font-size: 2.5rem; margin-bottom: 20px;">Expressway to our hotel</h2>
+                <p>Expressway to our hotel. I have to confess that even though you were freaking out the whole time we were on the third level, I was taking pictures and giggling. I can't think of anything that excites a greater sense of childlike wonder than to be in a country where you are ignorant of almost everything. Suddenly everything became a mystery. Anything is an excuse to be surprised. That day I was impressed by the complexity of Kuala Lumpur and I couldn't have been happier to share your country with you.</p>
+                <img id="highwayImg" class="spinning-highway" src="day17/highway.jpg" onclick="openModal('day17/highway.jpg')" style="max-width: 400px; width: 300px; height: 300px; object-fit: cover;">
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container-narrow">
+            <h3>A Moment of Peace</h3>
+            <p>We finally escaped the car and went to the park with your brother. low-key our chauffeur and guide.</p>
+            
+            <div style="width: 100%; margin-bottom: 40px;">
+                <img src="day17/park_pano.jpg" onclick="openModal('day17/park_pano.jpg')" style="height: auto; width: 100%;">
+                <span class="caption">The View</span>
+            </div>
+
+            <div class="w-40-smaller" style="margin-bottom: 50px;">
+                <img src="day17/park_us1.jpg" onclick="openModal('day17/park_us1.jpg')">
+                <span class="caption">Us in the park</span>
+            </div>
+
+            <div class="w-40-smaller">
+                <img src="day17/nasi_kandar.jpg" onclick="openModal('day17/nasi_kandar.jpg')">
+                <span class="caption">Nasi Kandar competetion. I felt scammed that it wasn't spicy</span>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container-narrow">
+            <h3>Next Day: Market</h3>
+            <p>I loved walking with you, seeing how you interact and buy things for both of us. It gives me that eternal feeling that our trips are in themselves a reminder of what we can be and what we want in this life. For my part, I would love to see you walking along the shelves, looking at and trying food, and occasionally buying a treat. I still remember the time I walked behind you in that Chinese store in Melbourne, following you as we were going to cook malatang. And I couldn't stop thinking, wow, this woman is beautiful. Every time you turned, you would disappear from my sight, only to reappear as beautiful as ever. </p>
+            
+            <div class="turtle-zone" id="turtleZone">
+                <img src="day17/turtles.jpg" class="draggable-turtle" style="top: 50px; left: 50px; border-radius: 50%; width: 200px;" onmousedown="dragStart(event)">
+                <img src="day17/mangosteen.jpg" class="draggable-turtle" style="bottom: 50px; right: 50px; border-radius: 50%; width: 150px;" onmousedown="dragStart(event)">
+                <img src="day17/me_car_silly.jpg" class="draggable-turtle" style="top: 40%; left: 40%; width: 120px; border: 5px solid #fff; transform: rotate(10deg);" onmousedown="dragStart(event)">
+                <div class="zone-label">Stuff that I took with me!</div>
+            </div>
+            
+        </div>
+    </section>
+
+    <section>
+        <div class="container-narrow">
+            <h3>Friends</h3>
+            <p>I was a little nervous about meeting all your friends at once. But at the same time, it's a blessing. I stand there quietly, just listening to you. I watch you laugh with them, talk about people I don't have the pleasure of knowing, and remember stories that happened long before I appeared on your radar.
+It's a strange feeling, you know? A little overwhelming, but also revealing. As I listen to them, I realize that you have a whole emotional infrastructure, a huge safety net that I'm not part of. It's years of stories, inside jokes, and shared scars that sustain you. 
+Thank you for letting me in, for letting me be a spectator of the best version of yourself, and for allowing your stories to gradually become mine as well. I hope ill never let downn your friends on you. </p>
+            
+            <div style="width: 100%; margin-bottom: 30px; text-align: center;">
+                <img src="day17/friends.jpg" onclick="openModal('day17/friends.jpg')" style="max-height: 550px; width: auto; margin: 0 auto; box-shadow: var(--shadow);">
+                <span class="caption" style="margin-top: 15px;">DINNER WITH FRIENDS</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="paella-section">
+        <div class="container-narrow">
+            <h2 style="font-family: 'Permanent Marker'; font-size: 3rem; margin-bottom: 30px; color: var(--danger);">Dinner</h2>
+            <p style="font-size: 1.1rem; max-width: 600px; margin: 0 auto 50px auto;">Well, what can I say? Traveling from Spain to eat paella in Malaysia may be one of life's great ironies. In the end, even though I didn't think it was a good idea, your friends treated me really well, I felt so welcome, and best of all, the paella wasn't bad and the rest of the food was very good. </p>
+            
+            <div style="position: relative; width: 100%; text-align: center; margin: 0 auto; cursor: pointer;" onclick="burstPaella(event)">
+                <img src="day17/paella.jpg" style="max-height: 500px; width: auto; border: 10px solid #fff; box-shadow: 0 20px 50px rgba(0,0,0,0.2); transform: rotate(-2deg); margin: 0 auto;">
+                <div style="position: absolute; top: 10%; right: 10%; background: #fff; padding: 10px 20px; font-family: 'Space Mono'; font-weight: bold; border: 2px solid #000; box-shadow: 5px 5px 0 #000; transform: rotate(5deg); pointer-events: none;">SPANISH PAELLA 🇪🇸</div>
+            </div>
+            <span class="caption" style="margin-top: 40px;">Worth it? Absolutely.</span>
+        </div>
+    </section>
+
+    <section>
+        <div class="container-narrow">
+            <h3>The After Party</h3>
+            <p>Fighting with Truffle, because after all those scars I don't thing he was playing.</p>
+            <div class="w-40-smaller">
+                <video src="day17/truffle_dog.mp4" autoplay loop muted playsinline></video>
+                <span class="caption">Truffle the danger</span>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container-narrow">
+            <h3>Late Night</h3>
+            <p>Sometimes I wonder what goes through your mind every time you get drunk. I'm not judging, but you seem so delicate, so fragile. Whenever we drink, I worry about you, I still seek your body, I still seek your affection, I still love you. But there's something instinctive in me every time you're not in your full faculties. Even if I'm tipsy or a little horny, I don't care, what I want is for nothing to happen to you, I don't want you to suffer, I don't want you to get tired. I want to be with you so you're not afraid of anything, so you feel that my hand is always holding you, even if you can't see it. Sometimes this is difficult when we're apart, but when we're together, I'm so lucky to be able to show you that. You're the only person I want to take care of more than my own life.</p>
+            
+            <div style="border: 10px solid #fff; box-shadow: var(--shadow); width: 60%; margin: 0 auto;">
+                <img src="day17/crying_hotel.jpg" onclick="openModal('day17/crying_hotel.jpg')" style="filter: grayscale(100%);">
+            </div>
+            <span class="caption">I went to poop. And when I came back, you were crying so much because I wans't there for you, always in this moments i feel such a deep love for you. You looked so precious that all I wanted to do was kiss you and treat you with all the tenderness you deserve. Of course, don't forget the photo, to remeber that moment.</span>
+        </div>
+    </section>
+
+    <section>
+        <div class="container-narrow">
+            <h2 style="font-family: 'Cinzel'; margin-bottom: 30px;">The Departure</h2>
+            <p>We left the same day. Same airport, different terminals. It is painful, leaving every time</p>
+            
+            <div class="w-medium">
+                <img src="day17/airport_separation.jpg" onclick="openModal('day17/airport_separation.jpg')">
+                <span class="caption">The last meal hehe.</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="depression-section">
+        <div class="rain"></div>
+        <div class="container-narrow" style="position: relative; z-index: 20;">
+            <h2 style="font-family: 'Permanent Marker'; font-size: 3rem; margin-bottom: 40px; color: #fff !important;">THE END</h2>
+            
+            <div style="width: 250px; height: 250px; border-radius: 50%; overflow: hidden; margin: 0 auto 30px auto; border: 2px solid #333;">
+                <video src="day17/sad_round.mp4" autoplay loop muted playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
+            </div>
+
+            <p>Post-depression trip Andrés.</p>
+        </div>
+    </section>
+
+    <section class="letter-section">
+        <div class="letter-container">
+            <div class="letter-content">
+                <h3 style="text-align: left; margin-bottom: 20px;">The end of what we have lived</h3>
+                <p>Hola Hermosa,</p>
+                <p>I am writing this to you today with my blood still a bit hot from our fight a while ago. I was furious as you might know. But the more I think about that anger the more I realize what it really means. I miss you so much that the slightest noise in our connection breaks me down. I feel it every time you leave. Your absence is a figure that always leaves me in a state of suspension. The silence of the house after you go is not a relief. It is a deafening noise that reminds me that this space has lost its center. Everything that was chaos when you were here like the objects out of place and our overlapping voices now turns into a frozen order that I would rather see broken a thousand times by your presence.</p>
+
+<p>I even miss our arguments the tears over silly things and the exhaustion of the long trips we have taken. Because in those moments even though we were killing each other we were alive. I prefer a thousand times the stress of an uncertain path by your side over the safety of an empty room. In the end what remains of this whole travel summary is not the landscape we saw in Salento or in the Cocora Valley but the fact that we were together in the middle of the storm.</p>
+
+<p>It is about building those memories we have lived and the life we deserve since I know I work with my eyes on that future. A future where we do not fight over small things because we cannot call each other or because we cannot spend time together so it can become something I can touch. My motivation does not come from ambition but from the need for you to stop being a voice in my ears and become the person who sleeps by my side.</p>
+
+<p>My only absolute goal is to save every cent and dedicate every hour of my work so I can get lost with you on the dates that belong to us. Do not forget that in August we have a promise. I want to travel the whole world with you. I want to kiss you on every continent and celebrate every birthday by your side. Because I have understood something in this time apart. Without you the most incredible landscapes are just silent scenes without color and the most beautiful places on the planet are nothing more than empty coordinates on a map. I want to recognize in the world what I have lived with you. The world only takes on color when your eyes reflect it.</p>
+            </div>
+            <div class="signature">With love, Andrés.</div>
+        </div>
+    </section>
+
+    <footer>
+        <a href="index.html">BACK TO INDEX</a>
+    </footer>
+
+    <div id="imageModal" class="modal-overlay" onclick="closeModal()">
+        <span class="close-btn">&times;</span>
+        <div class="modal-scroll-container">
+            <img class="modal-img" id="img01">
+        </div>
+    </div>
+
+    <script>
+        // --- BASIC UTILS ---
+        var modal = document.getElementById("imageModal");
+        var modalImg = document.getElementById("img01");
+        function openModal(src) { modal.style.display = "block"; modalImg.src = src; }
+        function closeModal() { modal.style.display = "none"; }
+
+        function shuffleStack() {
+            const stack = document.getElementById('photoStack');
+            const topCard = stack.lastElementChild; 
+            topCard.style.transform = "translate(50px, -50px) rotate(10deg)";
+            topCard.style.opacity = "0";
+            setTimeout(() => {
+                stack.insertBefore(topCard, stack.firstElementChild);
+                topCard.style.transform = "rotate(-5deg)";
+                topCard.style.opacity = "1";
+            }, 300);
+        }
+
+        // --- INTERACTIVE 2: PARALLAX ---
+        function parallax(e) {
+            const cards = document.querySelectorAll('.parallax-card');
+            const x = (window.innerWidth - e.pageX * 2) / 100;
+            const y = (window.innerHeight - e.pageY * 2) / 100;
+
+            cards.forEach(card => {
+                const speed = card.getAttribute('data-speed');
+                card.style.transform = `translateX(${x * speed}px) translateY(${y * speed}px)`;
+            });
+        }
+
+        // --- INTERACTIVE 3: SCROLL SPIN (LOOP) ---
+        window.addEventListener('scroll', () => {
+            const img = document.getElementById('highwayImg');
+            const rotation = window.pageYOffset / 5;
+            img.style.transform = `rotate(${rotation}deg)`;
+        });
+
+        // --- INTERACTIVE 4: DRAG TURTLES ---
+        let draggedItem = null;
+        let diffX = 0, diffY = 0;
+
+        function dragStart(e) {
+            e.preventDefault(); 
+            draggedItem = e.target;
+            const rect = draggedItem.getBoundingClientRect();
+            // Calculate offset
+            diffX = e.clientX - rect.left;
+            diffY = e.clientY - rect.top;
+            
+            document.addEventListener('mousemove', dragMove);
+            document.addEventListener('mouseup', dragEnd);
+        }
+
+        function dragMove(e) {
+            if (!draggedItem) return;
+            const container = document.getElementById('turtleZone');
+            const containerRect = container.getBoundingClientRect();
+
+            let x = e.clientX - containerRect.left - diffX;
+            let y = e.clientY - containerRect.top - diffY;
+
+            x = Math.max(0, Math.min(x, containerRect.width - draggedItem.offsetWidth));
+            y = Math.max(0, Math.min(y, containerRect.height - draggedItem.offsetHeight));
+
+            draggedItem.style.left = x + 'px';
+            draggedItem.style.top = y + 'px';
+        }
+
+        function dragEnd() {
+            draggedItem = null;
+            document.removeEventListener('mousemove', dragMove);
+            document.removeEventListener('mouseup', dragEnd);
+        }
+
+        // --- INTERACTIVE 5: PAELLA BURST ---
+        function burstPaella(e) {
+            const emojis = ['🇪🇸', '🥘', '🍤', '🍋'];
+            for(let i=0; i<15; i++) {
+                const el = document.createElement('div');
+                el.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+                el.classList.add('particle');
+                el.style.left = (e.clientX + (Math.random() - 0.5) * 50) + 'px';
+                el.style.top = (e.clientY + window.scrollY) + 'px';
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 800);
+            }
+        }
+    </script>
+
+</body>
+</html>
