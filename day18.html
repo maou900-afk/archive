@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 18</title>
+    <link rel="icon" type="image/png" href="img/icono.jpg">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400;1,600&family=Montserrat:wght@200;300;400;600&family=Space+Mono&family=Playfair+Display:ital,wght@1,400;1,600&family=La+Belle+Aurore&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- ESTÉTICA COSMICA --- */
+        :root {
+            --star-white: #e6e6ff;
+            --gold-light: #ffd700;
+            --active-color: #9d4edd; 
+            --active-shadow: rgba(157, 78, 221, 0.8);
+            --line-color: rgba(255, 255, 255, 0.7); 
+            
+            /* Colores para la carta */
+            --paper-color: #fdfbf7;
+            --paper-grad: linear-gradient(135deg, #fdfbf7 0%, #f3ede1 100%);
+            --text-dark: #1a1a1a;
+            --gold-dark: #c5a059;
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            overflow: hidden;
+            background: radial-gradient(ellipse at bottom, #0a1329 0%, #02040a 100%);
+            color: var(--star-white);
+            font-family: 'Montserrat', sans-serif;
+            cursor: grab;
+            user-select: none;
+        }
+
+        body:active { cursor: grabbing; }
+
+        /* --- FONDO ANIMADO Y PROFUNDO --- */
+        .stars-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                radial-gradient(2px 2px at 40px 60px, #fff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 150px 200px, rgba(255,255,255,0.8), rgba(0,0,0,0)),
+                radial-gradient(3px 3px at 300px 80px, rgba(255,255,255,0.9), rgba(0,0,0,0)),
+                radial-gradient(1.5px 1.5px at 400px 300px, rgba(255,255,255,0.6), rgba(0,0,0,0));
+            background-size: 600px 600px;
+            z-index: -3; 
+            animation: drift 150s linear infinite;
+        }
+
+        @keyframes drift {
+            from { background-position: 0 0; }
+            to { background-position: 600px 600px; }
+        }
+        
+        .nebula-bg-1 {
+            position: fixed; top: -20%; left: -10%; width: 120%; height: 120%;
+            background: radial-gradient(circle at 30% 40%, rgba(138, 43, 226, 0.15) 0%, transparent 60%);
+            z-index: -2; filter: blur(60px);
+            animation: breathe 15s infinite alternate ease-in-out;
+        }
+        .nebula-bg-2 {
+            position: fixed; top: -10%; left: -10%; width: 120%; height: 120%;
+            background: radial-gradient(circle at 70% 60%, rgba(0, 180, 216, 0.12) 0%, transparent 60%);
+            z-index: -2; filter: blur(60px);
+            animation: breathe 20s infinite alternate-reverse ease-in-out;
+        }
+
+        @keyframes breathe { 
+            0% { opacity: 0.5; transform: scale(1) translate(0, 0); } 
+            100% { opacity: 0.9; transform: scale(1.1) translate(2%, 2%); } 
+        }
+
+        /* --- UI FIJA (HUD) SUTIL Y ELEGANTE --- */
+        .hud { position: fixed; padding: 30px; z-index: 1000; pointer-events: none; }
+        .hud-top-left { top: 0; left: 0; }
+        .hud-bottom-right { 
+            bottom: 0; right: 0; 
+            display: flex; flex-direction: column; align-items: flex-end; gap: 12px; 
+        }
+        
+        .hud-center { 
+            top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            text-align: center; pointer-events: none;
+            transition: opacity 1s ease;
+        }
+        
+        .hud-text {
+            font-family: 'Space Mono', monospace; 
+            font-size: 0.75rem; 
+            letter-spacing: 3px; color: rgba(255,255,255,0.9);
+            text-transform: uppercase; margin-bottom: 5px;
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif; 
+            font-size: 2.5rem; 
+            color: #fff;
+            text-shadow: 0 0 20px rgba(255,255,255,0.8);
+            margin: 0; font-weight: 400; letter-spacing: 2px;
+        }
+
+        .fade-out { animation: fadeOutAnim 5s forwards; animation-delay: 3s; }
+        @keyframes fadeOutAnim { to { opacity: 0; visibility: hidden; } }
+
+        .back-link {
+            pointer-events: auto; color: #fff; text-decoration: none; 
+            font-family: 'Space Mono'; font-size: 0.75rem; 
+            font-weight: bold; letter-spacing: 2px;
+            border: 1px solid rgba(255,255,255,0.2); padding: 10px 20px;
+            transition: all 0.4s; background: rgba(0,0,0,0.4); backdrop-filter: blur(10px);
+            border-radius: 30px;
+        }
+        .back-link:hover { 
+            background: #fff; color: #000; 
+            border-color: #fff; box-shadow: 0 0 15px rgba(255,255,255,0.6); 
+        }
+
+        /* --- UNIVERSO --- */
+        #universe {
+            position: absolute; 
+            width: 7000px; height: 5000px; 
+            top: 0; left: 0; transform-origin: 0 0; 
+            will-change: transform;
+        }
+
+        #constellation-svg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: -1;
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
+        }
+        line {
+            stroke: var(--line-color); stroke-width: 3px;
+            stroke-dasharray: 12 8; opacity: 1; animation: flow 40s linear infinite;
+        }
+        @keyframes flow { to { stroke-dashoffset: 200; } }
+
+        .node {
+            position: absolute; transform: translate(-50%, -50%); 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10;
+        }
+        .node:hover { z-index: 200; }
+
+        .star-core {
+            width: 18px; height: 18px; background: #fff; border-radius: 50%;
+            box-shadow: 0 0 25px 8px rgba(255, 255, 255, 0.9);
+            position: relative; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            cursor: pointer; pointer-events: auto;
+        }
+        .star-muse {
+            width: 45px; height: 45px; box-shadow: 0 0 90px 25px rgba(255, 255, 255, 1);
+        }
+        .star-muse::after {
+            top: -25px !important; left: -25px !important; width: 95px !important; height: 95px !important;
+        }
+
+        .star-core.visited {
+            background-color: var(--active-color);
+            box-shadow: 0 0 60px 20px var(--active-shadow), 0 0 120px 40px rgba(157, 78, 221, 0.4);
+            transform: scale(1.4);
+        }
+
+        .star-core::after {
+            content: ''; position: absolute; top: -18px; left: -18px;
+            width: 54px; height: 54px; border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 50%; animation: orbit 8s linear infinite; pointer-events: none;
+        }
+        .star-core:hover { transform: scale(1.5); }
+        .star-core.visited:hover { transform: scale(1.6); background: #b17de8; }
+
+        @keyframes orbit { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* ==========================================================
+           MODALES (CARTAS Y FOTOS) - TAMAÑOS INTERNOS REDUCIDOS
+           ========================================================== */
+        .reading-modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.75); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            z-index: 4000; justify-content: center; align-items: center; cursor: default;
+        }
+
+        .reading-modal-box {
+            padding: 50px 60px; width: 95%; max-width: 900px; max-height: 85vh; overflow-y: auto; 
+            position: relative; transition: all 0.4s ease; border-radius: 16px; 
+            display: flex; flex-direction: column;
+            background: rgba(15, 20, 30, 0.4);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8), inset 0 0 20px rgba(255,255,255,0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .reading-modal-box::-webkit-scrollbar { width: 8px; }
+        .reading-modal-box::-webkit-scrollbar-track { background: transparent; margin: 20px 0; }
+        .reading-modal-box::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
+        .reading-modal-box::-webkit-scrollbar-thumb:hover { background: var(--active-color); }
+
+        .close-reading-btn {
+            position: absolute; top: 20px; right: 25px; 
+            color: rgba(255,255,255,0.6); font-size: 28px; cursor: pointer; 
+            font-family: 'Montserrat', sans-serif; font-weight: 300; transition: all 0.3s;
+            line-height: 1; z-index: 10;
+        }
+        .close-reading-btn:hover { color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.8); transform: rotate(90deg); }
+
+        /* Imágenes ajustadas proporcionalmente */
+        .modal-body img {
+            max-width: 100%; max-height: 40vh; height: auto; object-fit: contain; display: block; 
+            margin: 0 auto 30px auto; border-radius: 4px; 
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1);
+            cursor: zoom-in; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .modal-body img:hover { transform: scale(1.02); border-color: rgba(255,255,255,0.3); }
+
+        /* Textos de los nodos */
+        .node-text { font-size: 1.15rem; line-height: 1.7; font-weight: 300; letter-spacing: 0.5px; }
+        .node-text p { margin-bottom: 1.2rem; margin-top: 0; }
+        .node-text p:last-child { margin-bottom: 0; }
+        .hidden-data { display: none; }
+
+        /* --- ESTILO PARA EL SUBTÍTULO DE LAS ESTRELLAS --- */
+        .node-subtitle {
+            display: block;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 400;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            opacity: 0.8;
+            margin-top: 10px;
+            font-style: normal;
+            text-shadow: none;
+        }
+
+        /* --- TEMAS DINÁMICOS --- */
+        .theme-muse {
+            background: linear-gradient(145deg, rgba(30,15,45,0.6), rgba(10,15,25,0.6));
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            box-shadow: inset 0 0 40px rgba(212, 175, 55, 0.05), 0 30px 60px rgba(0,0,0,0.8);
+        }
+        .theme-muse .node-title {
+            font-family: 'Cinzel', serif; color: #d4af37; font-size: 2.2rem; text-align: center; 
+            margin-bottom: 20px; letter-spacing: 2px; text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+        .theme-muse .node-text { font-family: 'Cormorant Garamond', serif; color: #fdfbf7; }
+
+        .theme-memory {
+            background: linear-gradient(145deg, rgba(40,30,20,0.7), rgba(15,12,10,0.7));
+            border: 1px solid rgba(197, 160, 89, 0.3);
+        }
+        .theme-memory .node-title {
+            font-family: 'Playfair Display', serif; font-style: italic; color: #e5dcc5; 
+            font-size: 2rem; text-align: center; margin-bottom: 25px; border-bottom: 1px solid rgba(197,160,89,0.3); padding-bottom: 15px;
+        }
+        .theme-memory .node-text { font-family: 'Cormorant Garamond', serif; color: #e5dcc5; }
+
+        .theme-travel {
+            background: linear-gradient(145deg, rgba(10,30,40,0.6), rgba(5,10,15,0.6));
+            border-left: 3px solid rgba(0,180,216,0.6); border-radius: 4px 16px 16px 4px;
+        }
+        .theme-travel .node-title {
+            font-family: 'Montserrat', sans-serif; font-weight: 200; color: #00b4d8; font-size: 1.8rem; 
+            text-transform: uppercase; letter-spacing: 6px; margin-bottom: 25px; text-align: center;
+        }
+        .theme-travel .node-text { font-family: 'Montserrat', sans-serif; font-weight: 300; font-size: 1.1rem; color: #e0fbfc; line-height: 1.8; }
+
+        .theme-love {
+            background: linear-gradient(145deg, rgba(40,15,20,0.6), rgba(15,5,10,0.6));
+            border-top: 3px solid rgba(168, 63, 57, 0.6);
+        }
+        .theme-love .node-title {
+            font-family: 'La Belle Aurore', cursive; color: #ffb3b6; font-size: 2.8rem; 
+            text-align: center; margin-bottom: 20px; text-shadow: 0 0 15px rgba(255, 179, 182, 0.2);
+        }
+        .theme-love .node-text { font-family: 'Playfair Display', serif; color: #fce4ec; font-style: italic; font-size: 1.2rem; }
+
+        .theme-future {
+            background: rgba(15, 15, 20, 0.6); border: 1px solid rgba(255,255,255,0.15);
+        }
+        .theme-future .node-title {
+            font-family: 'Space Mono', monospace; color: #fff; font-size: 1.5rem; letter-spacing: 4px; 
+            text-align: center; border-bottom: 1px dashed rgba(255,255,255,0.3); padding-bottom: 15px; margin-bottom: 25px;
+        }
+        .theme-future .node-text { font-family: 'Montserrat', sans-serif; font-weight: 200; font-size: 1.1rem; color: #eaeaea; }
+
+
+        /* MODAL IMAGEN FULL */
+        .img-modal-overlay { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 7000; cursor: zoom-out;
+        }
+        .img-modal-full { 
+            max-width: 95vw; max-height: 95vh; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border: 1px solid #333; box-shadow: 0 0 50px rgba(0,0,0,0.8); border-radius: 4px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="stars-bg"></div>
+    <div class="nebula-bg-1"></div>
+    <div class="nebula-bg-2"></div>
+
+    <div class="hud hud-top-left">
+        <div class="hud-text">DAY 18</div>
+        <div class="hud-text" style="color: var(--gold-light); font-weight: bold;">LEO</div>
+    </div>
+
+    <div class="hud hud-center fade-out">
+        <h1>The stars of my universe</h1>
+        <div class="hud-text" style="color: #e0b0ff; font-weight:bold;">Use the wheel to zoom out.<br>Click on the stars to read.</div>
+    </div>
+
+    <div class="hud hud-bottom-right" style="pointer-events: auto;">
+        <a href="index.html" class="back-link">BACK TO INDEX</a>
+    </div>
+
+    <div id="universe">
+        
+        <svg id="constellation-svg">
+            <line x1="3180" y1="3420" x2="3228" y2="2988" />
+            <line x1="3228" y1="2988" x2="2892" y2="2700" />
+            <line x1="2892" y1="2700" x2="3012" y2="2292" />
+            <line x1="3012" y1="2292" x2="3420" y2="1980" />
+            <line x1="3420" y1="1980" x2="3612" y2="2220" />
+            <line x1="3180" y1="3420" x2="2220" y2="3180" />
+            <line x1="2220" y1="3180" x2="2100" y2="2652" />
+            <line x1="2100" y1="2652" x2="2892" y2="2700" />
+            <line x1="2100" y1="2652" x2="1620" y2="3132" />
+            <line x1="1620" y1="3132" x2="2220" y2="3180" />
+        </svg>
+
+        <div class="node node-muse" style="top: 3420px; left: 3180px;">
+            <div class="star-core star-muse" onclick="openReadingCard('content-1', this, 'theme-muse')"></div>
+            <div id="content-1" class="hidden-data">
+                <div class="node-title">Regulus<span class="node-subtitle">The Musa</span></div>
+                <div class="node-text">
+                    <p>Sometimes I feel like I am no longer a person, but rather something like a being who has encountered a dream, who knows deep down that it has no name but does have a story, our points in space. That is why, my love, I present this page to you as a collection of thoughts that have shaped my life as it has been until now. As you already know, since I can't keep my lips sealed for more than a second, avoiding at all costs keeping secrets, this is a compilation of my favorite moments, things, and ideas during my life with you.</p>
+
+<p>I look at you and realize that you are my center of gravity. If someone asked me what I admire, I would say it is your ability to be in the world with a burning purity, with such pure and strong love. Sometimes I think that I don't just love you, but also something that you have given me. You are the perfect interpretation of my moments, of my personality. When I write, when I talk to you, I feel understood. It is to you that I try to explain the world because only through your eyes the world seems to have real weight and not an unbearable lightness.</p>
+
+<p>Without you, my words, my being, the world feels empty, because you are the one who gives them the color and pain that makes them real.</p>
+
+<p>This is the star that represents the heart of the constellation; it is the central point. For me, that star is you. You are for me the kind of perfection that God has placed on earth to remind us that heaven exists. My soul is so full of you that there is no room for anything but your image. Along with this page, I present the photo that I look at every day. Every time I want to check my messages, there you are, with that beautiful smile surrounded by all your stuffed animals. After all, you are the star that guides my heart.</p>
+
+                </div>
+                                <img src="day18/muse_main.jpg" onclick="openFullImg(this.src)">
+
+            </div>
+        </div>
+
+        <div class="node" style="top: 2988px; left: 3228px;">
+            <div class="star-core" onclick="openReadingCard('content-2', this, 'theme-memory')"></div>
+            <div id="content-2" class="hidden-data">
+                <img src="day18/first_date.jpg" onclick="openFullImg(this.src)">
+                <div class="node-title">Eta<span class="node-subtitle">The heart</span></div>
+                <div class="node-text">
+                    <p>This is the heart and I think the analogies here are quite clear. My love, do not be afraid to feel proud of how you have shaped this relationship. You are, literally, the engine that pumps blood into everything we have built. You make me feel like the luckiest man on the planet just for having the privilege of being the destination of your impulses and the witness of your intensity. You give me life literally, we made a blood transfusion a long time ago, at the moment we decided to be together, at the moment you said yes to being my girlfriend. I love you with the body, with that brute force that does not know how to reason and that only knows it needs to stay alive through you. You are my own blood moving, you are the impulse that forces me not to stop. Your love does not ask me for rest, it asks me to empty myself, to give everything I am. Seeing your drive, seeing how you surrender yourself to destiny with that active strength, is what makes me want to be the creator of my own destiny by your side. Love is a danger for the one who is not willing to give everything, and I am happy to take that risk with you.</p>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="node" style="top: 2700px; left: 2892px;">
+            <div class="star-core" onclick="openReadingCard('content-3', this, 'theme-love')"></div>
+            <div id="content-3" class="hidden-data">
+                <img src="day18/crying.jpg" onclick="openFullImg(this.src)">
+                <div class="node-title">Algieba<span class="node-subtitle">Breaking point</span></div>
+                <div class="node-text">
+                   <p>I remember that night in Bogotá perfectly, the weight of the expectations I had placed on the club I so badly wanted to take you to so that you could finally feel my culture up close, dance bad bunny, salsa, merengue properly, so you could feel the rhythm and that energy that is only understood by dancing. I am not going to lie to you, during those first ten minutes the fury was a knot in my throat, a bit of resentment over the sudden change, I felt that the plan I had built so carefully was falling apart because we did not know how to control ourselves. But then I saw you, and all that anger dissolved into absolute nothingness when I saw you crying inconsolably, broken by the idea that you had ruined the trip and, even worse, our relationship. Of course not, silly. How could I not hold this image, this moment in which I wrapped my arms around you while the world kept spinning outside without us? In that instant, the party stopped mattering, the only thing that mattered was that raw vulnerability of yours, the weight of your head on my shoulder and the need to protect you even from your own thoughts, because for me, embracing your mess was far more real and far more ours than any night of dancing we could have had and the creation of a promise that there will be a next time. Right?</p>
+
+<p>It breaks my heart that you think you are not kind or that you have that tendency to ruin everything, as if one mistake could tarnish all the brightness you bring into my life. That night I realized that you punish yourself with a harshness you do not deserve, believing that I was going to hate you for a stumble, when the only thing I felt was that laughter that attacks me when I find a tenderness in that irrational fear of believing that our love is so fragile, my love is not that simple. We are learning to love, remember, and learning means accepting that there will be nights when we do not make it to the party because of exhaustion or any of many other things that may happen to us, fights or accidents. I want you to know, Bizcochito, that those shadows that scare you so much are part of the woman I admire and love. Of course I do not want a perfect and polished version of you, I want the person who makes mistakes and has the courage to feel bad about it, even if I am there to remind you that there is nothing you can ruin that we cannot rebuild together. There is no good party without you, I would much rather stay taking care of you and giving you kisses in our bed drunk and making sure you sleep well and safe with me, because my culture and my home now also reside in the way we forgive each other and hold each other when everything seems to go wrong. This is the start of duality of the perfect and the not that much</p>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="node" style="top: 2292px; left: 3012px;">
+            <div class="star-core" onclick="openReadingCard('content-4', this, 'theme-muse')"></div>
+            <div id="content-4" class="hidden-data">
+                <img src="day18/eyes.jpg" onclick="openFullImg(this.src)">
+                <div class="node-title">Zeta<span class="node-subtitle">The Mane</span></div>
+                <div class="node-text">
+                    <p>My love, Zeta is determination, courage. Since I met you, I have never known anyone with more fierceness. You are that mane that blows in the wind. Your personality is a refuge and, at the same time, a challenge. You force me to be better just by existing. Because we complement each other, you see my mistakes clearly and in the things I lack, I see that they are within you. I admire your courage, your style, your way of being. You are the most complex and beautiful woman I have ever known. It's not just your intellect, it's the way you manage your own existence, as if it were a work of art in constant motion. Everything you do has its own stamp, a mark of authenticity that leaves me speechless. I'm pretty sure, everyone can see it.</p>
+                    
+                </div>
+            </div>
+        </div>
+
+        <div class="node" style="top: 1980px; left: 3420px;">
+            <div class="star-core" onclick="openReadingCard('content-5', this, 'theme-memory')"></div>
+            <div id="content-5" class="hidden-data">
+                <img src="day18/chaos.jpg" onclick="openFullImg(this.src)">
+                <div class="node-title">Mu<span class="node-subtitle">The future and the danger</span></div>
+                <div class="node-text">
+<p>Sometimes I feel that I am still a beginner in this, Eunice. I realize that we have to learn to love again every day, and I want to do it with all my strength, with my whole being gathered in this heart of mine that sometimes feels lonely, distressed and beating too loudly. It scares me to think that the future could become a threat, simply because this long distance love is at the mercy of time and of that freedom of yours which, although I admire it, reminds me that you could step away at any moment. The deepest terror is not what we plan, but what happens to us while we look the other way, that lack of control over what will come after our last kiss before the airport separates us again.</p>
+
+<p>Every time I have to leave you and return to Madrid, I feel that I carry a piece of you with me, but I am also invaded by doubt about what will happen while I am away. I wonder what you might have thought in the silence of Australia or whether, because of the kilometers, you might have forgotten our very unique way of looking at things. My real fear is not that you leave physically, but that time and routine turn us into two strangers who greet each other politely on a street they no longer recognize, losing that complicity we have built between letters and screens.</p>
+
+<p>However, in the midst of that uncertainty, I choose to believe in what we are building. I know I am not perfect and that I carry much to amend, but it is you, with your infinite patience and that light you emanate even on my darkest days, who makes me want to be better. You are my refuge and my greatest certainty, and that is why I am here, willing to keep working on us right now, so that this bond does not become a distant echo, but a work that heals and grows deeper with every wound overcome. Acknowledging our shadows is the purest way I have to tell you that I trust you, that I admire you deeply and that I choose, one and a thousand times, for this distance to force us to love each other with a delicacy we did not know before. This star is the cabella, it is the one that thinks about the future and approaches the fears.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="node" style="top: 2220px; left: 3612px;">
+            <div class="star-core" onclick="openReadingCard('content-6', this, 'theme-future')"></div>
+            <div id="content-6" class="hidden-data">
+                <img src="day18/silhouette.jpg" onclick="openFullImg(this.src)">
+                <div class="node-title">Genubi<span class="node-subtitle">My eyes</span></div>
+                <div class="node-text">
+             <p>Well, baby. The star itself tells you what it means, it's exactly that: the eyes of the constellation. In this case, I want to get closer to my favorite photo of you.</p>
+
+<p>In these pages, I've told you what I think about photography, and you know I'm always very pretentious about it. But the existence of this photo represents my greatest truth; that “this has been” that guarantees me that your body was there, in front of my lens, just as it was in front of my eyes. It's not a dead image; it's the fragment that marks my memory, a before and after. When I took this photo, I wasn't just trying to capture your beauty, but our intimacy, which at that moment was growing little by little, gaining ground in the silence.</p>
+
+<p>It was the first portrait I took of you. I'm pretty sure you don't let just anyone take your picture, and you know I don't like to photograph just anyone; yet there I was, trying to find you through the viewfinder. I don't photograph for others, but for ourselves. I wanted proof that we had been there, that that light and that skin existed in an unrepeatable conjunction, just at the exact moment when we were beginning to be ourselves, finally losing our fear of our own relationship. I caught you, sneaky sneaky, smiling at me as you always do, but at that time it was a smile that was still unknown to me.</p>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="node" style="top: 2652px; left: 2100px;">
+            <div class="star-core" onclick="openReadingCard('content-7', this, 'theme-love')"></div>
+            <div id="content-7" class="hidden-data">
+                <img src="day18/peace.jpg" onclick="openFullImg(this.src)">
+                <div class="node-title">Zosma<span class="node-subtitle">Conflict</span></div>
+                <div class="node-text">
+                    <p>The ribs of the lion are, in the end, what give body to the constellation, they are the support of all that light. In some way, that reminds me of our fights, of how sometimes we lock ourselves into that endless loop of what we hate most about each other. When the arguments on WhatsApp seem to have no end and escalate so much that I no longer even know what we are saying, I have learned that the right person is not the one who thinks the same as I do, but the one who, like you, has the intelligence and the heart to negotiate with me even when everything becomes difficult.
+
+Being in love with you means learning to have infinite patience with your complexity, but above all thanking you with my whole being for putting up with me, because I know that I am also, in my own way, someone unbearable. I can only thank you, for the way you face me, for the way you love me. I know that in my own way I am someone difficult and that you choose to stay by my side in the middle of my own mess is what makes me feel like the luckiest man in the world.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="node" style="top: 3132px; left: 1620px;">
+            <div class="star-core" onclick="openReadingCard('content-8', this, 'theme-travel')"></div>
+            <div id="content-8" class="hidden-data">
+                <div class="node-title">Denebola<span class="node-subtitle">The future</span></div>
+                <div class="node-text">
+                 <p>I.<br>
+I, Andrés, solemnly promise to defy physics and geography to reach you. I promise that latency will no longer be the measure of our love. I commit to crossing the necessary time zones so that, on your birthday, my I am here is not a digital signal, but a tangible truth. I promise to give you the end of waiting and to ensure that, from now on, the air you move when you blow out the candles is the same air I breathe. I take you not through a screen, but in the absolute immediacy of skin.</p>
+
+<p>II.<br>
+I promise to work tirelessly, editing every fragment of my life and structuring my future, to build a present where coming home means walking towards you, not away from you. I promise that my hard drives and your things will rest on the same shelf, and that the only journey we will undertake will be from the bed to the kitchen. I accept you as my final destination, my life, and my future.</p>
+
+<p>III.<br>
+I promise that my eyes and my lens will preserve every version of you as a sacred work of art, reminding you, when you forget, that you are the most beautiful thing that has ever walked this earth. I want to be a witness, my love, to your entire existence. To love you not despite your wounds but because of them, from the badass who conquers the world to the soft and vulnerable woman who wakes up next to me.</p>
+<p>This is the star of the future, the star of our promises</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="node" style="top: 3180px; left: 2220px;">
+            <div class="star-core" onclick="openReadingCard('content-9', this, 'theme-memory')"></div>
+            <div id="content-9" class="hidden-data">
+                <div class="node-title">Theta<span class="node-subtitle">Strenght</span></div>
+                <div class="node-text">
+<p>If I stop to look back, I am amazed by the almost heroic resilience we have built. Being at a distance is not simply missing you, it is deafening to live with the silences of the places we once inhabited, with a loneliness that settles into the corners of my room every time I hang up the screen. But what keeps me alive is that you are somewhere, that you exist. It is not that I miss you, it is that my entire life has shifted toward where you are. Sometimes it seems to me that we are one single being, that the pain of being apart is not a punishment, but the proof that our union is so strong that space and destiny themselves try, in vain, to break it.</p>
+
+<p>What moves me most about us is that, after so many months, we still inhabit that intensity of the first days, that honeymoon phase that refuses to wither. I wake up every morning with the same urgency to hear you, with the same brightness in my eyes when I see your name on my phone, as if time had not passed, as if every kiss we owe each other were accumulating interest instead of being forgotten. One does not love less because the other is far away, one loves with a resilience that those who are close will never know. I have learned that being separated from you is a more intense form of presence, because I look for you in every thought. Our strength does not lie in being together, but in the fact that, after so much time, we are still looking in the same direction, crossing loneliness with the certainty that the other is the only possible destination. Im so proud of our love and I can wait
+                </div>
+
+                                <img src="day18/maracuya.jpg" onclick="openFullImg(this.src)">
+
+            </div>
+        </div>
+
+    </div>
+
+    <div id="readingModal" class="reading-modal-overlay">
+        <div id="readingModalBox" class="reading-modal-box">
+            <span class="close-reading-btn" onclick="closeReadingCard()">&#10005;</span>
+            <div id="readingModalBody" class="modal-body"></div>
+        </div>
+    </div>
+
+    <div id="fullImgModal" class="img-modal-overlay" onclick="closeFullImg()">
+        <img class="img-modal-full" id="fullImgSrc">
+    </div>
+
+    <script>
+        const universe = document.getElementById('universe');
+        
+        let currentScale = window.innerWidth < 768 ? 0.3 : 0.5;
+        const REGULUS_X = 3180;
+        const REGULUS_Y = 3420;
+        
+        let currentX = window.innerWidth / 2 - (REGULUS_X * currentScale); 
+        let currentY = window.innerHeight / 2 - (REGULUS_Y * currentScale);
+        
+        let isDragging = false;
+        let startX, startY;
+
+        updateTransform();
+
+        function updateTransform() {
+            universe.style.transform = `translate(${currentX}px, ${currentY}px) scale(${currentScale})`;
+        }
+
+        // --- SISTEMA LECTURA ESTRELLAS ---
+        function openReadingCard(contentId, starElement, themeClass) {
+            starElement.classList.add('visited');
+            const contentHtml = document.getElementById(contentId).innerHTML;
+            document.getElementById('readingModalBody').innerHTML = contentHtml;
+            const modalBox = document.getElementById('readingModalBox');
+            modalBox.className = 'reading-modal-box ' + themeClass;
+            document.getElementById('readingModal').style.display = 'flex';
+        }
+
+        function closeReadingCard() {
+            document.getElementById('readingModal').style.display = 'none';
+        }
+
+        document.getElementById('readingModal').addEventListener('click', function(e) {
+            if(e.target === this) closeReadingCard();
+        });
+
+        // --- SISTEMA FOTOS FULL ---
+        function openFullImg(src) {
+            document.getElementById('fullImgSrc').src = src;
+            document.getElementById('fullImgModal').style.display = 'block';
+        }
+        function closeFullImg() {
+            document.getElementById('fullImgModal').style.display = 'none';
+        }
+
+        // --- ZOOM ---
+        document.addEventListener('wheel', (e) => {
+            if(e.target.closest('.reading-modal-box') || e.target.closest('.letter-paper')) return; 
+            e.preventDefault();
+
+            const zoomAmount = e.deltaY * -0.001;
+            let newScale = currentScale + zoomAmount;
+            newScale = Math.max(0.15, Math.min(1.5, newScale));
+            
+            const mouseX = e.clientX;
+            const mouseY = e.clientY;
+
+            const uniX = (mouseX - currentX) / currentScale;
+            const uniY = (mouseY - currentY) / currentScale;
+
+            currentScale = newScale;
+            currentX = mouseX - (uniX * currentScale);
+            currentY = mouseY - (uniY * currentScale);
+
+            updateTransform();
+        }, { passive: false });
+
+        // --- DRAG ---
+        document.addEventListener('mousedown', (e) => {
+            if(e.target.closest('.reading-modal-overlay') || 
+               e.target.classList.contains('star-core') || 
+               e.target.closest('.img-modal-overlay') || 
+               e.target.closest('.hud-bottom-right')) return;
+               
+            isDragging = true;
+            startX = e.clientX - currentX;
+            startY = e.clientY - currentY;
+            document.body.style.cursor = 'grabbing';
+            universe.style.transition = 'none'; 
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            e.preventDefault();
+            currentX = e.clientX - startX;
+            currentY = e.clientY - startY;
+            updateTransform();
+        });
+
+        document.addEventListener('mouseup', () => {
+            if(!isDragging) return;
+            isDragging = false;
+            document.body.style.cursor = 'grab';
+            universe.style.transition = 'transform 0.2s ease-out';
+        });
+
+        // --- TOUCH ---
+        let initialPinchDistance = null;
+        let initialPinchScale = null;
+
+        document.addEventListener('touchstart', (e) => {
+            if(e.target.closest('.reading-modal-overlay') || 
+               e.target.classList.contains('star-core') || 
+               e.target.closest('.img-modal-overlay') || 
+               e.target.closest('.hud-bottom-right')) return;
+            
+            if (e.touches.length === 2) {
+                isDragging = false;
+                initialPinchDistance = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                initialPinchScale = currentScale;
+            } else if (e.touches.length === 1) {
+                isDragging = true;
+                startX = e.touches[0].clientX - currentX;
+                startY = e.touches[0].clientY - currentY;
+                universe.style.transition = 'none';
+            }
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            if(e.target.closest('.reading-modal-box')) return; 
+
+            if (e.touches.length === 2) {
+                e.preventDefault();
+                const currentDistance = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                
+                const touchCenterX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+                const touchCenterY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+                
+                const uniX = (touchCenterX - currentX) / currentScale;
+                const uniY = (touchCenterY - currentY) / currentScale;
+
+                let newScale = initialPinchScale * (currentDistance / initialPinchDistance);
+                newScale = Math.max(0.15, Math.min(1.5, newScale));
+                
+                currentScale = newScale;
+                currentX = touchCenterX - (uniX * currentScale);
+                currentY = touchCenterY - (uniY * currentScale);
+                
+                updateTransform();
+            } else if (e.touches.length === 1 && isDragging) {
+                e.preventDefault();
+                currentX = e.touches[0].clientX - startX;
+                currentY = e.touches[0].clientY - startY;
+                updateTransform();
+            }
+        }, { passive: false });
+
+        document.addEventListener('touchend', () => {
+            isDragging = false;
+            initialPinchDistance = null;
+            universe.style.transition = 'transform 0.2s ease-out';
+        });
+
+        // --- PARTICULAS DE FONDO ---
+        for(let i=0; i<800; i++) {
+            const dust = document.createElement('div');
+            dust.style.position = 'absolute';
+            dust.style.left = Math.random() * 7000 + 'px';
+            dust.style.top = Math.random() * 5000 + 'px';
+            dust.style.width = Math.random() * 4 + 'px';
+            dust.style.height = dust.style.width;
+            dust.style.background = 'rgba(255,255,255, ' + (Math.random() * 0.7 + 0.3) + ')';
+            dust.style.borderRadius = '50%';
+            dust.style.boxShadow = '0 0 ' + (Math.random() * 5) + 'px rgba(255,255,255,0.8)';
+            dust.style.pointerEvents = 'none';
+            universe.appendChild(dust);
+        }
+    </script>
+
+</body>
+</html>

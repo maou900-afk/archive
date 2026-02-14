@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 19</title>
+    <link rel="icon" type="image/png" href="img/icono.jpg">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@1,400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-main: #f8f9fa;
+            --bg-card: #ffffff;
+            --text-color: #2c2c2c;
+            --gold: #d4af37;
+            --gold-light: #e6c66a;
+            --shadow-soft: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-color);
+            font-family: 'Montserrat', sans-serif;
+            margin: 0; padding: 0;
+            min-height: 100vh;
+            display: flex; flex-direction: column; align-items: center;
+        }
+
+        header { 
+            padding-top: 60px; padding-bottom: 30px; text-align: center; 
+            width: 100%;
+        }
+        .day-label { font-family: 'Cinzel', serif; font-size: 0.8rem; color: var(--gold); letter-spacing: 4px; text-transform: uppercase; display: block; margin-bottom: 10px; }
+        h1 { font-family: 'Playfair Display', serif; font-size: 2.5rem; font-weight: 500; font-style: italic; margin: 0; }
+
+        .section-card {
+            background-color: var(--bg-card);
+            width: 90%;
+            max-width: 650px;
+            padding: 40px 20px;
+            border-radius: 15px;
+            box-shadow: var(--shadow-soft);
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h2.section-title {
+            font-family: 'Playfair Display', serif; font-size: 1.6rem; color: #333; margin-bottom: 20px;
+        }
+
+        /* --- ESTILOS AUDIO --- */
+        .audio-wrapper {
+            background: #fafafa; border-radius: 12px; padding: 20px;
+        }
+        audio { width: 100%; max-width: 350px; height: 35px; margin-bottom: 10px; }
+        
+        .audio-subtitle-container {
+            min-height: 60px; display: flex; align-items: center; justify-content: center;
+        }
+        .subtitle-text {
+            font-size: 1.1rem; color: #444; opacity: 0; transition: opacity 0.3s;
+        }
+        .subtitle-text.visible { opacity: 1; }
+
+        /* --- ESTILOS VIDEO (REDIMENSIONABLE) --- */
+        .frame-container {
+            position: relative;
+            width: 100%; max-width: 340px;
+            min-height: 500px;
+            margin: 0 auto;
+            background: #000;
+            border: 10px solid #fff;
+            box-shadow: var(--shadow-soft);
+            resize: vertical; /* Permite estirar verticalmente */
+            overflow: hidden;
+        }
+
+        video { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+        .glass-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            z-index: 10; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: opacity 0.8s ease;
+        }
+        .wax-seal {
+            width: 75px; height: 75px; background: radial-gradient(circle at 30% 30%, #ffd700, #d4af37, #8a6e20);
+            border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15); transition: transform 0.2s;
+        }
+        .wax-seal:hover { transform: scale(1.05); }
+        .wax-seal i { font-family: 'Cinzel', serif; font-style: normal; font-size: 1.8rem; color: rgba(0,0,0,0.3); }
+
+        .frame-container.unlocked .glass-overlay { opacity: 0; pointer-events: none; }
+
+        footer { margin-top: auto; padding: 40px; }
+        footer a { text-decoration: none; color: #888; font-family: 'Cinzel', serif; font-size: 0.8rem; letter-spacing: 2px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <span class="day-label">Day 19</span>
+        <h1>A Story</h1>
+    </header>
+
+    <section class="section-card">
+        <h2 class="section-title">The Story</h2>
+        <div class="audio-wrapper">
+            <audio id="storyAudio" controls>
+                <source src="day19/audio.mp3" type="audio/mp3">
+            </audio>
+            <div class="audio-subtitle-container">
+                <span id="subtitleText" class="subtitle-text"></span>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-card">
+        <h2 class="section-title">The Video</h2>
+        <div class="frame-container" id="frame">
+            <div class="glass-overlay">
+                <div class="wax-seal" onclick="unlockVideo()"><i>A</i></div>
+                <p style="margin-top:15px; font-family:'Cinzel'; font-size:0.6rem; letter-spacing:2px;">TAP TO UNLOCK & PLAY</p>
+            </div>
+
+            <video id="workoutVideo" playsinline controlsList="nodownload">
+                <source src="day19/video.mp4" type="video/mp4">
+            </video>
+        </div>
+    </section>
+
+    <footer>
+        <a href="index.html">BACK TO INDEX</a>
+    </footer>
+
+    <script>
+        const subtitles = [
+            { start: 0.06, end: 2.07, text: "Hello, Baby" },
+            { start: 2.07, end: 3.10, text: "So we promised each other" },
+            { start: 3.10, end: 3.20, text: "each other" },
+            { start: 3.20, end: 5.17, text: "that I would create," },
+            { start: 5.17, end: 8.13, text: "more story where I want" },
+            { start: 8.13, end: 9.15, text: "to speak to you" },
+            { start: 9.15, end: 11.18, text: "in Spanish and English." },
+            { start: 11.18, end: 12.14, text: "I think that it" },
+            { start: 12.14, end: 13.10, text: "was a good idea" },
+            { start: 13.10, end: 14.03, text: "to make, like," },
+            { start: 14.03, end: 15.20, text: "a little story" },
+            { start: 15.20, end: 16.17, text: "that you can hear" },
+            { start: 16.17, end: 18.07, text: "before you go to sleep." },
+            { start: 18.07, end: 19.10, text: "Think about" },
+            { start: 19.10, end: 22.00, text: "how much you I love" },
+            { start: 22.00, end: 23.03, text: "so." },
+            { start: 23.03, end: 24.08, text: "Well, había una" },
+            { start: 24.08, end: 25.13, text: "vez" },
+            { start: 25.13, end: 27.04, text: "En una tierra" },
+            { start: 27.04, end: 29.01, text: "Muy muy lejana" },
+            { start: 29.01, end: 30.01, text: "Once upon a time," },
+            { start: 30.01, end: 30.17, text: "there was a" },
+            { start: 30.17, end: 32.06, text: "very nervous boy" },
+            { start: 32.06, end: 33.11, text: "in North Melbourne" },
+            { start: 33.11, end: 35.19, text: "Do you remember" },
+            { start: 35.19, end: 35.24, text: "that?" },
+            { start: 35.24, end: 36.20, text: "¿Te acuerdas?" },
+            { start: 36.20, end: 37.18, text: "before that." },
+            { start: 37.18, end: 40.04, text: "I even heard your laugh" },
+            { start: 40.04, end: 42.11, text: "and was already making" },
+            { start: 42.11, end: 43.05, text: "a fortress" },
+            { start: 43.05, end: 45.21, text: "of contingencies." },
+            { start: 45.21, end: 46.02, text: "tenia" },
+            { start: 46.02, end: 47.15, text: "tres restuarantes" },
+            { start: 47.15, end: 48.03, text: "japonenses" },
+            { start: 48.03, end: 48.24, text: "preparados" },
+            { start: 48.24, end: 50.23, text: "Can you believe it?" },
+            { start: 50.23, end: 52.21, text: "Hey, I had, like, three" },
+            { start: 52.21, end: 55.11, text: "Japanese restaurants," },
+            { start: 55.11, end: 57.03, text: "just in case, you know," },
+            { start: 57.03, end: 58.16, text: "like something" },
+            { start: 58.16, end: 59.10, text: "will go wrong." },
+            { start: 61.04, end: 62.03, text: "Queria que" },
+            { start: 62.03, end: 63.14, text: "todo fuera perfecto." },
+            { start: 63.14, end: 66.14, text: "Todo perfecto para ti" },
+            { start: 66.22, end: 69.08, text: "I was terrified" },
+            { start: 69.08, end: 70.01, text: "at the moment." },
+            { start: 70.01, end: 71.22, text: "I saw kind of this plan" },
+            { start: 71.22, end: 74.12, text: "disappear. You know?" },
+            { start: 74.12, end: 75.09, text: "El mundo se quedó" },
+            { start: 75.09, end: 76.18, text: "en silencio" },
+            { start: 76.18, end: 77.09, text: "in an earlier" },
+            { start: 77.09, end: 79.00, text: "was in this meeting" },
+            { start: 79.00, end: 79.15, text: "occur," },
+            { start: 79.15, end: 80.09, text: "I knew it was" },
+            { start: 80.09, end: 82.16, text: "meeting" },
+            { start: 82.16, end: 83.20, text: "The love of my life." },
+            { start: 83.20, end: 85.16, text: "So we actually start" },
+            { start: 85.16, end: 87.23, text: "dating. And them." },
+            { start: 87.23, end: 89.15, text: "You say no" },
+            { start: 89.15, end: 91.07, text: "then I don't want to." },
+            { start: 91.07, end: 92.09, text: "date fuckboys" },
+            { start: 92.09, end: 92.21, text: "And I told," },
+            { start: 92.21, end: 94.19, text: "you know, mi vida," },
+            { start: 94.19, end: 96.11, text: "mi vida hermosa" },
+            { start: 96.11, end: 97.19, text: "Im not a fuckboy" },
+            { start: 97.19, end: 100.16, text: "Silly, you know." },
+            { start: 100.16, end: 103.16, text: "I see in your eyes." },
+            { start: 103.16, end: 104.06, text: "You deserve" },
+            { start: 104.06, end: 106.16, text: "to be loved so much." },
+            { start: 106.16, end: 108.23, text: "So promise myself that." },
+            { start: 108.23, end: 109.11, text: "That I wanted" },
+            { start: 109.11, end: 112.11, text: "to love you so much" }
+        ];
+
+        const audio = document.getElementById('storyAudio');
+        const video = document.getElementById('workoutVideo');
+        const subText = document.getElementById('subtitleText');
+
+        function unlockVideo() {
+            document.getElementById('frame').classList.add('unlocked');
+            // Activamos los controles al desbloquear para que pueda mover el tiempo
+            video.controls = true; 
+            setTimeout(() => { video.play(); }, 800);
+        }
+
+        audio.addEventListener('timeupdate', () => {
+            const currentSub = subtitles.find(s => audio.currentTime >= s.start && audio.currentTime <= s.end);
+            if (currentSub) {
+                subText.innerText = currentSub.text;
+                subText.classList.add('visible');
+            } else {
+                subText.classList.remove('visible');
+            }
+        });
+    </script>
+</body>
+</html>

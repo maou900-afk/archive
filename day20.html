@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 20: Valentine's</title>
+    <link rel="icon" type="image/png" href="img/icono.jpg">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Montserrat:wght@300;400;500&family=Playfair+Display:ital,wght@1,400&family=Cormorant+Garamond:ital,wght@0,400;1,600&family=La+Belle+Aurore&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- ESTILO MUSEO (EXACTAMENTE IGUAL A LOS OTROS DÍAS) --- */
+        :root {
+            --bg-color: #fcfcfc;       /* Fondo Claro */
+            --text-color: #111111;     /* Texto Oscuro */
+            --paper-color: #fdfbf7;    /* Color Papel */
+            --gold: #d4af37;           /* Dorado */
+            --shadow-soft: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Montserrat', sans-serif;
+            margin: 0; padding: 0;
+            min-height: 100vh;
+            display: flex; flex-direction: column; align-items: center;
+        }
+
+        /* --- HEADER --- */
+        header {
+            padding-top: 80px;
+            padding-bottom: 50px;
+            text-align: center;
+        }
+
+        .date-label {
+            font-family: 'Cinzel', serif;
+            font-size: 0.9rem;
+            color: var(--gold);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            display: block; margin-bottom: 15px;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            font-weight: 400;
+            font-style: italic;
+            margin: 0;
+            color: var(--text-color);
+        }
+
+        /* --- CONTENEDOR CARTA (PAPEL CLÁSICO) --- */
+        main {
+            width: 100%; max-width: 700px;
+            padding: 0 20px;
+            box-sizing: border-box;
+            margin-bottom: 60px;
+        }
+
+        .letter-paper {
+            background-color: var(--paper-color);
+            padding: 80px 60px;
+            box-shadow: var(--shadow-soft);
+            position: relative;
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+
+        /* Detalle sutil de borde doble (opcional, como en Day 14) */
+        .letter-paper::before {
+            content: ''; position: absolute;
+            top: 20px; left: 20px; right: 20px; bottom: 20px;
+            border: 1px solid var(--gold);
+            opacity: 0.2; pointer-events: none;
+        }
+
+        .letter-content {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.4rem; /* Tamaño legible y elegante */
+            line-height: 1.8;
+            color: #222;
+            text-align: justify;
+        }
+
+        .letter-content p {
+            margin-bottom: 25px;
+            text-indent: 30px; /* Sangría clásica de párrafo */
+        }
+        
+        /* Párrafo inicial sin sangría y un poco más destacado, pero SIN letra gigante */
+        .letter-content p:first-child {
+            text-indent: 0;
+        }
+
+        .signature {
+            font-family: 'La Belle Aurore', cursive;
+            font-size: 2.2rem;
+            text-align: right;
+            margin-top: 50px;
+            color: #444;
+            padding-right: 20px;
+        }
+
+        /* --- FOOTER --- */
+        footer {
+            margin-top: auto;
+            padding: 50px;
+            text-align: center;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            width: 100%;
+        }
+
+        footer a {
+            text-decoration: none;
+            color: #111;
+            font-family: 'Cinzel', serif;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        footer a:hover {
+            color: var(--gold);
+        }
+        
+        /* Línea decorativa al hover del footer */
+        footer a::after {
+            content: ''; position: absolute; bottom: -5px; left: 0; width: 0%; height: 1px;
+            background: var(--gold); transition: width 0.3s;
+        }
+        footer a:hover::after { width: 100%; }
+
+        /* RESPONSIVE */
+        @media (max-width: 600px) {
+            .letter-paper { padding: 50px 30px; }
+            h1 { font-size: 2.2rem; }
+            .letter-content { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <span class="date-label">February 14, 2026</span>
+        <h1>My Valentine</h1>
+    </header>
+
+    <main>
+        <div class="letter-paper">
+            <div class="letter-content">
+                <p>Mi amor,</p>
+                <p>I built these twenty pages not merely as a collection of digital memories, but as a permanent archive of the architecture of my soul, which now belongs entirely to you. As you navigated through the static of our beginning, past the nervous boy in North Melbourne who built a fortress of contingencies just to ensure a single perfect night and through the vibrant chaos of our travels in Malaysia and the deep roots of my home in Colombia, I hope you realized that every line of code was a desperate attempt to bridge the miles between us. I wanted this website to be a sanctuary where you could walk through the museum of us, a place where the distance dissolves and you can clearly see that you have become the melody wrapping my life, transforming my wreckage into a garden and my silence into a song that only you can hear. I poured my heart into this project because I needed you to feel, with absolute certainty, that you are not just a part of my days, but the very foundation upon which I stand, and I hope that scrolling through our history brought you the same depth of emotion I feel every time I look at the life we are building together.</p>
+
+<p>When I look at your face, I don’t just see the most beautiful woman I have ever known or the radiant warmth that makes you so unbelievably attractive. I see the living map of our entire history etched into your gaze. In your eyes, I see the reflection of those humid nights in Penang, of those silent moments in Medellín. I see the quiet intimacy of watching Chernobyl where we learned that love is about sitting in the mess together, and I see the courage it took for you to walk into my past in Bogotá and make it your own. You are the muse I edit photos for, not just because of your light, but because looking at you is like reading the best chapters of my life over and over again. I hope you understand that I love you more than words could ever express and every time I see you smile, I am reminded that my past was just a long, winding road leading me to the only destination that has ever mattered.</p>
+
+<p>My greatest desire, the one that fuels every decision I make and every line I write, is to finally close the physical gap between us and turn this long distance journey into a life lived side by side. I am so done with airports being the setting of our romance. I promise you that this distance is just a temporary season, a test of our architecture that we have already passed, and I am working tirelessly to ensure that soon, the only space between us will be the air we breathe. I love you with a depth that scares me and heals me all at once, and I will continue to dismantle every mile that separates us until the day comes when I can look into your eyes and know that I never have to say goodbye again.</p>
+<br>Happy Valentine's Day, my everything. 
+            </div>
+            
+            <div class="signature">Siempre tuyo, Andrés.</div>
+        </div>
+    </main>
+
+    <footer>
+        <a href="index.html">BACK TO INDEX</a>
+    </footer>
+
+</body>
+</html>
